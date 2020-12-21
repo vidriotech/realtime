@@ -2,7 +2,7 @@
 #define RTS_2_TESTPROBE_H
 
 #include <stdexcept>
-#include "../Probe.h"
+#include "../src/Probe.h"
 
 
 ProbeConfig test_probeconfig(size_t n_channels, size_t n_active, size_t n_groups, double srate_hz)

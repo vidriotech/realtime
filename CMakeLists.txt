@@ -6,10 +6,10 @@ set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CXX_STANDARD 17)
 
 # RTS
-set(HEADER_FILES Probe.h DistanceMatrix.h
-        )
-set(SOURCE_FILES main.cpp Probe.cpp DistanceMatrix.cpp
-        )
+set(HEADER_FILES src/Probe.h src/DistanceMatrix.h
+        src/acquisition/FileReader.h)
+set(SOURCE_FILES src/main.cpp src/Probe.cpp src/DistanceMatrix.cpp
+        src/acquisition/FileReader.cpp)
 
 #set(HEADER_FILES)
 #set(SOURCE_FILES main.cpp)

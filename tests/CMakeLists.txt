@@ -5,10 +5,10 @@ set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CXX_STANDARD 17)
 
 set(HEADER_FILES TestProbe.h
-        ../DistanceMatrix.h ../Probe.h)
+        ../src/DistanceMatrix.h ../src/Probe.h)
 set(SOURCE_FILES KernelTests.cu
-        ../DistanceMatrix.cpp DistanceMatrixTests.cpp
-        ../Probe.cpp ProbeTests.cpp
+        ../src/DistanceMatrix.cpp DistanceMatrixTests.cpp
+        ../src/Probe.cpp ProbeTests.cpp
         SocketReaderTests.cpp)
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 

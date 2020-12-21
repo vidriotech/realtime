@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <exception>
-#include "../DistanceMatrix.h"
+#include "../src/DistanceMatrix.h"
 
 TEST(DistanceMatrixTestSuite, TestDiagonalAlwaysZero) {
     const auto N = 1000;
