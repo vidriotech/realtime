@@ -4,12 +4,12 @@ project(rtstests CXX CUDA)
 set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CXX_STANDARD 17)
 
-set(HEADER_FILES TestSocketServer.h TestProbe.h
-        ../DistanceMatrix.h ../Probe.h ../SocketReader.h)
-set(SOURCE_FILES TestSocketServer.cpp KernelTests.cu
+set(HEADER_FILES TestProbe.h
+        ../DistanceMatrix.h ../Probe.h)
+set(SOURCE_FILES KernelTests.cu
         ../DistanceMatrix.cpp DistanceMatrixTests.cpp
         ../Probe.cpp ProbeTests.cpp
-        ../SocketReader.cpp SocketReaderTests.cpp)
+        SocketReaderTests.cpp)
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 
 add_subdirectory(lib)

@@ -3,8 +3,8 @@ project(RTSKernels CUDA)
 
 set(CMAKE_CUDA_STANDARD 14)
 
-set(HEADER_FILES ChanAdd.cuh)
-set(SOURCE_FILES ChanAdd.cu)
+set(HEADER_FILES ChanAdd.cuh Filters.cuh)
+set(SOURCE_FILES ChanAdd.cu Filters.cu)
 
 add_library(RTSKernels STATIC ${SOURCE_FILES} ${HEADER_FILES})
 

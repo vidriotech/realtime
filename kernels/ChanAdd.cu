@@ -13,3 +13,7 @@ __global__ void sq_diff(int n, const float *x, float *y) {
     for (unsigned int i = offset; i < n; i += stride)
         y[i] = pow(x[i] - y[i], 2);
 }
+
+__global__ void ndiff2(int n, const float *x, float *y) {
+    
+}
