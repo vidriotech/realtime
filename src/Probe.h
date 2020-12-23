@@ -81,7 +81,7 @@ private:
     void find_inactive();
 
 public:
-    Probe(ProbeConfig cfg);
+    explicit Probe(ProbeConfig cfg);
 
     // getter for _n_total, the total number of channels on this Probe
     [[nodiscard]] size_t n_total() const;

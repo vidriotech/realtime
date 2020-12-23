@@ -1,6 +1,6 @@
 #include "Filters.cuh"
 
-__global__ void ndiff2_i16(int N, const int16_t *in, int16_t *out, int nchans) {
+__global__ void ndiff2_i16(int N, const short *in, short *out, int nchans) {
     unsigned int offset = blockIdx.x * blockDim.x + threadIdx.x;
     unsigned int stride = gridDim.x * blockDim.x;
 

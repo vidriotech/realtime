@@ -1,17 +1,15 @@
-#ifndef RTS_2_TESTPROBE_H
-#define RTS_2_TESTPROBE_H
+//
+// Created by alan on 12/21/20.
+//
 
-#include <stdexcept>
-#include "../src/Probe.h"
+#include "TestProbe.h"
 
-
-ProbeConfig test_probeconfig(size_t n_channels, size_t n_active, size_t n_groups, double srate_hz)
+ProbeConfig make_probeconfig(size_t n_channels, size_t n_active, size_t n_groups, double srate_hz)
 {
     // don't check that n_total >= n_active for test purposes
     if (n_groups > n_active) {
         throw std::domain_error("Number of groups cannot exceed number of active sites.");
-    }
-    else if (n_active % n_groups != 0) {
+    } else if (n_active % n_groups != 0) {
         throw std::domain_error("Number of groups must evenly divide number of active sites.");
     }
 
@@ -22,18 +20,18 @@ ProbeConfig test_probeconfig(size_t n_channels, size_t n_active, size_t n_groups
 
     // divide n_active evenly into n_groups
     auto chans_per_group = n_active / n_groups;
-    size_t k = 0;
+    auto k = 0;
     double x = 0.0, y = 0.0;
 
-    for (size_t i = 0; i < n_groups; i++) {
+    for (auto i = 0; i < n_groups; i++) {
         ChannelGroup grp = ChannelGroup{
-            std::vector<size_t>(chans_per_group), // channels
-            std::vector<size_t>(chans_per_group), // site_labels
-            std::vector<double>(chans_per_group), // x_coords
-            std::vector<double>(chans_per_group), // y_coords
+                std::vector<size_t>(chans_per_group), // channels
+                std::vector<size_t>(chans_per_group), // site_labels
+                std::vector<double>(chans_per_group), // x_coords
+                std::vector<double>(chans_per_group), // y_coords
         };
 
-        for (size_t j = 0; j < chans_per_group; j++) {
+        for (auto j = 0; j < chans_per_group; j++) {
             grp.site_labels[j] = k + 1;
             grp.channels[j] = k++;
             grp.x_coords[j] = x;
@@ -53,4 +51,7 @@ ProbeConfig test_probeconfig(size_t n_channels, size_t n_active, size_t n_groups
     return cfg;
 }
 
-#endif //RTS_2_TESTPROBE_H
+Probe make_probe(size_t n_channels, size_t n_active, size_t n_groups, double srate_hz)
+{
+    return Probe(make_probeconfig(n_channels, n_active, n_groups, srate_hz));
+}

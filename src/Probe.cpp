@@ -1,13 +1,8 @@
 #include "Probe.h"
 
 Probe::Probe(ProbeConfig cfg)
-        : chan_idx(cfg.n_active()),
-        site_labels(cfg.n_active()),
-        chan_grps(cfg.n_active()),
-        x_coords(cfg.n_active()),
-        y_coords(cfg.n_active()),
-        is_active(cfg.n_total),
-        channel_distances(cfg.n_active())
+        : chan_idx(cfg.n_active()), site_labels(cfg.n_active()), chan_grps(cfg.n_active()), x_coords(cfg.n_active()),
+          y_coords(cfg.n_active()), is_active(cfg.n_total), channel_distances(cfg.n_active())
 {
     _n_total = cfg.n_total;
     if (_n_total < cfg.n_active()) {

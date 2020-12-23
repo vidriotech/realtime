@@ -59,9 +59,9 @@ TEST(KernelTestSuite, TestSqDiff) {
 TEST(KernelTestSuite, TestNdiff2I16) {
     auto nchans = 64;
 
-    int16_t *data, *filtered;
-    cudaMallocManaged(&data, 4 * nchans * sizeof(int16_t));
-    cudaMallocManaged(&filtered, 4 * nchans * sizeof(int16_t));
+    short *data, *filtered;
+    cudaMallocManaged(&data, 4 * nchans * sizeof(short));
+    cudaMallocManaged(&filtered, 4 * nchans * sizeof(short));
 
     /*
      * channel values: 1 1 2 2 -> (-1 * 1) + (-2 * 1) + (2 * 2) + (1 * 2) = 3
