@@ -20,6 +20,7 @@ public:
         : data(val), left(nullptr), right(nullptr), n(1) {};
 
     void insert(T val);
+    void insert_node(std::unique_ptr<MedianTreeNode<T>> node);
     short remove(T val);
     std::unique_ptr<MedianTreeNode<T>> pop(T val);
 
@@ -37,7 +38,6 @@ private:
     std::unique_ptr<MedianTreeNode<T>> right;
     unsigned n;
 
-    void insert_node(std::unique_ptr<MedianTreeNode<T>> node);
     short remove_child(short id);
     std::unique_ptr<MedianTreeNode<T>> pop_child(short id);
 };
