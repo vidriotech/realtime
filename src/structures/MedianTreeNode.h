@@ -19,23 +19,24 @@ public:
     explicit MedianTreeNode(T val)
         : data(val), left(nullptr), right(nullptr), n(1) {};
 
+    std::unique_ptr<MedianTreeNode<T>> left;
+    std::unique_ptr<MedianTreeNode<T>> right;
+
     void insert(T val);
     void insert_node(std::unique_ptr<MedianTreeNode<T>> node);
     short remove(T val);
     std::unique_ptr<MedianTreeNode<T>> pop(T val);
 
     // getters
-    T value() { return data; }
-    unsigned height();
-    int balance();
-    unsigned n_elements() { return n; };
+    T value() const { return data; }
+    unsigned height() const;
+    int balance() const;
+    unsigned n_elements() const { return n; };
 
-    T max();
-    T min();
+    T max() const;
+    T min() const;
 private:
     T data;
-    std::unique_ptr<MedianTreeNode<T>> left;
-    std::unique_ptr<MedianTreeNode<T>> right;
     unsigned n;
 
     short remove_child(short id);
@@ -149,7 +150,7 @@ std::unique_ptr<MedianTreeNode<T>> MedianTreeNode<T>::pop_child(short id) {
 }
 
 template<class T>
-int MedianTreeNode<T>::balance() {
+int MedianTreeNode<T>::balance() const {
     int balance;
 
     if (left == nullptr && right == nullptr) {
@@ -166,8 +167,9 @@ int MedianTreeNode<T>::balance() {
 }
 
 template<class T>
-unsigned MedianTreeNode<T>::height() {
+unsigned MedianTreeNode<T>::height() const {
     unsigned height = 1;
+
     if (left != nullptr && right != nullptr) {
         height += MAX(left->height(), right->height());
     } else if (left != nullptr) {
@@ -180,7 +182,7 @@ unsigned MedianTreeNode<T>::height() {
 }
 
 template<class T>
-T MedianTreeNode<T>::max() {
+T MedianTreeNode<T>::max() const {
     T val;
 
     if (n_elements() == 1 || right == nullptr) {
@@ -193,7 +195,7 @@ T MedianTreeNode<T>::max() {
 }
 
 template<class T>
-T MedianTreeNode<T>::min() {
+T MedianTreeNode<T>::min() const {
     T val;
 
     if (n_elements() == 1 || left == nullptr) {
