@@ -11,7 +11,7 @@
 #define NODE_LEFT 1
 #define NODE_RIGHT -1
 
-#define MAX(a, b) (a < b ? b : a)
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 template <class T>
 class MedianTreeNode {
@@ -46,6 +46,7 @@ void MedianTreeNode<T>::insert_node(std::unique_ptr<MedianTreeNode<T>> node) {
     }
 
     auto val = node->value();
+    auto ht = node->height();
     if (val <= data && left == nullptr) {
         left.swap(node);
     } else if (val <= data) {
@@ -56,7 +57,7 @@ void MedianTreeNode<T>::insert_node(std::unique_ptr<MedianTreeNode<T>> node) {
         right->insert_node(std::move(node));
     }
 
-    n++;
+    n += ht;
 }
 
 template<class T>
@@ -137,6 +138,7 @@ std::unique_ptr<MedianTreeNode<T>> MedianTreeNode<T>::pop_child(short id) {
         return res;
     }
 
+    n--;
     this->insert_node(std::move(left_child));
     this->insert_node(std::move(right_child));
 
