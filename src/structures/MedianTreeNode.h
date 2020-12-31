@@ -28,6 +28,9 @@ public:
     unsigned height();
     int balance();
     unsigned n_elements() { return n; };
+
+    T max();
+    T min();
 private:
     T data;
     std::unique_ptr<MedianTreeNode<T>> left;
@@ -174,6 +177,32 @@ unsigned MedianTreeNode<T>::height() {
     }
 
     return height;
+}
+
+template<class T>
+T MedianTreeNode<T>::max() {
+    T val;
+
+    if (n_elements() == 1 || right == nullptr) {
+        val = data;
+    } else {
+        val = right->max();
+    }
+
+    return val;
+}
+
+template<class T>
+T MedianTreeNode<T>::min() {
+    T val;
+
+    if (n_elements() == 1 || left == nullptr) {
+        val = data;
+    } else {
+        val = left->min();
+    }
+
+    return val;
 }
 
 #endif //RTS_2_MEDIANTREENODE_H

@@ -122,3 +122,27 @@ TEST(MedianTreeNodeTestSuite, PopValueOK)
     EXPECT_EQ(1, nodeptr->n_elements());
     EXPECT_EQ(test_child, nodeptr->value());
 }
+
+TEST(MedianTreeNodeTestSuite, Extrema)
+{
+    short test_data = 0;
+    auto node = MedianTreeNode<short>(test_data);
+    EXPECT_EQ(test_data, node.max());
+    EXPECT_EQ(test_data, node.min());
+
+    node.insert(test_data - 1);
+    EXPECT_EQ(test_data, node.max());
+    EXPECT_EQ(test_data - 1, node.min());
+
+    node.insert(test_data - 2);
+    EXPECT_EQ(test_data, node.max());
+    EXPECT_EQ(test_data - 2, node.min());
+
+    node.insert(test_data + 1);
+    EXPECT_EQ(test_data + 1, node.max());
+    EXPECT_EQ(test_data - 2, node.min());
+
+    node.insert(test_data + 2);
+    EXPECT_EQ(test_data + 2, node.max());
+    EXPECT_EQ(test_data - 2, node.min());
+}
