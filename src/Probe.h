@@ -9,26 +9,26 @@
 
 struct ChannelGroup {
     // indices of the channels in this group
-    std::vector<size_t> channels;
+    std::vector<unsigned> channels;
 
     // unique (across the entire probe) labels of channels in this group
-    std::vector<size_t> site_labels;
+    std::vector<unsigned> site_labels;
 
     // x coordinates of sites in this group, in microns
     std::vector<double> x_coords;
     // y coordinates of sites in this group, in microns
     std::vector<double> y_coords;
 
-    [[nodiscard]] size_t n_channels() const {
+    [[nodiscard]] unsigned n_channels() const {
         return channels.size();
     }
 };
 
 struct ProbeConfig {
     // the total number of channels currently recorded
-    size_t n_total;
+    unsigned n_total;
     // physical or logical groups of channels on the probe
-    std::map<size_t, ChannelGroup> channel_groups;
+    std::map<unsigned, ChannelGroup> channel_groups;
 
     // number of samples collected per channel per second
     double srate_hz;
@@ -36,8 +36,8 @@ struct ProbeConfig {
     // default spatial extent (in microns) of the templates that will be considered for the probe
     double spatial_extent;
 
-    size_t n_active() {
-        size_t n_act = 0;
+    unsigned n_active() {
+        unsigned n_act = 0;
         for (const auto & channel_group : channel_groups) {
             n_act += channel_group.second.n_channels();
         }
@@ -48,18 +48,18 @@ struct ProbeConfig {
 class Probe
 {
 private:
-    size_t _n_total = 0;  // the TOTAL number of channels on the probe
+    unsigned _n_total = 0;  // the TOTAL number of channels on the probe
     // the number of neighbors to consider for each active channel
-    size_t _n_neigh = 0;
+    unsigned _n_neigh = 0;
     // the number of samples taken per channel per second
     double _srate_hz = 0.0;
 
     // row indices of active sites in the data matrix
-    std::vector<size_t> chan_idx;
+    std::vector<unsigned> chan_idx;
     // (unique) label of each site in the probe mapping
-    std::vector<size_t> site_labels;
+    std::vector<unsigned> site_labels;
     // channel group ID of each active site
-    std::vector<size_t> chan_grps;
+    std::vector<unsigned> chan_grps;
     // x coordinates of sites on the probe, in microns
     std::vector<double> x_coords;
     // y coordinates of sites on the probe, in microns
@@ -84,19 +84,19 @@ public:
     explicit Probe(ProbeConfig cfg);
 
     // getter for _n_total, the total number of channels on this Probe
-    [[nodiscard]] size_t n_total() const;
+    [[nodiscard]] unsigned n_total() const;
     // getter for _n_active, the number of active channels on this Probe
-    [[nodiscard]] size_t n_active() const;
+    [[nodiscard]] unsigned n_active() const;
     // getter for _srate_hz, the number of samples per channel per second
     [[nodiscard]] double sample_rate() const;
 
-    size_t index_at(size_t i);
-    size_t label_at(size_t i);
-    size_t group_at(size_t i);
-    double x_at(size_t i);
-    double y_at(size_t j);
+    unsigned index_at(unsigned i);
+    unsigned label_at(unsigned i);
+    unsigned group_at(unsigned i);
+    double x_at(unsigned i);
+    double y_at(unsigned j);
 
-    float dist_between(size_t i, size_t j);
+    float dist_between(unsigned i, unsigned j);
     void make_distance_matrix();
 };
 

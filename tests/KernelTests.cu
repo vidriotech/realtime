@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "../kernels/ChanAdd.cuh"
-#include "../kernels/Filters.cuh"
+#include "../src/kernels/ChanAdd.cuh"
+#include "../src/kernels/Filters.cuh"
 
 TEST(KernelTestSuite, TestSqAdd) {
     float *x, *y;
@@ -10,7 +10,7 @@ TEST(KernelTestSuite, TestSqAdd) {
     cudaMallocManaged(&x, N*sizeof(float));
     cudaMallocManaged(&y, N*sizeof(float));;
 
-    for (int i=0; i<N; i++) {
+    for (int i=0; i < N; i++) {
         x[i] = 1.0;
         y[i] = -1.0;
     }
@@ -21,7 +21,7 @@ TEST(KernelTestSuite, TestSqAdd) {
     sq_add<<<nblocks, block_size>>>(N, x, y);
     cudaDeviceSynchronize();
 
-    for (int i=0; i<N; i++) {
+    for (int i=0; i < N; i++) {
         EXPECT_EQ(2.0, y[i]);
     }
 

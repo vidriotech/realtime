@@ -7,9 +7,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 # RTS
 set(HEADER_FILES src/Probe.h src/DistanceMatrix.h
-        src/acquisition/FileReader.h)
+        src/acquisition/FileReader.h src/extraction/SnippetExtractor.h src/extraction/Snippet.h
+        src/structures/MedianTree.h src/structures/MedianTreeNode.h)
 set(SOURCE_FILES src/main.cpp src/Probe.cpp src/DistanceMatrix.cpp
-        src/acquisition/FileReader.cpp)
+        src/acquisition/FileReader.cpp src/extraction/SnippetExtractor.cpp src/extraction/Snippet.cpp
+        src/structures/MedianTree.cpp src/structures/MedianTreeNode.cpp)
 
 #set(HEADER_FILES)
 #set(SOURCE_FILES main.cpp)
@@ -23,8 +25,8 @@ set_target_properties(
 # CUDA
 include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
-include_directories(kernels)
-add_subdirectory(kernels)
+include_directories(src/kernels)
+add_subdirectory(src/kernels)
 
 target_link_libraries(rts_2 RTSKernels)
 

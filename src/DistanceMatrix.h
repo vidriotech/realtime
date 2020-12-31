@@ -12,28 +12,28 @@ template <class T>
 class DistanceMatrix
 {
 private:
-    size_t N{};
+    unsigned N{};
     std::vector<T> data;
 
-    size_t index_at(size_t i, size_t j);
+    unsigned index_at(unsigned i, unsigned j);
 
 public:
-    explicit DistanceMatrix(size_t N);
+    explicit DistanceMatrix(unsigned N);
 
-    size_t n_cols();  // column count (also row count)
+    unsigned n_cols();  // column count (also row count)
 
-    T get_at(size_t i, size_t j);  // get the element at the (i,j) index
-    void set_at(size_t i, size_t j, T val);  // set the element at the (i,j) index
+    T get_at(unsigned i, unsigned j);  // get the element at the (i,j) index
+    void set_at(unsigned i, unsigned j, T val);  // set the element at the (i,j) index
 };
 
 template <class T>
-DistanceMatrix<T>::DistanceMatrix(size_t N)
+DistanceMatrix<T>::DistanceMatrix(unsigned N)
     : data(N * (N - 1) / 2) {
     this->N = N;
 }
 
 template <class T>
-size_t DistanceMatrix<T>::index_at(size_t i, size_t j)
+unsigned DistanceMatrix<T>::index_at(unsigned i, unsigned j)
 {
     // private and accessed only from get_at, so we can skip a bounds check
     if (j < i) {
@@ -45,13 +45,13 @@ size_t DistanceMatrix<T>::index_at(size_t i, size_t j)
 }
 
 template <class T>
-size_t DistanceMatrix<T>::n_cols()
+unsigned DistanceMatrix<T>::n_cols()
 {
     return N;
 }
 
 template <class T>
-T DistanceMatrix<T>::get_at(size_t i, size_t j)
+T DistanceMatrix<T>::get_at(unsigned i, unsigned j)
 {
     if (i >= N || j >= N) {
         throw std::out_of_range("Index is out of bounds for this size matrix.");
@@ -65,7 +65,7 @@ T DistanceMatrix<T>::get_at(size_t i, size_t j)
 }
 
 template <class T>
-void DistanceMatrix<T>::set_at(size_t i, size_t j, T val)
+void DistanceMatrix<T>::set_at(unsigned i, unsigned j, T val)
 {
     if (i >= N || j >= N) {
         throw std::out_of_range("Index is out of bounds for this size matrix.");

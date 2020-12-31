@@ -43,7 +43,7 @@ FileReader<T>::FileReader(std::string& filename, Probe& probe)
     fsize = fp.tellg();
 
     close();
-};
+}
 
 template<class T>
 FileReader<T>::~FileReader()

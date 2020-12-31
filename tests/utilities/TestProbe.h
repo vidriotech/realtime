@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include "../../src/Probe.h"
 
-ProbeConfig make_probeconfig(size_t, size_t, size_t, double);
-Probe make_probe(size_t, size_t, size_t, double);
+ProbeConfig make_probeconfig(unsigned, unsigned, unsigned, double);
+Probe make_probe(unsigned, unsigned, unsigned, double);
 
 #endif //RTS_2_TESTPROBE_H

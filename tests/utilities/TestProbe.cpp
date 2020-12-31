@@ -4,7 +4,7 @@
 
 #include "TestProbe.h"
 
-ProbeConfig make_probeconfig(size_t n_channels, size_t n_active, size_t n_groups, double srate_hz)
+ProbeConfig make_probeconfig(unsigned n_channels, unsigned n_active, unsigned n_groups, double srate_hz)
 {
     // don't check that n_total >= n_active for test purposes
     if (n_groups > n_active) {
@@ -25,8 +25,8 @@ ProbeConfig make_probeconfig(size_t n_channels, size_t n_active, size_t n_groups
 
     for (auto i = 0; i < n_groups; i++) {
         ChannelGroup grp = ChannelGroup{
-                std::vector<size_t>(chans_per_group), // channels
-                std::vector<size_t>(chans_per_group), // site_labels
+                std::vector<unsigned>(chans_per_group), // channels
+                std::vector<unsigned>(chans_per_group), // site_labels
                 std::vector<double>(chans_per_group), // x_coords
                 std::vector<double>(chans_per_group), // y_coords
         };
@@ -45,13 +45,13 @@ ProbeConfig make_probeconfig(size_t n_channels, size_t n_active, size_t n_groups
             }
         }
 
-        cfg.channel_groups.insert(std::pair<size_t, ChannelGroup>(i, grp));
+        cfg.channel_groups.insert(std::pair<unsigned, ChannelGroup>(i, grp));
     }
 
     return cfg;
 }
 
-Probe make_probe(size_t n_channels, size_t n_active, size_t n_groups, double srate_hz)
+Probe make_probe(unsigned n_channels, unsigned n_active, unsigned n_groups, double srate_hz)
 {
     return Probe(make_probeconfig(n_channels, n_active, n_groups, srate_hz));
 }

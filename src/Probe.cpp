@@ -14,11 +14,11 @@ Probe::Probe(ProbeConfig cfg)
     }
     this->_srate_hz = cfg.srate_hz;
 
-    size_t k = 0;  // nested for loop go brr
+    unsigned k = 0;  // nested for loop go brr
     for (const auto & channel_group : cfg.channel_groups) {
         const ChannelGroup grp = channel_group.second;
 
-        for (size_t j = 0; j < grp.n_channels(); j++) {
+        for (unsigned j = 0; j < grp.n_channels(); j++) {
             chan_idx[k] = grp.channels[j];
             site_labels[k] = grp.site_labels[j];
             x_coords[k] = grp.x_coords[j];
@@ -33,12 +33,12 @@ Probe::Probe(ProbeConfig cfg)
     this->find_inactive();
 }
 
-size_t Probe::n_total() const
+unsigned Probe::n_total() const
 {
     return this->_n_total;
 }
 
-size_t Probe::n_active() const
+unsigned Probe::n_active() const
 {
     return chan_idx.size();
 }
@@ -53,7 +53,7 @@ double Probe::sample_rate() const
  *
  * @ param i Index into the chan_idx array.
  */
-size_t Probe::index_at(size_t i) {
+unsigned Probe::index_at(unsigned i) {
     if (i > this->n_active()) {
         throw std::length_error("Index exceeds array dimensions.");
     }
@@ -66,7 +66,7 @@ size_t Probe::index_at(size_t i) {
  *
  * @ param i Index into the site_labels array.
  */
-size_t Probe::label_at(size_t i) {
+unsigned Probe::label_at(unsigned i) {
     if (i > this->n_active()) {
         throw std::length_error("Index exceeds array dimensions.");
     }
@@ -79,7 +79,7 @@ size_t Probe::label_at(size_t i) {
  *
  * @ param i Index into the chan_grps array.
  */
-size_t Probe::group_at(size_t i) {
+unsigned Probe::group_at(unsigned i) {
     if (i > this->n_active()) {
         throw std::length_error("Index exceeds array dimensions.");
     }
@@ -92,7 +92,7 @@ size_t Probe::group_at(size_t i) {
  *
  * @ param i Index into the x_coords array.
  */
-double Probe::x_at(size_t i)
+double Probe::x_at(unsigned i)
 {
     if (i > this->n_active()) {
         throw std::length_error("Index exceeds array dimensions.");
@@ -106,7 +106,7 @@ double Probe::x_at(size_t i)
  *
  * @ param i Index into the y_coords array.
  */
-double Probe::y_at(size_t i)
+double Probe::y_at(unsigned i)
 {
     if (i > this->n_active()) {
         throw std::length_error("Index exceeds array dimensions.");
@@ -118,7 +118,7 @@ double Probe::y_at(size_t i)
 /**
  * Returns the Euclidean distance between the ith channel and the jth channel.
  */
-float Probe::dist_between(size_t i, size_t j)
+float Probe::dist_between(unsigned i, unsigned j)
 {
     if (i > this->n_active()) {
         throw std::length_error("Index exceeds array dimensions.");
@@ -137,8 +137,8 @@ void Probe::make_distance_matrix()
     if (dist_mat_complete || this->channel_distances.n_cols() != this->n_active())
         return;
 
-    for (size_t i = 0; i < this->n_active(); i++) {
-        for (size_t j = i + 1; j < this->n_active(); j++) {
+    for (unsigned i = 0; i < this->n_active(); i++) {
+        for (unsigned j = i + 1; j < this->n_active(); j++) {
             auto dx = x_coords[i] - x_coords[j], dy = y_coords[i] - y_coords[j];
             this->channel_distances.set_at(i, j, (float)std::hypot(dx, dy));
         }
@@ -157,23 +157,23 @@ void Probe::sort_channels()
         return;
 
     // get indices that would sort chan_idx
-    std::vector<size_t> argsort(n_active());
-    for (size_t i = 0; i < n_active(); i++) {
+    std::vector<unsigned> argsort(n_active());
+    for (unsigned i = 0; i < n_active(); i++) {
         argsort[i] = i;
     }
 
     std::sort(argsort.begin(), argsort.end(),
-              [&](size_t i, size_t j) { return chan_idx[i] < chan_idx[j]; });
+              [&](unsigned i, unsigned j) { return chan_idx[i] < chan_idx[j]; });
 
     if (std::is_sorted(argsort.begin(), argsort.end())) {  // nothing to do!
         return;
     }
 
-    std::vector<size_t> tmp_buf_s(n_active());
+    std::vector<unsigned> tmp_buf_s(n_active());
     std::vector<double> tmp_buf_d(n_active());
 
     // reorder chan_idx, x_coords
-    for (size_t i = 0; i < argsort.size(); i++) {
+    for (unsigned i = 0; i < argsort.size(); i++) {
         tmp_buf_s[i] = chan_idx[argsort[i]];
         tmp_buf_d[i] = x_coords[argsort[i]];
     }
@@ -181,7 +181,7 @@ void Probe::sort_channels()
     this->x_coords.assign(tmp_buf_d.begin(), tmp_buf_d.end());
 
     // reorder site_labels, y_coords
-    for (size_t i = 0; i < argsort.size(); i++) {
+    for (unsigned i = 0; i < argsort.size(); i++) {
         tmp_buf_s[i] = site_labels[argsort[i]];
         tmp_buf_d[i] = y_coords[argsort[i]];
     }
@@ -189,7 +189,7 @@ void Probe::sort_channels()
     this->y_coords.assign(tmp_buf_d.begin(), tmp_buf_d.end());
 
     // reorder chan_grps
-    for (size_t i = 0; i < argsort.size(); i++) {
+    for (unsigned i = 0; i < argsort.size(); i++) {
         tmp_buf_s[i] = chan_grps[argsort[i]];
     }
     this->chan_grps.assign(tmp_buf_s.begin(), tmp_buf_s.end());
@@ -201,15 +201,15 @@ void Probe::sort_channels()
 void Probe::ensure_unique()
 {
     // ensure all channel indices are unique
-    size_t ct;
-    for (std::vector<size_t>::iterator it = chan_idx.begin(); it != chan_idx.end(); it++) {
+    unsigned ct;
+    for (std::vector<unsigned>::iterator it = chan_idx.begin(); it != chan_idx.end(); it++) {
         ct = std::count(it, chan_idx.end(), *(it));
         if (ct > 1) {
             throw std::domain_error("Channel indices are not unique.");
         }
     }
 
-    for (std::vector<size_t>::iterator it = site_labels.begin(); it != site_labels.end(); it++) {
+    for (std::vector<unsigned>::iterator it = site_labels.begin(); it != site_labels.end(); it++) {
         ct = std::count(it, site_labels.end(), *(it));
         if (ct > 1) {
             throw std::domain_error("Site labels are not unique.");
@@ -224,7 +224,7 @@ void Probe::ensure_unique()
 */
 void Probe::find_inactive()
 {
-    for (size_t i = 0; i < this->_n_total; i++) {
+    for (unsigned i = 0; i < this->_n_total; i++) {
         if (std::binary_search(chan_idx.begin(), chan_idx.end(), i)) {  // channel not found
             is_active[i] = true;
         }

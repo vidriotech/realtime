@@ -6,7 +6,7 @@
 
 TEST(ProbeTestSuite, TestInitOK)
 {
-    size_t n_tot = 385, n_active = 384, n_groups = 4;
+    unsigned n_tot = 385, n_active = 384, n_groups = 4;
     double srate_hz = 30000.0;
 
     ProbeConfig cfg = make_probeconfig(n_tot, n_active, n_groups, srate_hz);
@@ -18,7 +18,7 @@ TEST(ProbeTestSuite, TestInitOK)
 
 TEST(ProbeTestSuite, TestInitMoreActiveThanTotalFails)
 {
-    size_t n_tot = 385, n_active = 388, n_groups = 4; // 388 > 385
+    unsigned n_tot = 385, n_active = 388, n_groups = 4; // 388 > 385
     double srate_hz = 30000.0;
 
     ProbeConfig cfg = make_probeconfig(n_tot, n_active, n_groups, srate_hz);
@@ -28,7 +28,7 @@ TEST(ProbeTestSuite, TestInitMoreActiveThanTotalFails)
 
 TEST(ProbeTestSuite, TestMakeDistMatrixOK)
 {
-    size_t n_tot = 4, n_active = 4, n_groups = 2;
+    unsigned n_tot = 4, n_active = 4, n_groups = 2;
     double srate_hz = 30000.0;
 
     Probe prb = make_probe(n_tot, n_active, n_groups, srate_hz);
