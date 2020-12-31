@@ -6,6 +6,7 @@
 
 #include "Probe.h"
 #include "acquisition/FileReader.h"
+#include "structures/MedianTree.h"
 
 std::string get_env_var(std::string const &key)
 {
@@ -74,10 +75,18 @@ int main()
     auto srate_hz = std::stod(get_env_var("TEST_SRATE_HZ"));
 
     auto probe = make_probe(n_channels, n_active, n_groups, srate_hz);
-    auto reader = FileReader<short>(filename, probe);
+    FileReader<short> reader(filename, probe);
 
-    short *buf;
-    cudaMallocManaged(&buf, (int)ceil(srate_hz) * n_channels);
+    auto nsamples = n_channels * (int)ceil(srate_hz);
+    auto buf = new short[nsamples];
 
-    cudaFree(buf);
+    reader.acquire_frames(0, nsamples, buf);
+    auto trees = new MedianTree<short>[n_channels];
+
+//    cudaMallocManaged(&buf, (int)ceil(srate_hz) * n_channels);
+
+//    cudaFree(buf);
+
+    delete [] buf;
+    delete [] trees;
 }

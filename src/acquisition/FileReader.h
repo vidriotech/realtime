@@ -11,6 +11,10 @@
 #include <vector>
 #include "../Probe.h"
 
+/**
+ *
+ * @tparam T
+ */
 template <class T>
 class FileReader {
 public:
@@ -32,11 +36,16 @@ private:
     void close();
 };
 
+/**
+ *
+ * @tparam T
+ * @param filename
+ * @param probe
+ */
 template <class T>
 FileReader<T>::FileReader(std::string& filename, Probe& probe)
     : filename(filename), probe(probe)
 {
-    //
     open();
 
     fp.seekg(0, std::ios::end);
@@ -45,12 +54,23 @@ FileReader<T>::FileReader(std::string& filename, Probe& probe)
     close();
 }
 
+/**
+ *
+ * @tparam T
+ */
 template<class T>
 FileReader<T>::~FileReader()
 {
     fp.close(); // no-op if already closed
 }
 
+/**
+ *
+ * @tparam T
+ * @param frame_offset
+ * @param nsamples
+ * @param buf
+ */
 template<class T>
 void FileReader<T>::acquire_frames(int frame_offset, int nsamples, T *buf) {
     open(); // no-op if already open
@@ -58,16 +78,30 @@ void FileReader<T>::acquire_frames(int frame_offset, int nsamples, T *buf) {
     fp.read((char *) buf, sizeof(T) * nsamples);
 }
 
+/**
+ *
+ * @tparam T
+ * @return
+ */
 template<class T>
 unsigned long FileReader<T>::get_nframes() const {
     return fsize / (probe.n_total() * sizeof(T));
 }
 
+/**
+ *
+ * @tparam T
+ * @return
+ */
 template<class T>
 std::string FileReader<T>::get_filename() const {
     return filename;
 }
 
+/**
+ *
+ * @tparam T
+ */
 template<class T>
 void FileReader<T>::open()
 {
@@ -75,6 +109,10 @@ void FileReader<T>::open()
     fp.open(filename, std::ios::in | std::ios::binary);
 }
 
+/**
+ *
+ * @tparam T
+ */
 template<class T>
 void FileReader<T>::close()
 {
