@@ -65,6 +65,41 @@ TEST(MedianTreeNodeTestSuite, RemoveChildOK)
     EXPECT_EQ(1, node.height());
 }
 
+TEST(MedianTreeNodeTestSuite, RemoveArbitraryDescendentOK)
+{
+    /* construct a height-4, perfectly balanced, full tree, looks like
+     *
+     *         7
+     *     3        8
+     *  1   5      9  11
+     * 0 2 4 6   8 10 12 14
+     */
+
+    auto node = MedianTreeNode<int>(7);
+    node.insert(3); // left child
+    node.insert(11); // right child
+    node.insert(1); // left child of left child
+    node.insert(5); // right child of left child
+    node.insert(9); // left child of right child
+    node.insert(13); // right child of right child
+    node.insert(0); // left child of left child of left child
+    node.insert(2); // right child of left child of left child
+    node.insert(4); // left child of right child of left child
+    node.insert(6); // right child of right child of left child
+    node.insert(8); // left child of left child of right child
+    node.insert(10); // right child of left child of right child
+    node.insert(12); // left child of right child of right child
+    node.insert(14); // right child of right child of right child
+
+    EXPECT_EQ(15, node.n_elements());
+    EXPECT_EQ(4, node.height());
+
+    // remove the 1 node
+    EXPECT_EQ(0, node.remove(1)); // success
+    EXPECT_EQ(14, node.n_elements());
+    EXPECT_EQ(4, node.height());
+}
+
 TEST(MedianTreeNodeTestSuite, AttemptRemoveMissingValue)
 {
     short test_data = 0;

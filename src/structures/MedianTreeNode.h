@@ -83,10 +83,14 @@ short MedianTreeNode<T>::remove(T val) {
         res = remove_child(NODE_LEFT);
     } else if (val <= data && left != nullptr) {
         res = left->remove(val);
+        if (res == 0)
+            n--;
     } else if (val > data && right != nullptr && right->value() == val) {
         res = remove_child(NODE_RIGHT);
     } else if (val > data && right != nullptr) {
         res = right->remove(val);
+        if (res == 0)
+            n--;
     }
 
     return res;
@@ -100,10 +104,14 @@ std::unique_ptr<MedianTreeNode<T>> MedianTreeNode<T>::pop(T val) {
         node = pop_child(NODE_LEFT);
     } else if (val <= data && left != nullptr) {
         node = left->pop(val);
+        if (node != nullptr)
+            n--;
     } else if (val > data && right != nullptr && right->value() == val) {
         node = pop_child(NODE_RIGHT);
     } else if (val > data && right != nullptr) {
         node = right->pop(val);
+        if (node != nullptr)
+            n--;
     } else {
         node.reset(nullptr);
     }
@@ -132,7 +140,6 @@ std::unique_ptr<MedianTreeNode<T>> MedianTreeNode<T>::pop_child(short id) {
     this->insert_node(std::move(left_child));
     this->insert_node(std::move(right_child));
 
-    n--;
     return std::move(res);
 }
 
