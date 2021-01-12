@@ -1,8 +1,8 @@
-#ifndef RTS_2_MEDIANTREE_H
-#define RTS_2_MEDIANTREE_H
+#ifndef RTS_2_OLDMEDIANTREE_H
+#define RTS_2_OLDMEDIANTREE_H
 
 #include <limits>
-#include "MedianTreeNode.h"
+#include "OldMedianTreeNode.h"
 
 #define MIN(a, b) ((a) <= (b) ? (a) : (b))
 
@@ -10,19 +10,19 @@
 #define SHIFT_RTL 1
 
 template <class T>
-class MedianTree {
+class OldMedianTree {
 public:
-    explicit MedianTree()
+    explicit OldMedianTree()
         : left(nullptr), right(nullptr),
           right_min(std::numeric_limits<T>::max()),
           left_max(std::numeric_limits<T>::min()) {};
-    explicit MedianTree(T a)
-        : left(new MedianTreeNode<T>(a)), right(nullptr),
+    explicit OldMedianTree(T a)
+        : left(new OldMedianTreeNode<T>(a)), right(nullptr),
           right_min(std::numeric_limits<T>::max()),
           left_max(a) {};
-    explicit MedianTree(T a, T b)
-        : left(new MedianTreeNode<T>(MIN(a, b))),
-          right(new MedianTreeNode<T>(MAX(a, b))) {
+    explicit OldMedianTree(T a, T b)
+        : left(new OldMedianTreeNode<T>(MIN(a, b))),
+          right(new OldMedianTreeNode<T>(MAX(a, b))) {
 
         right_min = right->value();
         left_max = left->value();
@@ -38,8 +38,8 @@ public:
     unsigned n_elements();
 
 private:
-    std::unique_ptr<MedianTreeNode<T>> left;
-    std::unique_ptr<MedianTreeNode<T>> right;
+    std::unique_ptr<OldMedianTreeNode<T>> left;
+    std::unique_ptr<OldMedianTreeNode<T>> right;
 
     T right_min; // the min value of the greater-than subtree
     T left_max; // the max value of the less-than-or-equal subtree
@@ -48,7 +48,7 @@ private:
 };
 
 template<class T>
-float MedianTree<T>::median() {
+float OldMedianTree<T>::median() {
     float med;
 
     if (left == nullptr && right == nullptr) {
@@ -69,7 +69,7 @@ float MedianTree<T>::median() {
 }
 
 template<class T>
-unsigned MedianTree<T>::height() {
+unsigned OldMedianTree<T>::height() {
     unsigned left_height = left == nullptr ? 0 : left->height();
     unsigned right_height = right == nullptr ? 0 : right->height();
 
@@ -77,7 +77,7 @@ unsigned MedianTree<T>::height() {
 }
 
 template<class T>
-int MedianTree<T>::balance() {
+int OldMedianTree<T>::balance() {
     int n_left = left == nullptr ? 0 : left->n_elements();
     int n_right = right == nullptr ? 0 : right->n_elements();
 
@@ -85,7 +85,7 @@ int MedianTree<T>::balance() {
 }
 
 template<class T>
-unsigned MedianTree<T>::n_elements() {
+unsigned OldMedianTree<T>::n_elements() {
     unsigned n_left = left == nullptr ? 0 : left->n_elements();
     unsigned n_right = right == nullptr ? 0 : right->n_elements();
 
@@ -93,9 +93,9 @@ unsigned MedianTree<T>::n_elements() {
 }
 
 template<class T>
-void MedianTree<T>::insert(T val) {
+void OldMedianTree<T>::insert(T val) {
     if (left == nullptr && (right == nullptr || val <= median())) {
-        left.reset(new MedianTreeNode<T>(val));
+        left.reset(new OldMedianTreeNode<T>(val));
         left_max = val;
     } else if (val <= median()) {
         left->insert(val);
@@ -105,7 +105,7 @@ void MedianTree<T>::insert(T val) {
             shift_value(SHIFT_LTR);
         }
     } else if (right == nullptr) {
-        right.reset(new MedianTreeNode<T>(val));
+        right.reset(new OldMedianTreeNode<T>(val));
         right_min = val;
     } else {
         right->insert(val);
@@ -118,7 +118,7 @@ void MedianTree<T>::insert(T val) {
 }
 
 template<class T>
-short MedianTree<T>::remove(T val) {
+short OldMedianTree<T>::remove(T val) {
     short res = -1;
 
     if (left == nullptr && right == nullptr) {
@@ -148,11 +148,11 @@ short MedianTree<T>::remove(T val) {
  * @param dir
  */
 template<class T>
-void MedianTree<T>::shift_value(short dir) {
+void OldMedianTree<T>::shift_value(short dir) {
     if (dir == SHIFT_LTR) {
         if (left->value() == left_max) {
-            std::unique_ptr<MedianTreeNode<T>> left_child(nullptr);
-            std::unique_ptr<MedianTreeNode<T>> right_child(nullptr);
+            std::unique_ptr<OldMedianTreeNode<T>> left_child(nullptr);
+            std::unique_ptr<OldMedianTreeNode<T>> right_child(nullptr);
 
             left_child.swap(left->left);
             right_child.swap(left->right);
@@ -169,8 +169,8 @@ void MedianTree<T>::shift_value(short dir) {
         right->insert(left_max);
     } else if (dir == SHIFT_RTL) {
         if (right->value() == right_min) {
-            std::unique_ptr<MedianTreeNode<T>> left_child(nullptr);
-            std::unique_ptr<MedianTreeNode<T>> right_child(nullptr);
+            std::unique_ptr<OldMedianTreeNode<T>> left_child(nullptr);
+            std::unique_ptr<OldMedianTreeNode<T>> right_child(nullptr);
 
             left_child.swap(right->left);
             right_child.swap(right->right);
@@ -191,4 +191,4 @@ void MedianTree<T>::shift_value(short dir) {
     right_min = right->min();
 }
 
-#endif //RTS_2_MEDIANTREE_H
+#endif //RTS_2_OLDMEDIANTREE_H

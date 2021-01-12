@@ -6,7 +6,7 @@
 
 #include "Probe.h"
 #include "acquisition/FileReader.h"
-#include "structures/MedianTree.h"
+#include "structures/OldMedianTree.h"
 
 std::string get_env_var(std::string const &key)
 {
@@ -81,7 +81,7 @@ int main()
     auto buf = new short[nsamples];
 
     reader.acquire_frames(0, nsamples, buf);
-    auto trees = new MedianTree<short>[n_channels];
+    auto trees = new OldMedianTree<short>[n_channels];
 
 //    cudaMallocManaged(&buf, (int)ceil(srate_hz) * n_channels);
 

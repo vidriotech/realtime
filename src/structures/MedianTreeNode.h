@@ -1,210 +1,80 @@
 #ifndef RTS_2_MEDIANTREENODE_H
 #define RTS_2_MEDIANTREENODE_H
 
+#include <algorithm>
 #include <memory>
 #include <utility>
-
-#define AVL_LEFT_HEAVY 1
-#define AVL_BALANCED 0
-#define AVL_RIGHT_HEAVY -1
-
-#define NODE_LEFT 1
-#define NODE_RIGHT -1
-
-#define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 template <class T>
 class MedianTreeNode {
 public:
-    explicit MedianTreeNode(T val)
-        : data(val), left(nullptr), right(nullptr), n(1) {};
+    MedianTreeNode(T val) : data(val), ht(1), bal(0) {};
 
-    std::unique_ptr<MedianTreeNode<T>> left;
-    std::unique_ptr<MedianTreeNode<T>> right;
-
-    void insert(T val);
-    void insert_node(std::unique_ptr<MedianTreeNode<T>> node);
-    short remove(T val);
-    std::unique_ptr<MedianTreeNode<T>> pop(T val);
+    short insert(T val);
 
     // getters
-    T value() const { return data; }
-    unsigned height() const;
-    int balance() const;
-    unsigned n_elements() const { return n; };
-
-    T max() const;
-    T min() const;
+    /**
+     * @return The value stored in this node.
+     */
+    [[nodiscard]] T value() const { return data; };
+    /**
+     * @return The height of the subtree rooted at this node.
+     */
+    [[nodiscard]] unsigned short height() const { return ht; };
+    /**
+     * @return The height of the subtree rooted at this node.
+     */
+    [[nodiscard]] short balance() const { return bal; };
+    /**
+     * @return Pointer to the left subtree of this node.
+     */
+    [[nodiscard]] std::shared_ptr<MedianTreeNode<T>> left() const { return lt; };
+    /**
+     * @return Pointer to the right subtree of this node.
+     */
+    [[nodiscard]] std::shared_ptr<MedianTreeNode<T>> right() const { return rt; };
 private:
-    T data;
-    unsigned n;
+    T data; /*!< The data in this node.  */
+    std::shared_ptr<MedianTreeNode<T>> lt; /*!< Left child. */
+    std::shared_ptr<MedianTreeNode<T>> rt; /*!< Right node. */
 
-    short remove_child(short id);
-    std::unique_ptr<MedianTreeNode<T>> pop_child(short id);
+    unsigned short ht; /*!< The height of the subtree rooted at this node. */
+    short bal; /*!< This subtree's balance factor. */
 };
 
+/**
+ * Insert a value into the subtree rooted at this node.
+ *
+ * @tparam T The type of the value in this node.
+ * @param val The value to insert in the left or right subtree.
+ * @return The updated height of the subtree rooted at this node.
+ */
 template<class T>
-void MedianTreeNode<T>::insert_node(std::unique_ptr<MedianTreeNode<T>> node) {
-    if (node == nullptr) {
-        return;
-    }
-
-    auto val = node->value();
-    auto ht = node->height();
-    if (val <= data && left == nullptr) {
-        left.swap(node);
-    } else if (val <= data) {
-        left->insert_node(std::move(node));
-    } else if (right == nullptr) { // val > data
-        right.swap(node);
-    } else { // val > data && right != nullptr
-        right->insert_node(std::move(node));
-    }
-
-    n += ht;
-}
-
-template<class T>
-void MedianTreeNode<T>::insert(T val) {
-    std::unique_ptr<MedianTreeNode<T>> node(new MedianTreeNode<T>(val));
-    insert_node(std::move(node));
-}
-
-template<class T>
-short MedianTreeNode<T>::remove_child(short id) {
-    std::unique_ptr<MedianTreeNode<T>> node = pop_child(id);
-    short res = node == nullptr ? -1 : 0;
-
-    node.reset(nullptr);
-
-    return res;
-}
-
-template<class T>
-short MedianTreeNode<T>::remove(T val) {
-    short res = -1;
-
-    if (val <= data && left != nullptr && left->value() == val) {
-        res = remove_child(NODE_LEFT);
-    } else if (val <= data && left != nullptr) {
-        res = left->remove(val);
-        if (res == 0)
-            n--;
-    } else if (val > data && right != nullptr && right->value() == val) {
-        res = remove_child(NODE_RIGHT);
-    } else if (val > data && right != nullptr) {
-        res = right->remove(val);
-        if (res == 0)
-            n--;
-    }
-
-    return res;
-}
-
-template<class T>
-std::unique_ptr<MedianTreeNode<T>> MedianTreeNode<T>::pop(T val) {
-    std::unique_ptr<MedianTreeNode<T>> node;
-
-    if (val <= data && left != nullptr && left->value() == val) {
-        node = pop_child(NODE_LEFT);
-    } else if (val <= data && left != nullptr) {
-        node = left->pop(val);
-        if (node != nullptr)
-            n--;
-    } else if (val > data && right != nullptr && right->value() == val) {
-        node = pop_child(NODE_RIGHT);
-    } else if (val > data && right != nullptr) {
-        node = right->pop(val);
-        if (node != nullptr)
-            n--;
+short MedianTreeNode<T>::insert(T val) {
+    if (val <= data) {
+        if (lt == nullptr) {
+            lt.reset(new MedianTreeNode<T>(val));
+        } else {
+            lt->insert(val);
+        }
     } else {
-        node.reset(nullptr);
+        if (rt == nullptr) {
+            rt.reset(new MedianTreeNode<T>(val));
+        } else {
+            rt->insert(val);
+        }
     }
 
-    return std::move(node);
+    // update tree height
+    auto left_height = lt == nullptr ? 0 : lt->height();
+    auto right_height = rt == nullptr ? 0 : rt->height();
+    ht = 1 + std::max(left_height, right_height);
+
+    // update tree balance
+    bal = left_height - right_height;
+
+    return ht;
 }
 
-template<class T>
-std::unique_ptr<MedianTreeNode<T>> MedianTreeNode<T>::pop_child(short id) {
-    std::unique_ptr<MedianTreeNode<T>> res(nullptr);
-    std::unique_ptr<MedianTreeNode<T>> left_child(nullptr);
-    std::unique_ptr<MedianTreeNode<T>> right_child(nullptr);
-
-    if (id == NODE_LEFT) {
-        left_child.swap(left->left);
-        right_child.swap(left->right);
-        res.swap(left);
-    } else if (id == NODE_RIGHT) {
-        left_child.swap(right->left);
-        right_child.swap(right->right);
-        res.swap(right);
-    } else {
-        return res;
-    }
-
-    n--;
-    this->insert_node(std::move(left_child));
-    this->insert_node(std::move(right_child));
-
-    return std::move(res);
-}
-
-template<class T>
-int MedianTreeNode<T>::balance() const {
-    int balance;
-
-    if (left == nullptr && right == nullptr) {
-        balance = 0;
-    } else if (left == nullptr) {
-        balance = -(right->height());
-    } else if (right == nullptr) {
-        balance = left->height();
-    } else {
-        balance = left->height() - right->height();
-    }
-
-    return balance;
-}
-
-template<class T>
-unsigned MedianTreeNode<T>::height() const {
-    unsigned height = 1;
-
-    if (left != nullptr && right != nullptr) {
-        height += MAX(left->height(), right->height());
-    } else if (left != nullptr) {
-        height += left->height();
-    } else if (right != nullptr) {
-        height += right->height();
-    }
-
-    return height;
-}
-
-template<class T>
-T MedianTreeNode<T>::max() const {
-    T val;
-
-    if (n_elements() == 1 || right == nullptr) {
-        val = data;
-    } else {
-        val = right->max();
-    }
-
-    return val;
-}
-
-template<class T>
-T MedianTreeNode<T>::min() const {
-    T val;
-
-    if (n_elements() == 1 || left == nullptr) {
-        val = data;
-    } else {
-        val = left->min();
-    }
-
-    return val;
-}
 
 #endif //RTS_2_MEDIANTREENODE_H

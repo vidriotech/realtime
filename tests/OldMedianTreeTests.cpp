@@ -1,11 +1,11 @@
 #include "gtest/gtest.h"
 
 #include <cmath>
-#include "../src/structures/MedianTree.h"
+#include "../src/structures/OldMedianTree.h"
 
 TEST(MedianTreeTestSuite, Init0ArgsOK)
 {
-    MedianTree<short> tree;
+    OldMedianTree<short> tree;
 
     EXPECT_EQ(0, tree.n_elements());
     EXPECT_TRUE(std::isnan(tree.median()));
@@ -14,7 +14,7 @@ TEST(MedianTreeTestSuite, Init0ArgsOK)
 TEST(MedianTreeTestSuite, Init2ArgsOK)
 {
     short left = 0, right = 1;
-    MedianTree<short> tree(left, right);
+    OldMedianTree<short> tree(left, right);
 
     EXPECT_EQ(2, tree.n_elements());
     EXPECT_EQ((left + right) / 2.0f, tree.median());
@@ -23,7 +23,7 @@ TEST(MedianTreeTestSuite, Init2ArgsOK)
 TEST(MedianTreeTestSuite, TestInsertOK)
 {
     short left = 0, right = 1;
-    MedianTree<short> tree(right, left);
+    OldMedianTree<short> tree(right, left);
 
     tree.insert(left - 1);
     EXPECT_EQ(3, tree.n_elements());
@@ -33,7 +33,7 @@ TEST(MedianTreeTestSuite, TestInsertOK)
 TEST(MedianTreeTestSuite, TestMaintainBalance)
 {
     short left = 1, right = 2;
-    MedianTree<short> tree(left, right); // 1] [2
+    OldMedianTree<short> tree(left, right); // 1] [2
     EXPECT_EQ(AVL_BALANCED, tree.balance());
     EXPECT_EQ((left + right) / 2.0f, tree.median());
 

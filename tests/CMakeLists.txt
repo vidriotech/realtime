@@ -12,8 +12,8 @@ set(SOURCE_FILES utilities/TestProbe.cpp utilities/TestException.cpp
         FileReaderTests.cpp
         SnippetTests.cpp
         SnippetExtractorTests.cpp
-        MedianTreeTests.cpp
-        MedianTreeNodeTests.cpp)
+        OldMedianTreeTests.cpp
+        OldMedianTreeNodeTests.cpp MedianTreeNodeTests.cpp)
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 
 add_subdirectory(lib)
