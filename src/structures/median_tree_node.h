@@ -5,17 +5,6 @@
 #include <memory>
 #include <utility>
 
-/**
- * @brief Type of rotation to perform on a child element.
- */
-enum class RotationType {
-    kNone = 0, // no rotation required
-    kLL, // left-left
-    kLR, // left-right
-    kRL, // right-left
-    kRR, // right-right
-};
-
 template <class T>
 class MedianTreeNode {
 public:
@@ -85,7 +74,6 @@ private:
 
 /**
  * @brief Insert a value into the subtree rooted at this node.
- *
  * @tparam T The type of the value in this node.
  * @param val The value to Insert in the left or right subtree.
  * @return The updated height of the subtree rooted at this node.
@@ -113,7 +101,6 @@ short MedianTreeNode<T>::Insert(T val) {
 
 /**
  * @brief Insert a subtree into the subtree rooted at this node.
- *
  * @tparam T The type of data stored in the nodes of this subtree.
  * @param node Root of the subtree to Insert into the tree rooted at this node.
  * @return The updated height of the subtree rooted at this node.
@@ -145,7 +132,6 @@ MedianTreeNode<T>::InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node) {
 
 /**
  * @brief Remove a value from the subtree rooted at this node.
- *
  * @tparam T The type of the value in this node.
  * @param val The value to remove the subtree rooted at this node.
  * @return 0 if value successfully found and removed, 1 otherwise.
@@ -209,11 +195,10 @@ void MedianTreeNode<T>::RemoveChild(std::shared_ptr<MedianTreeNode<T>> child) {
 }
 
 /**
- * @brief
- * @tparam T
- * @param child
- * @param r_type
- * @return
+ * @brief Perform an LL, LR, RL, or RR rotation on a child node if it needs one.
+ * @tparam T The type of data stored in the nodes of this subtree.
+ * @param child Pointer to the child to rotate.
+ * @return Root of the subtree to be inserted into child's former place.
  */
 template<class T>
 std::shared_ptr<MedianTreeNode<T>>

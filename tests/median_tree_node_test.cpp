@@ -326,7 +326,9 @@ TEST(MedianTreeNodeTests, RemoveChildWithChildren)
  * GIVEN a MedianTreeNode `node` with a balance factor of 2 and whose own left
  *       child has a balance factor of 1, i.e., is in need of an LL rotation
  * DO perform an LL rotation AND
- * TEST THAT the balance factor of `node` is 0.
+ * TEST THAT the balance factor of `node` is 0; AND
+ *           `node` has the correct number of children; AND
+ *           both the left and right children of `node` are balanced.
  */
 TEST(MedianTreeNodeTests, TestLLRotation)
 {
@@ -383,7 +385,9 @@ TEST(MedianTreeNodeTests, TestLLRotation)
  * GIVEN a MedianTreeNode `node` with a balance factor of 2 and whose own left
  *       child has a balance factor of -1, i.e., is in need of an LR rotation
  * DO perform an LR rotation AND
- * TEST THAT the balance factor of `node` is 0.
+ * TEST THAT the balance factor of `node` is 0; AND
+ *           `node` has the correct number of children; AND
+ *           both the left and right children of `node` are balanced.
  */
 TEST(MedianTreeNodeTests, TestLRRotation)
 {
@@ -440,7 +444,9 @@ TEST(MedianTreeNodeTests, TestLRRotation)
  * GIVEN a MedianTreeNode `node` with a balance factor of -2 and whose own right
  *       child has a balance factor of 1, i.e., is in need of an RL rotation
  * DO perform an RL rotation AND
- * TEST THAT the balance factor of `node` is 0.
+ * TEST THAT the balance factor of `node` is 0; AND
+ *           `node` has the correct number of children; AND
+ *           both the left and right children of `node` are balanced.
  */
 TEST(MedianTreeNodeTests, TestRLRotation)
 {
@@ -498,7 +504,9 @@ TEST(MedianTreeNodeTests, TestRLRotation)
  * GIVEN a MedianTreeNode `node` with a balance factor of -2 and whose own right
  *       child has a balance factor of -1, i.e., is in need of an RR rotation
  * DO perform an RR rotation AND
- * TEST THAT the balance factor of `node` is 0.
+ * TEST THAT the balance factor of `node` is 0; AND
+ *           `node` has the correct number of children; AND
+ *           both the left and right children of `node` are balanced.
  */
 TEST(MedianTreeNodeTests, TestRRRotation)
 {

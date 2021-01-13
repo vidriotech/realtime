@@ -8,10 +8,10 @@ set(CMAKE_CXX_STANDARD 17)
 # RTS
 set(HEADER_FILES src/Probe.h src/DistanceMatrix.h
         src/acquisition/FileReader.h src/extraction/SnippetExtractor.h src/extraction/Snippet.h
-        src/structures/OldMedianTree.h src/structures/OldMedianTreeNode.h)
+        src/structures/OldMedianTree.h src/structures/OldMedianTreeNode.h src/structures/median_tree.h)
 set(SOURCE_FILES src/main.cpp src/Probe.cpp src/DistanceMatrix.cpp
         src/acquisition/FileReader.cpp src/extraction/SnippetExtractor.cpp src/extraction/Snippet.cpp
-        src/structures/OldMedianTree.cpp src/structures/OldMedianTreeNode.cpp src/structures/median_tree_node.h)
+        src/structures/OldMedianTree.cpp src/structures/OldMedianTreeNode.cpp src/structures/median_tree_node.h src/structures/median_tree_node.cpp src/structures/median_tree.cpp)
 
 #set(HEADER_FILES)
 #set(SOURCE_FILES main.cpp)

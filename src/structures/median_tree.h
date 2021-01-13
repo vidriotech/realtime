@@ -1,0 +1,178 @@
+#ifndef RTS_2_MEDIAN_TREE_H
+#define RTS_2_MEDIAN_TREE_H
+
+#include <algorithm>
+#include <memory>
+#include <utility>
+
+#include "median_tree_node.h"
+
+template <class T>
+class MedianTree {
+public:
+    MedianTree() {};
+    MedianTree(T a)
+        : lt(new MedianTreeNode<T>(a)), left_max(a) {};
+    MedianTree(T a, T b);
+
+    // Insert and remove elements
+    void Insert(T val);
+
+    // getters
+    /**
+     * @brief Get a pointer to the left, or smaller, subtree.
+     * @return Pointer to the left subtree.
+     */
+    std::shared_ptr<MedianTreeNode<T>> left() const { return lt; };
+    /**
+     * @brief Get a pointer to the right, or larger, subtree.
+     * @return Pointer to the right subtree.
+     */
+    std::shared_ptr<MedianTreeNode<T>> right() const { return rt; };
+    /**
+     * @brief Get the number of elements in the left subtree.
+     * @return The number of elements in the left subtree.
+     */
+    [[nodiscard]] int
+    count_left() const { return lt == nullptr ? 0 : lt->count(); };
+    /**
+     * @brief Get the number of elements in the right subtree.
+     * @return The number of elements in the right subtree.
+     */
+    [[nodiscard]] int
+    count_right() const { return rt == nullptr ? 0 : rt->count(); };
+    /**
+     * @brief Get the number of elements in the tree.
+     * @return The sum of the number of elements in both subtrees.
+     */
+    [[nodiscard]] unsigned
+    count() const { return count_left() + count_right(); };
+    [[nodiscard]] unsigned short height();
+    [[nodiscard]] short balance();
+    [[nodiscard]] short el_balance();
+    [[nodiscard]] float median() const;
+private:
+    std::shared_ptr<MedianTreeNode<T>> lt; /*!< Left subtree. */
+    std::shared_ptr<MedianTreeNode<T>> rt; /*!< Right subtree. */
+
+    T left_max = 0; /*!< Maximum value of the left subtree. */
+    T right_min = 0; /*!< Minimum value of the right subtree. */
+};
+
+/**
+ * @brief Construct a MedianTree with two elements, one for each subtree.
+ * @tparam T The type of values stored in this tree.
+ * @param a A value to store in the tree.
+ * @param b Another value to store in the tree.
+ */
+template<class T>
+MedianTree<T>::MedianTree(T a, T b) {
+    auto min_val = std::min(a, b);
+    auto max_val = std::max(a, b);
+
+    lt.reset(new MedianTreeNode<T>(min_val));
+    left_max = min_val;
+
+    rt.reset(new MedianTreeNode<T>(max_val));
+    right_min = max_val;
+}
+
+/**
+ * @brief Insert a value into this tree.
+ * @tparam T The type of data stored in the nodes of this tree.
+ * @param val The value to insert.
+ */
+template<class T>
+void MedianTree<T>::Insert(T val) {
+    if (count() == 0) {
+        lt.reset(new MedianTreeNode<T>(val));
+
+        left_max = right_min = val;
+    } else if (val <= median()) {
+        if (lt == nullptr) {
+            lt.reset(new MedianTreeNode<T>(val));
+        } else {
+            lt->Insert(val);
+        }
+
+        left_max = std::max(left_max, val);
+    } else {
+        if (rt == nullptr) {
+            rt.reset(new MedianTreeNode<T>(val));
+        } else {
+            rt->Insert(val);
+        }
+
+        right_min = std::min(right_min, val);
+    }
+}
+
+/**
+ * @brief Compute and return the height of this tree.
+ * @tparam T The type of data stored in the nodes of this tree.
+ * @return The height of this tree.
+ */
+template<class T>
+unsigned short MedianTree<T>::height() {
+    auto left_height = lt == nullptr ? 0 : lt->height();
+    auto right_height = rt == nullptr ? 0 : rt->height();
+
+    return 1 + std::max(left_height, right_height);
+}
+
+/**
+ * @brief Compute the balance between the heights of the left and right
+ * subtrees.
+ *
+ * Balance factor is defined to be the difference between the height of the
+ * left subtree and that of the right subtree. A tree is said to be
+ * "left-heavy" if the subtree has a larger height than the right subtree.
+ * "Right-heavy" is analogously defined. In AVL trees, a tree's balance,
+ * together with that of its subtrees, is used to determine when to rotate.
+ *
+ * @tparam T The type of data stored in the nodes of this tree.
+ * @return The balance factor.
+ */
+template<class T>
+short MedianTree<T>::balance() {
+    auto left_height = lt == nullptr ? 0 : lt->height();
+    auto right_height = rt == nullptr ? 0 : rt->height();
+
+    return left_height - right_height;
+}
+
+/**
+ * @brief Compute the balance between the counts of the left and right subtrees.
+ * @tparam T The type of data stored in the nodes of this tree.
+ * @return The difference between the left tree's count and the right tree's
+ * count.
+ */
+template<class T>
+short MedianTree<T>::el_balance() {
+    auto left_count = lt == nullptr ? 0 : lt->count();
+    auto right_count = rt == nullptr ? 0 : rt->count();
+
+    return left_count - right_count;
+}
+
+/**
+ * @brief Compute and return the median of all values in this tree.
+ * @tparam T The type of values stored in the tree.
+ * @return The median of all values.
+ */
+template<class T>
+float MedianTree<T>::median() const {
+    float med;
+
+    if (count_left() == count_right()) {
+        med = (left_max + right_min) / 2.0f;
+    } else if (count_left() > count_right()) {
+        med = left_max;
+    } else { // count_right() > count_left()
+        med = right_min;
+    }
+
+    return med;
+}
+
+#endif //RTS_2_MEDIAN_TREE_H
