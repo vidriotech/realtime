@@ -1,5 +1,5 @@
-#ifndef RTS_2_MEDIANTREENODE_H
-#define RTS_2_MEDIANTREENODE_H
+#ifndef RTS_2_MEDIAN_TREE_NODE_H
+#define RTS_2_MEDIAN_TREE_NODE_H
 
 #include <algorithm>
 #include <memory>
@@ -10,9 +10,12 @@ class MedianTreeNode {
 public:
     MedianTreeNode(T val) : data(val), ht(1), n(1) {};
 
-    short insert(T val);
-    short insert_subtree(std::shared_ptr<MedianTreeNode<T>> node);
-    short remove(T val);
+    // Insert and remove elements/subtrees
+    short Insert(T val);
+    short InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node);
+    short Remove(T val);
+
+    // rotate
 
     // getters
     /**
@@ -58,22 +61,22 @@ private:
  * @brief Insert a value into the subtree rooted at this node.
  *
  * @tparam T The type of the value in this node.
- * @param val The value to insert in the left or right subtree.
+ * @param val The value to Insert in the left or right subtree.
  * @return The updated height of the subtree rooted at this node.
  */
 template<class T>
-short MedianTreeNode<T>::insert(T val) {
+short MedianTreeNode<T>::Insert(T val) {
     if (val <= data) {
         if (lt == nullptr) {
             lt.reset(new MedianTreeNode<T>(val));
         } else {
-            lt->insert(val);
+            lt->Insert(val);
         }
     } else {
         if (rt == nullptr) {
             rt.reset(new MedianTreeNode<T>(val));
         } else {
-            rt->insert(val);
+            rt->Insert(val);
         }
     }
 
@@ -86,11 +89,11 @@ short MedianTreeNode<T>::insert(T val) {
  * @brief Insert a subtree into the subtree rooted at this node.
  *
  * @tparam T The type of data stored in the nodes of this subtree.
- * @param node Root of the subtree to insert into the tree rooted at this node.
+ * @param node Root of the subtree to Insert into the tree rooted at this node.
  * @return The updated height of the subtree rooted at this node.
  */
 template<class T>
-short MedianTreeNode<T>::insert_subtree(std::shared_ptr<MedianTreeNode<T>> node) {
+short MedianTreeNode<T>::InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node) {
     if (node == nullptr)
         return ht;
 
@@ -99,13 +102,13 @@ short MedianTreeNode<T>::insert_subtree(std::shared_ptr<MedianTreeNode<T>> node)
         if (lt == nullptr) {
             lt.swap(node);
         } else {
-            lt->insert_subtree(node);
+            lt->InsertSubtree(node);
         }
     } else {
         if (rt == nullptr) {
             rt.swap(node);
         } else {
-            rt->insert_subtree(node);
+            rt->InsertSubtree(node);
         }
     }
 
@@ -122,7 +125,7 @@ short MedianTreeNode<T>::insert_subtree(std::shared_ptr<MedianTreeNode<T>> node)
  * @return 0 if value successfully found and removed, 1 otherwise.
  */
 template<class T>
-short MedianTreeNode<T>::remove(T val) {
+short MedianTreeNode<T>::Remove(T val) {
     short res = 1;
 
     if (val <= data && lt != nullptr) {
@@ -130,14 +133,14 @@ short MedianTreeNode<T>::remove(T val) {
             remove_child(std::move(lt));
             res = 0;
         } else {
-            res = lt->remove(val);
+            res = lt->Remove(val);
         }
     } else if (val > data && rt != nullptr) {
         if (rt->value() == val) {
             remove_child(std::move(rt));
             res = 0;
         } else {
-            res = rt->remove(val);
+            res = rt->Remove(val);
         }
     }
 
@@ -183,8 +186,8 @@ void MedianTreeNode<T>::remove_child(std::shared_ptr<MedianTreeNode<T>> child) {
     auto right_child = child->right();
 
     child.reset();
-    insert_subtree(left_child);
-    insert_subtree(right_child);
+    InsertSubtree(left_child);
+    InsertSubtree(right_child);
 }
 
 /**
@@ -211,4 +214,4 @@ void MedianTreeNode<T>::update_count() {
     n = 1 + left_count + right_count;
 }
 
-#endif //RTS_2_MEDIANTREENODE_H
+#endif //RTS_2_MEDIAN_TREE_NODE_H

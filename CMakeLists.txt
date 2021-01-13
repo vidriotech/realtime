@@ -11,7 +11,7 @@ set(HEADER_FILES src/Probe.h src/DistanceMatrix.h
         src/structures/OldMedianTree.h src/structures/OldMedianTreeNode.h)
 set(SOURCE_FILES src/main.cpp src/Probe.cpp src/DistanceMatrix.cpp
         src/acquisition/FileReader.cpp src/extraction/SnippetExtractor.cpp src/extraction/Snippet.cpp
-        src/structures/OldMedianTree.cpp src/structures/OldMedianTreeNode.cpp src/structures/MedianTreeNode.h)
+        src/structures/OldMedianTree.cpp src/structures/OldMedianTreeNode.cpp src/structures/median_tree_node.h)
 
 #set(HEADER_FILES)
 #set(SOURCE_FILES main.cpp)

@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "../src/structures/MedianTreeNode.h"
+#include "../src/structures/median_tree_node.h"
 
 /*
  * GIVEN a value v
@@ -26,7 +26,7 @@ TEST(MedianTreeNodeTests, InitialState)
 
 /*
  * GIVEN a MedianTreeNode node with value v and no children
- * DO insert a value u smaller than v AND
+ * DO Insert a value u smaller than v AND
  * TEST THAT the left child of node has value u;
  *           the height of the subtree rooted at node is 2; AND
  *           the balance factor of the subtree is 1, i.e., left-heavy.
@@ -40,9 +40,9 @@ TEST(MedianTreeNodeTests, InsertChildLeft)
     EXPECT_EQ(nullptr, node.left());
     EXPECT_EQ(nullptr, node.right());
 
-    // perform the insert
+    // perform the Insert
     auto u = node.value() - 1;
-    EXPECT_EQ(2, node.insert(u)); // success
+    EXPECT_EQ(2, node.Insert(u)); // success
 
     // ensure that u is node's left child
     ASSERT_NE(nullptr, node.left());
@@ -57,7 +57,7 @@ TEST(MedianTreeNodeTests, InsertChildLeft)
 
 /*
  * GIVEN a MedianTreeNode node with value v and no children
- * DO insert a value u larger than v AND
+ * DO Insert a value u larger than v AND
  * TEST THAT the right child of node has value u;
  *           the height of the subtree rooted at node is 2; AND
  *           the balance factor of the subtree is -1, i.e., right-heavy.
@@ -71,9 +71,9 @@ TEST(MedianTreeNodeTests, InsertChildRight)
     EXPECT_EQ(nullptr, node.left());
     EXPECT_EQ(nullptr, node.right());
 
-    // perform the insert
+    // perform the Insert
     auto u = node.value() + 1;
-    EXPECT_EQ(2, node.insert(u)); // success
+    EXPECT_EQ(2, node.Insert(u)); // success
 
     // ensure that u is node's right child
     EXPECT_EQ(nullptr, node.left());
@@ -89,7 +89,7 @@ TEST(MedianTreeNodeTests, InsertChildRight)
 /*
  * GIVEN a MedianTreeNode node with value v and left child with value u < v
  *       and no children
- * DO insert a value t < u AND
+ * DO Insert a value t < u AND
  * TEST THAT the left child of the left child of `node` has value t; AND
  *           the height of the subtree rooted at `node` is 3; AND
  *           the balance of the subtree rooted at `node` is 2.
@@ -101,7 +101,7 @@ TEST(MedianTreeNodeTests, InsertGrandchildLeft)
 
     // establish preconditions for the test
     auto u = v - 1;
-    node.insert(u);
+    node.Insert(u);
 
     EXPECT_EQ(2, node.count());
     EXPECT_EQ(2, node.height());
@@ -109,9 +109,9 @@ TEST(MedianTreeNodeTests, InsertGrandchildLeft)
     ASSERT_NE(nullptr, node.left());
     EXPECT_EQ(u, node.left()->value());
 
-    // perform the insert
+    // perform the Insert
     auto t = u - 1;
-    EXPECT_EQ(3, node.insert(t));
+    EXPECT_EQ(3, node.Insert(t));
 
     // ensure that t is the left child of node's left child
     ASSERT_NE(nullptr, node.left()->left());
@@ -126,7 +126,7 @@ TEST(MedianTreeNodeTests, InsertGrandchildLeft)
 
 /*
  * GIVEN a MedianTreeNode `node` of height 2, balance 1
- * DO insert a subtree of height 2 on the right hand side of `node` AND
+ * DO Insert a subtree of height 2 on the right hand side of `node` AND
  * TEST THAT `node` has height 3; AND
  *           `node` has balance -1.
  */
@@ -137,7 +137,7 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsChild)
 
     // establish preconditions for the test
     auto u = v - 1;
-    node.insert(u);
+    node.Insert(u);
 
     EXPECT_EQ(2, node.count());
     EXPECT_EQ(2, node.height());
@@ -149,14 +149,14 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsChild)
     // create new subtree with 3 elements, height 2
     auto t = v + 2;
     std::shared_ptr<MedianTreeNode<short>> node2(new MedianTreeNode<short>(t));
-    node2->insert(t - 1);
-    node2->insert(t + 1);
+    node2->Insert(t - 1);
+    node2->Insert(t + 1);
     EXPECT_EQ(3, node2->count());
     EXPECT_EQ(0, node2->balance());
     EXPECT_EQ(2, node2->height());
 
-    // perform the insert
-    node.insert_subtree(node2);
+    // perform the Insert
+    node.InsertSubtree(node2);
 
     // ensure that t is in node's right child
     ASSERT_NE(nullptr, node.right());
@@ -170,7 +170,7 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsChild)
 
 /*
  * GIVEN a MedianTreeNode `node` of height 3, balance 2
- * DO insert a subtree of height 2 on the right hand side of the left child
+ * DO Insert a subtree of height 2 on the right hand side of the left child
  *    of `node` AND
  * TEST THAT `node` has height 4; AND
  *           `node` has balance 3.
@@ -182,8 +182,8 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsGrandchild)
 
     // establish preconditions for the test
     auto u = v - 2;
-    node.insert(u);
-    node.insert(u - 1);
+    node.Insert(u);
+    node.Insert(u - 1);
 
     EXPECT_EQ(3, node.count());
     EXPECT_EQ(3, node.height());
@@ -196,14 +196,14 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsGrandchild)
     // create new subtree with 3 elements, height 2
     auto t = v - 1;
     std::shared_ptr<MedianTreeNode<short>> node2(new MedianTreeNode<short>(t));
-    node2->insert(t - 1);
-    node2->insert(t + 1);
+    node2->Insert(t - 1);
+    node2->Insert(t + 1);
     EXPECT_EQ(3, node2->count());
     EXPECT_EQ(0, node2->balance());
     EXPECT_EQ(2, node2->height());
 
-    // perform the insert
-    node.insert_subtree(node2);
+    // perform the Insert
+    node.InsertSubtree(node2);
 
     // ensure that t is in node's left child's right child
     EXPECT_EQ(nullptr, node.right());
@@ -229,7 +229,7 @@ TEST(MedianTreeNodeTests, RemoveLeftChildWithNoChildren)
 
     // establish preconditions for the test
     auto u = v - 1;
-    node.insert(u);
+    node.Insert(u);
 
     EXPECT_EQ(2, node.count());
     EXPECT_EQ(2, node.height());
@@ -238,7 +238,7 @@ TEST(MedianTreeNodeTests, RemoveLeftChildWithNoChildren)
     EXPECT_EQ(u, node.left()->value());
 
     // perform the remove
-    EXPECT_EQ(0, node.remove(u));
+    EXPECT_EQ(0, node.Remove(u));
 
     // ensure that left child is now null
     EXPECT_EQ(nullptr, node.left());
@@ -264,7 +264,7 @@ TEST(MedianTreeNodeTests, RemoveRightChildWithNoChildren)
 
     // establish preconditions for the test
     auto u = v + 1;
-    node.insert(u);
+    node.Insert(u);
 
     EXPECT_EQ(2, node.count());
     EXPECT_EQ(2, node.height());
@@ -273,7 +273,7 @@ TEST(MedianTreeNodeTests, RemoveRightChildWithNoChildren)
     EXPECT_EQ(u, node.right()->value());
 
     // perform the remove
-    EXPECT_EQ(0, node.remove(u));
+    EXPECT_EQ(0, node.Remove(u));
 
     // ensure that left child is now null
     EXPECT_EQ(nullptr, node.right());
@@ -300,8 +300,8 @@ TEST(MedianTreeNodeTests, RemoveChildWithChildren)
     // establish preconditions for the test
     auto u = v - 1;
     auto t = u - 1;
-    node.insert(u);
-    node.insert(t);
+    node.Insert(u);
+    node.Insert(t);
 
     EXPECT_EQ(3, node.count());
     EXPECT_EQ(3, node.height());
@@ -310,7 +310,7 @@ TEST(MedianTreeNodeTests, RemoveChildWithChildren)
     EXPECT_EQ(u, node.left()->value());
 
     // perform the remove
-    EXPECT_EQ(0, node.remove(u));
+    EXPECT_EQ(0, node.Remove(u));
 
     // ensure that left child is not null
     ASSERT_NE(nullptr, node.left());
