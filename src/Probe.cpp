@@ -18,7 +18,7 @@ Probe::Probe(ProbeConfig cfg)
     for (const auto & channel_group : cfg.channel_groups) {
         const ChannelGroup grp = channel_group.second;
 
-        for (unsigned j = 0; j < grp.n_channels(); j++) {
+        for (unsigned j = 0; j < grp.n_channels(); ++j) {
             chan_idx[k] = grp.channels[j];
             site_labels[k] = grp.site_labels[j];
             x_coords[k] = grp.x_coords[j];
@@ -137,8 +137,8 @@ void Probe::make_distance_matrix()
     if (dist_mat_complete || this->channel_distances.n_cols() != this->n_active())
         return;
 
-    for (unsigned i = 0; i < this->n_active(); i++) {
-        for (unsigned j = i + 1; j < this->n_active(); j++) {
+    for (unsigned i = 0; i < this->n_active(); ++i) {
+        for (unsigned j = i + 1; j < this->n_active(); ++j) {
             auto dx = x_coords[i] - x_coords[j], dy = y_coords[i] - y_coords[j];
             this->channel_distances.set_at(i, j, (float)std::hypot(dx, dy));
         }
@@ -158,7 +158,7 @@ void Probe::sort_channels()
 
     // get indices that would sort chan_idx
     std::vector<unsigned> argsort(n_active());
-    for (unsigned i = 0; i < n_active(); i++) {
+    for (unsigned i = 0; i < n_active(); ++i) {
         argsort[i] = i;
     }
 
@@ -173,7 +173,7 @@ void Probe::sort_channels()
     std::vector<double> tmp_buf_d(n_active());
 
     // reorder chan_idx, x_coords
-    for (unsigned i = 0; i < argsort.size(); i++) {
+    for (unsigned i = 0; i < argsort.size(); ++i) {
         tmp_buf_s[i] = chan_idx[argsort[i]];
         tmp_buf_d[i] = x_coords[argsort[i]];
     }
@@ -181,7 +181,7 @@ void Probe::sort_channels()
     this->x_coords.assign(tmp_buf_d.begin(), tmp_buf_d.end());
 
     // reorder site_labels, y_coords
-    for (unsigned i = 0; i < argsort.size(); i++) {
+    for (unsigned i = 0; i < argsort.size(); ++i) {
         tmp_buf_s[i] = site_labels[argsort[i]];
         tmp_buf_d[i] = y_coords[argsort[i]];
     }
@@ -189,7 +189,7 @@ void Probe::sort_channels()
     this->y_coords.assign(tmp_buf_d.begin(), tmp_buf_d.end());
 
     // reorder chan_grps
-    for (unsigned i = 0; i < argsort.size(); i++) {
+    for (unsigned i = 0; i < argsort.size(); ++i) {
         tmp_buf_s[i] = chan_grps[argsort[i]];
     }
     this->chan_grps.assign(tmp_buf_s.begin(), tmp_buf_s.end());
@@ -202,14 +202,14 @@ void Probe::ensure_unique()
 {
     // ensure all channel indices are unique
     unsigned ct;
-    for (std::vector<unsigned>::iterator it = chan_idx.begin(); it != chan_idx.end(); it++) {
+    for (std::vector<unsigned>::iterator it = chan_idx.begin(); it != chan_idx.end(); ++it) {
         ct = std::count(it, chan_idx.end(), *(it));
         if (ct > 1) {
             throw std::domain_error("Channel indices are not unique.");
         }
     }
 
-    for (std::vector<unsigned>::iterator it = site_labels.begin(); it != site_labels.end(); it++) {
+    for (std::vector<unsigned>::iterator it = site_labels.begin(); it != site_labels.end(); ++it) {
         ct = std::count(it, site_labels.end(), *(it));
         if (ct > 1) {
             throw std::domain_error("Site labels are not unique.");
@@ -224,7 +224,7 @@ void Probe::ensure_unique()
 */
 void Probe::find_inactive()
 {
-    for (unsigned i = 0; i < this->_n_total; i++) {
+    for (unsigned i = 0; i < this->_n_total; ++i) {
         if (std::binary_search(chan_idx.begin(), chan_idx.end(), i)) {  // channel not found
             is_active[i] = true;
         }

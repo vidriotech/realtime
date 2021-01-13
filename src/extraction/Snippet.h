@@ -36,7 +36,7 @@ T Snippet<T, M, N>::get(unsigned i, unsigned j)
 template<class T, unsigned int M, unsigned int N>
 double Snippet<T, M, N>::sq_dist(Snippet<T, M, N> &other) {
     double d = 0.0;
-    for (auto i = 0; i < data.capacity(); i++) {
+    for (auto i = 0; i < data.capacity(); ++i) {
         d += pow(data.at(i) - other.at(i), 2);
     }
 

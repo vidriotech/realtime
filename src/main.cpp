@@ -33,7 +33,7 @@ ProbeConfig make_probeconfig(unsigned n_channels, unsigned n_active, unsigned n_
     auto k = 0;
     double x = 0.0, y = 0.0;
 
-    for (auto i = 0; i < n_groups; i++) {
+    for (auto i = 0; i < n_groups; ++i) {
         ChannelGroup grp = ChannelGroup{
                 std::vector<unsigned>(chans_per_group), // channels
                 std::vector<unsigned>(chans_per_group), // site_labels
@@ -41,7 +41,7 @@ ProbeConfig make_probeconfig(unsigned n_channels, unsigned n_active, unsigned n_
                 std::vector<double>(chans_per_group), // y_coords
         };
 
-        for (auto j = 0; j < chans_per_group; j++) {
+        for (auto j = 0; j < chans_per_group; ++j) {
             grp.site_labels[j] = k + 1;
             grp.channels[j] = k++;
             grp.x_coords[j] = x;
