@@ -191,6 +191,118 @@ TEST(MedianTreeTests, InsertLargerValue)
 }
 
 /*
+ * GIVEN a MedianTree `tree` with 3 elements u < v < w with the left subtree
+ *       root containing u and the right subtree root containing v
+ * DO remove v AND
+ * TEST THAT the return value of the remove call is 0 (success); AND
+ *           the value at the root of the left subtree is u; AND
+ *           the right subtree remains unchanged; AND
+ *           there are two elements in `tree`; AND
+ *           the height of `tree` is 2; AND
+ *           the element-wise balance of `tree` is 0; AND
+ *           the median of `tree` is the mean of u and w.
+ */
+TEST(MedianTreeTests, RemoveSubtreeRoot)
+{
+    short u = -1;
+    auto v = u + 1;
+    auto w = v + 1;
+
+    MedianTree<short> tree(v);
+    tree.Insert(w);
+    tree.Insert(u);
+
+    // establish preconditions for the test
+    EXPECT_EQ(3, tree.count());
+    EXPECT_EQ(3, tree.height());
+    EXPECT_EQ(1, tree.balance());
+    EXPECT_EQ(1, tree.el_balance());
+    EXPECT_EQ(v, tree.median());
+
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_EQ(v, tree.left()->value());
+    EXPECT_EQ(u, tree.left()->min());
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_EQ(w, tree.right()->value());
+
+    // perform the remove
+    ASSERT_EQ(0, tree.Remove(v));
+
+    // ensure that u now resides in tree.left()
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_EQ(u, tree.left()->value());
+
+    // ensure that tree.right() is unchanged
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_EQ(w, tree.right()->value());
+
+    // check tree count, height, and balance factor
+    EXPECT_EQ(2, tree.count());
+    EXPECT_EQ(2, tree.height());
+    EXPECT_EQ(0, tree.balance());
+
+    // check element-wise balance and median
+    EXPECT_EQ(0, tree.el_balance());
+    EXPECT_EQ((u + w) / 2.0, tree.median());
+}
+
+/*
+ * GIVEN a MedianTree `tree` with 2 elements u < v in the left subtree and 1
+ *       element w > v in the right subtree
+ * DO remove u AND
+ * TEST THAT the return value of the remove call is 0 (success); AND
+ *           the value at the root of the left subtree is still v; AND
+ *           the right subtree remains unchanged; AND
+ *           there are two elements in `tree`; AND
+ *           the height of `tree` is 2; AND
+ *           the element-wise balance of `tree` is 0; AND
+ *           the median of `tree` is the mean of v and w.
+ */
+TEST(MedianTreeTests, RemoveSubtreeDescendant)
+{
+    short u = -1;
+    auto v = u + 1;
+    auto w = v + 1;
+
+    MedianTree<short> tree(v);
+    tree.Insert(w);
+    tree.Insert(u);
+
+    // establish preconditions for the test
+    EXPECT_EQ(3, tree.count());
+    EXPECT_EQ(3, tree.height());
+    EXPECT_EQ(1, tree.balance());
+    EXPECT_EQ(1, tree.el_balance());
+    EXPECT_EQ(v, tree.median());
+
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_EQ(v, tree.left()->value());
+    EXPECT_EQ(u, tree.left()->min());
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_EQ(w, tree.right()->value());
+
+    // perform the remove
+    ASSERT_EQ(0, tree.Remove(u));
+
+    // ensure that u now resides in tree.left()
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_EQ(v, tree.left()->value());
+
+    // ensure that tree.right() is unchanged
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_EQ(w, tree.right()->value());
+
+    // check tree count, height, and balance factor
+    EXPECT_EQ(2, tree.count());
+    EXPECT_EQ(2, tree.height());
+    EXPECT_EQ(0, tree.balance());
+
+    // check element-wise balance and median
+    EXPECT_EQ(0, tree.el_balance());
+    EXPECT_EQ((v + w) / 2.0, tree.median());
+}
+
+/*
  * GIVEN a MedianTree `tree` with 3 elements t < u < v in the left subtree
  *       and 1 element w > v in the right subtree
  * DO rebalance the tree: shift the largest element of the left subtree to the
