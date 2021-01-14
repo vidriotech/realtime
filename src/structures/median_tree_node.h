@@ -11,12 +11,13 @@ public:
     MedianTreeNode(T val) : data(val), ht(1), n(1) {};
 
     // Insert and remove elements/subtrees
-    short Insert(T val);
-    short InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node);
-    short Remove(T val);
+    short Insert(T val, bool rotate = true);
+    short
+    InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node, bool rotate = true);
+    short Remove(T val, bool rotate = true);
 
     // rotate child elements
-    void RotateChildren();
+    void RotateChildren(bool recursive = true);
 
     // getters
     [[nodiscard]] short balance();
@@ -65,7 +66,8 @@ private:
     unsigned short n; /*!< Number of elements in the subtree. */
     unsigned short ht; /*!< The height of the subtree rooted at this node. */
 
-    void RemoveChild(std::shared_ptr<MedianTreeNode<T>> child);
+    void
+    RemoveChild(std::shared_ptr<MedianTreeNode<T>> child, bool rotate = true);
 
     std::shared_ptr<MedianTreeNode<T>>
     RotateChild(std::shared_ptr<MedianTreeNode<T>> child);
@@ -89,23 +91,28 @@ private:
  * @return The updated height of the subtree rooted at this node.
  */
 template<class T>
-short MedianTreeNode<T>::Insert(T val) {
+short MedianTreeNode<T>::Insert(T val, bool rotate) {
     if (val <= data) {
         if (lt == nullptr) {
             lt.reset(new MedianTreeNode<T>(val));
         } else {
-            lt->Insert(val);
+            lt->Insert(val, rotate);
         }
     } else {
         if (rt == nullptr) {
             rt.reset(new MedianTreeNode<T>(val));
         } else {
-            rt->Insert(val);
+            rt->Insert(val, rotate);
         }
     }
 
     UpdateCount();
     UpdateHeight();
+
+    if (rotate) {
+        RotateChildren(false);
+    }
+
     return ht;
 }
 
@@ -117,7 +124,8 @@ short MedianTreeNode<T>::Insert(T val) {
  */
 template<class T>
 short
-MedianTreeNode<T>::InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node) {
+MedianTreeNode<T>::InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node,
+                                 bool rotate) {
     if (node == nullptr)
         return ht;
 
@@ -125,18 +133,23 @@ MedianTreeNode<T>::InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node) {
         if (lt == nullptr) {
             lt.swap(node);
         } else {
-            lt->InsertSubtree(node);
+            lt->InsertSubtree(node, rotate);
         }
     } else {
         if (rt == nullptr) {
             rt.swap(node);
         } else {
-            rt->InsertSubtree(node);
+            rt->InsertSubtree(node, rotate);
         }
     }
 
     UpdateCount();
     UpdateHeight();
+
+    if (rotate) {
+        RotateChildren(false);
+    }
+
     return ht;
 }
 
@@ -147,27 +160,32 @@ MedianTreeNode<T>::InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node) {
  * @return 0 if value successfully found and removed, 1 otherwise.
  */
 template<class T>
-short MedianTreeNode<T>::Remove(T val) {
+short MedianTreeNode<T>::Remove(T val, bool rotate) {
     short res = 1;
 
     if (val <= data && lt != nullptr) {
         if (lt->value() == val) {
-            RemoveChild(std::move(lt));
+            RemoveChild(std::move(lt), rotate);
             res = 0;
         } else {
-            res = lt->Remove(val);
+            res = lt->Remove(val, rotate);
         }
     } else if (val > data && rt != nullptr) {
         if (rt->value() == val) {
-            RemoveChild(std::move(rt));
+            RemoveChild(std::move(rt), rotate);
             res = 0;
         } else {
-            res = rt->Remove(val);
+            res = rt->Remove(val, rotate);
         }
     }
 
     UpdateCount();
     UpdateHeight();
+
+    if (rotate) {
+        RotateChildren(false);
+    }
+
     return res;
 }
 
@@ -176,9 +194,18 @@ short MedianTreeNode<T>::Remove(T val) {
  * @tparam T The type of the value stored in the elements of the subtree.
  */
 template<class T>
-void MedianTreeNode<T>::RotateChildren() {
+void MedianTreeNode<T>::RotateChildren(bool recursive) {
     lt = RotateChild(std::move(lt));
     rt = RotateChild(std::move(rt));
+
+    if (recursive) {
+        if (lt != nullptr) {
+            lt->RotateChildren(recursive);
+        }
+        if (rt != nullptr) {
+            rt->RotateChildren(recursive);
+        }
+    }
 
     UpdateCount();
     UpdateHeight();
@@ -195,13 +222,14 @@ void MedianTreeNode<T>::RotateChildren() {
  * @param child Pointer to the child to remove.
  */
 template<class T>
-void MedianTreeNode<T>::RemoveChild(std::shared_ptr<MedianTreeNode<T>> child) {
+void MedianTreeNode<T>::RemoveChild(std::shared_ptr<MedianTreeNode<T>> child,
+                                    bool rotate) {
     auto left_child = child->left();
     auto right_child = child->right();
 
     child.reset();
-    InsertSubtree(left_child);
-    InsertSubtree(right_child);
+    InsertSubtree(left_child, rotate);
+    InsertSubtree(right_child, rotate);
 }
 
 /**
@@ -217,17 +245,17 @@ MedianTreeNode<T>::RotateChild(std::shared_ptr<MedianTreeNode<T>> child) {
         return child;
     }
 
-    if (child->balance() == 2) {
-        if (child->left()->balance() == 1) {
+    if (child->balance() >= 2) {
+        if (child->left()->balance() >= 1) {
             child = LLRotate(std::move(child));
-        } else if (child->left()->balance() == -1) {
+        } else if (child->left()->balance() <= -1) {
             child = LRRotate(std::move(child));
         }
-    } else if (child->balance() == -2) {
-        if (child->right()->balance() == 1) {
+    } else if (child->balance() <= -2) {
+        if (child->right()->balance() >= 1) {
             child = RLRotate(std::move(child));
         }
-        else if (child->right() != nullptr && child->right()->balance() == -1) {
+        else if (child->right() != nullptr && child->right()->balance() <= -1) {
             child = RRRotate(std::move(child));
         }
     } else {

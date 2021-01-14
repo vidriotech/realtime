@@ -42,7 +42,7 @@ TEST(MedianTreeNodeTests, InsertChildLeft)
 
     // perform the Insert
     auto u = node.value() - 1;
-    EXPECT_EQ(2, node.Insert(u)); // success
+    EXPECT_EQ(2, node.Insert(u, false)); // success
 
     // ensure that u is node's left child
     ASSERT_NE(nullptr, node.left());
@@ -73,7 +73,7 @@ TEST(MedianTreeNodeTests, InsertChildRight)
 
     // perform the Insert
     auto u = node.value() + 1;
-    EXPECT_EQ(2, node.Insert(u)); // success
+    EXPECT_EQ(2, node.Insert(u, false)); // success
 
     // ensure that u is node's right child
     EXPECT_EQ(nullptr, node.left());
@@ -101,7 +101,7 @@ TEST(MedianTreeNodeTests, InsertGrandchildLeft)
 
     // establish preconditions for the test
     auto u = v - 1;
-    node.Insert(u);
+    node.Insert(u, false);
 
     EXPECT_EQ(2, node.count());
     EXPECT_EQ(2, node.height());
@@ -111,7 +111,7 @@ TEST(MedianTreeNodeTests, InsertGrandchildLeft)
 
     // perform the Insert
     auto t = u - 1;
-    EXPECT_EQ(3, node.Insert(t));
+    EXPECT_EQ(3, node.Insert(t, false));
 
     // ensure that t is the left child of node's left child
     ASSERT_NE(nullptr, node.left()->left());
@@ -137,7 +137,7 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsChild)
 
     // establish preconditions for the test
     auto u = v - 1;
-    node.Insert(u);
+    node.Insert(u, false);
 
     EXPECT_EQ(2, node.count());
     EXPECT_EQ(2, node.height());
@@ -149,14 +149,14 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsChild)
     // create new subtree with 3 elements, height 2
     auto t = v + 2;
     std::shared_ptr<MedianTreeNode<short>> node2(new MedianTreeNode<short>(t));
-    node2->Insert(t - 1);
-    node2->Insert(t + 1);
+    node2->Insert(t - 1, false);
+    node2->Insert(t + 1, false);
     EXPECT_EQ(3, node2->count());
     EXPECT_EQ(0, node2->balance());
     EXPECT_EQ(2, node2->height());
 
     // perform the Insert
-    node.InsertSubtree(node2);
+    node.InsertSubtree(node2, false);
 
     // ensure that t is in node's right child
     ASSERT_NE(nullptr, node.right());
@@ -182,8 +182,8 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsGrandchild)
 
     // establish preconditions for the test
     auto u = v - 2;
-    node.Insert(u);
-    node.Insert(u - 1);
+    node.Insert(u, false);
+    node.Insert(u - 1, false);
 
     EXPECT_EQ(3, node.count());
     EXPECT_EQ(3, node.height());
@@ -196,14 +196,14 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsGrandchild)
     // create new subtree with 3 elements, height 2
     auto t = v - 1;
     std::shared_ptr<MedianTreeNode<short>> node2(new MedianTreeNode<short>(t));
-    node2->Insert(t - 1);
-    node2->Insert(t + 1);
+    node2->Insert(t - 1, false);
+    node2->Insert(t + 1, false);
     EXPECT_EQ(3, node2->count());
     EXPECT_EQ(0, node2->balance());
     EXPECT_EQ(2, node2->height());
 
     // perform the Insert
-    node.InsertSubtree(node2);
+    node.InsertSubtree(node2, false);
 
     // ensure that t is in node's left child's right child
     EXPECT_EQ(nullptr, node.right());
@@ -229,7 +229,7 @@ TEST(MedianTreeNodeTests, RemoveLeftChildWithNoChildren)
 
     // establish preconditions for the test
     auto u = v - 1;
-    node.Insert(u);
+    node.Insert(u, false);
 
     EXPECT_EQ(2, node.count());
     EXPECT_EQ(2, node.height());
@@ -238,7 +238,7 @@ TEST(MedianTreeNodeTests, RemoveLeftChildWithNoChildren)
     EXPECT_EQ(u, node.left()->value());
 
     // perform the remove
-    EXPECT_EQ(0, node.Remove(u));
+    EXPECT_EQ(0, node.Remove(u, false));
 
     // ensure that left child is now null
     EXPECT_EQ(nullptr, node.left());
@@ -264,7 +264,7 @@ TEST(MedianTreeNodeTests, RemoveRightChildWithNoChildren)
 
     // establish preconditions for the test
     auto u = v + 1;
-    node.Insert(u);
+    node.Insert(u, false);
 
     EXPECT_EQ(2, node.count());
     EXPECT_EQ(2, node.height());
@@ -273,7 +273,7 @@ TEST(MedianTreeNodeTests, RemoveRightChildWithNoChildren)
     EXPECT_EQ(u, node.right()->value());
 
     // perform the remove
-    EXPECT_EQ(0, node.Remove(u));
+    EXPECT_EQ(0, node.Remove(u, false));
 
     // ensure that left child is now null
     EXPECT_EQ(nullptr, node.right());
@@ -300,8 +300,8 @@ TEST(MedianTreeNodeTests, RemoveChildWithChildren)
     // establish preconditions for the test
     auto u = v - 1;
     auto t = u - 1;
-    node.Insert(u);
-    node.Insert(t);
+    node.Insert(u, false);
+    node.Insert(t, false);
 
     EXPECT_EQ(3, node.count());
     EXPECT_EQ(3, node.height());
@@ -310,7 +310,7 @@ TEST(MedianTreeNodeTests, RemoveChildWithChildren)
     EXPECT_EQ(u, node.left()->value());
 
     // perform the remove
-    EXPECT_EQ(0, node.Remove(u));
+    EXPECT_EQ(0, node.Remove(u, false));
 
     // ensure that left child is not null
     ASSERT_NE(nullptr, node.left());
@@ -333,16 +333,16 @@ TEST(MedianTreeNodeTests, RemoveChildWithChildren)
 TEST(MedianTreeNodeTests, TestLLRotation)
 {
     std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(6));
-    node->Insert(4);
-    node->Insert(7);
-    node->Insert(2);
-    node->Insert(5);
-    node->Insert(1);
-    node->Insert(3);
+    node->Insert(4, false);
+    node->Insert(7, false);
+    node->Insert(2, false);
+    node->Insert(5, false);
+    node->Insert(1, false);
+    node->Insert(3, false);
 
     // hook node into another, higher node in order to do the rotate
     MedianTreeNode<short> base(10);
-    base.InsertSubtree(node);
+    base.InsertSubtree(node, false);
 
     // establish preconditions for the test
     EXPECT_EQ(4, node->height());
@@ -352,7 +352,7 @@ TEST(MedianTreeNodeTests, TestLLRotation)
     EXPECT_EQ(1, node->left()->balance());
 
     // perform the rotation
-    base.RotateChildren();
+    base.RotateChildren(false);
 
     // node should no longer be base's left value
     ASSERT_NE(node, base.left());
@@ -392,16 +392,16 @@ TEST(MedianTreeNodeTests, TestLLRotation)
 TEST(MedianTreeNodeTests, TestLRRotation)
 {
     std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(6));
-    node->Insert(2);
-    node->Insert(7);
-    node->Insert(1);
-    node->Insert(4);
-    node->Insert(3);
-    node->Insert(5);
+    node->Insert(2, false);
+    node->Insert(7, false);
+    node->Insert(1, false);
+    node->Insert(4, false);
+    node->Insert(3, false);
+    node->Insert(5, false);
 
     // hook node into another, higher node in order to do the rotate
     MedianTreeNode<short> base(0);
-    base.InsertSubtree(node);
+    base.InsertSubtree(node, false);
 
     // establish preconditions for the test
     EXPECT_EQ(4, node->height());
@@ -411,7 +411,7 @@ TEST(MedianTreeNodeTests, TestLRRotation)
     EXPECT_EQ(-1, node->left()->balance());
 
     // perform the rotation
-    base.RotateChildren();
+    base.RotateChildren(false);
 
     // node should no longer be base's right value
     ASSERT_NE(node, base.right());
@@ -451,16 +451,16 @@ TEST(MedianTreeNodeTests, TestLRRotation)
 TEST(MedianTreeNodeTests, TestRLRotation)
 {
     std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(2));
-    node->Insert(1);
-    node->Insert(6);
-    node->Insert(4);
-    node->Insert(7);
-    node->Insert(3);
-    node->Insert(5);
+    node->Insert(1, false);
+    node->Insert(6, false);
+    node->Insert(4, false);
+    node->Insert(7, false);
+    node->Insert(3, false);
+    node->Insert(5, false);
 
     // hook node into another, higher node in order to do the rotate
     MedianTreeNode<short> base(10);
-    base.InsertSubtree(node);
+    base.InsertSubtree(node, false);
 
     // establish preconditions for the test
     EXPECT_EQ(4, node->height());
@@ -470,7 +470,7 @@ TEST(MedianTreeNodeTests, TestRLRotation)
     EXPECT_EQ(1, node->right()->balance());
 
     // perform the rotation
-    base.RotateChildren();
+    base.RotateChildren(false);
 
     // node should no longer be base's left value
     ASSERT_NE(node, base.left());
@@ -511,16 +511,16 @@ TEST(MedianTreeNodeTests, TestRLRotation)
 TEST(MedianTreeNodeTests, TestRRRotation)
 {
     std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(2));
-    node->Insert(1);
-    node->Insert(4);
-    node->Insert(3);
-    node->Insert(6);
-    node->Insert(5);
-    node->Insert(7);
+    node->Insert(1, false);
+    node->Insert(4, false);
+    node->Insert(3, false);
+    node->Insert(6, false);
+    node->Insert(5, false);
+    node->Insert(7, false);
 
     // hook node into another, higher node in order to do the rotate
     MedianTreeNode<short> base(0);
-    base.InsertSubtree(node);
+    base.InsertSubtree(node, false);
 
     // establish preconditions for the test
     EXPECT_EQ(4, node->height());
@@ -530,7 +530,7 @@ TEST(MedianTreeNodeTests, TestRRRotation)
     EXPECT_EQ(-1, node->right()->balance());
 
     // perform the rotation
-    base.RotateChildren();
+    base.RotateChildren(false);
 
     // node should no longer be base's right value
     ASSERT_NE(node, base.right());
@@ -571,8 +571,8 @@ TEST(MedianTreeNodeTests, MaxValue)
     auto v = u + 1;
 
     MedianTreeNode<short> node(u);
-    node.Insert(t);
-    node.Insert(v);
+    node.Insert(t, false);
+    node.Insert(v, false);
 
     EXPECT_EQ(v, node.max());
 }
@@ -589,8 +589,49 @@ TEST(MedianTreeNodeTests, MinValue)
     auto v = u + 1;
 
     MedianTreeNode<short> node(u);
-    node.Insert(t);
-    node.Insert(v);
+    node.Insert(t, false);
+    node.Insert(v, false);
 
     EXPECT_EQ(t, node.min());
+}
+
+/*
+ * GIVEN a MedianTreeNode `node` with 6 values u < v < w < x < y < z, inserted
+ *       in that order without rotation
+ * DO perform a recursive rotation AND
+ * TEST THAT `node` is balanced.
+ */
+TEST(MedianTreeNodeTests, RecursiveRotate)
+{
+    short u = 1;
+    auto v = u + 1;
+    auto w = v + 1;
+    auto x = w + 1;
+    auto y = x + 1;
+    auto z = y + 1;
+
+    std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(u));
+    node->Insert(v, false);
+    node->Insert(w, false);
+    node->Insert(x, false);
+    node->Insert(y, false);
+    node->Insert(z, false);
+
+    // hook node into another, higher node in order to do the rotate
+    MedianTreeNode<short> base(z + 1);
+    base.InsertSubtree(node, false);
+
+    // establish preconditions for the test
+    ASSERT_NE(nullptr, base.left());
+    EXPECT_EQ(-5, base.left()->balance());
+
+    // perform the rotation
+    base.RotateChildren(true);
+
+    // node no longer lives at base.left()
+    ASSERT_NE(nullptr, base.left());
+    EXPECT_NE(node, base.left());
+
+    node = base.left();
+    EXPECT_EQ(0, node->balance());
 }

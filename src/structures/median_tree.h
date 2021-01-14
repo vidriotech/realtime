@@ -97,7 +97,7 @@ void MedianTree<T>::Insert(T val) {
         if (lt == nullptr) {
             lt.reset(new MedianTreeNode<T>(val));
         } else {
-            lt->Insert(val);
+            lt->Insert(val, false);
         }
 
         left_max = count_left() == 1 ? val : std::max(left_max, val);
@@ -105,7 +105,7 @@ void MedianTree<T>::Insert(T val) {
         if (rt == nullptr) {
             rt.reset(new MedianTreeNode<T>(val));
         } else {
-            rt->Insert(val);
+            rt->Insert(val, false);
         }
 
         right_min = count_right() == 1 ? val : std::min(right_min, val);
@@ -127,7 +127,7 @@ short MedianTree<T>::Remove(T val) {
             lt = RemoveRoot(std::move(lt));
             res = 0;
         } else { // search for the value in the left subtree
-            res = lt->Remove(val);
+            res = lt->Remove(val, false);
         }
 
         // update right_min if we need to
@@ -144,7 +144,7 @@ short MedianTree<T>::Remove(T val) {
             rt = RemoveRoot(std::move(rt));
             res = 0;
         } else { // search for the value in the right subtree
-            res = rt->Remove(val);
+            res = rt->Remove(val, false);
         }
 
         // update right_min if we need to
@@ -266,7 +266,7 @@ std::shared_ptr<MedianTreeNode<T>> MedianTree<T>::RemoveRoot(std::shared_ptr<Med
         root.swap(left_child);
         left_child.reset();
 
-        root->InsertSubtree(right_child);
+        root->InsertSubtree(right_child, false);
     } else {
         root.swap(right_child);
         right_child.reset();
@@ -284,7 +284,7 @@ void MedianTree<T>::ShiftLTR() {
         rt.reset(new MedianTreeNode<T>(max_val));
         right_min = max_val;
     } else {
-        rt->Insert(max_val);
+        rt->Insert(max_val, false);
         right_min = std::min(max_val, right_min);
     }
 }
@@ -298,7 +298,7 @@ void MedianTree<T>::ShiftRTL() {
         lt.reset(new MedianTreeNode<T>(min_val));
         left_max = min_val;
     } else {
-        lt->Insert(min_val);
+        lt->Insert(min_val, false);
         left_max = std::max(min_val, left_max);
     }
 }
