@@ -19,6 +19,7 @@ public:
     void RotateChildren();
 
     // getters
+    [[nodiscard]] short balance();
     /**
      * @brief Get the value stored in this node.
      * @return The value stored in this node.
@@ -34,7 +35,6 @@ public:
      * @return The height of the subtree rooted at this node.
      */
     [[nodiscard]] unsigned short height() const { return ht; };
-    [[nodiscard]] short balance();
     /**
      * @brief Get a pointer to the left subtree of this node.
      * @return Pointer to the left subtree of this node.
@@ -47,6 +47,17 @@ public:
      */
     [[nodiscard]] std::shared_ptr<MedianTreeNode<T>>
     right() const { return rt; };
+
+    /**
+     * @brief Return the maximum value in the subtree rooted at this node.
+     * @return The maximum value in this subtree.
+     */
+    [[nodiscard]] T max() const { return rt == nullptr ? data : rt->max(); };
+    /**
+     * @brief Return the minimum value in the subtree rooted at this node.
+     * @return The minimum value in this subtree.
+     */
+    [[nodiscard]] T min() const { return lt == nullptr ? data : lt->min(); };
 private:
     T data; /*!< The data in this node.  */
     std::shared_ptr<MedianTreeNode<T>> lt; /*!< Left child. */

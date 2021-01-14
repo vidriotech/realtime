@@ -558,3 +558,39 @@ TEST(MedianTreeNodeTests, TestRRRotation)
     EXPECT_EQ(3, node->right()->count());
     EXPECT_EQ(0, node->right()->balance());
 }
+
+/*
+ * GIVEN a MedianTreeNode `node` with three values t < u < v
+ * DO query the max value M of `node` AND
+ * TEST THAT M = v.
+ */
+TEST(MedianTreeNodeTests, MaxValue)
+{
+    short u = 0;
+    auto t = u - 1;
+    auto v = u + 1;
+
+    MedianTreeNode<short> node(u);
+    node.Insert(t);
+    node.Insert(v);
+
+    EXPECT_EQ(v, node.max());
+}
+
+/*
+ * GIVEN a MedianTreeNode `node` with three values t < u < v
+ * DO query the min value M of `node` AND
+ * TEST THAT M = t.
+ */
+TEST(MedianTreeNodeTests, MinValue)
+{
+    short u = 0;
+    auto t = u - 1;
+    auto v = u + 1;
+
+    MedianTreeNode<short> node(u);
+    node.Insert(t);
+    node.Insert(v);
+
+    EXPECT_EQ(t, node.min());
+}
