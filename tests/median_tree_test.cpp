@@ -4,8 +4,14 @@
 
 /*
  * DO construct a MedianTree `tree` with no arguments; AND
- * TEST THAT `tree` has null pointers for both left and right children; AND
+ * TEST THAT `tree` has a null pointer for its left subtree; AND
+ *           the number of elements in its left subtree is 0; AND
+ *           `tree` has a null pointer for its right subtree; AND
+ *           the number of elements in its right subtree is 0; AND
  *           `tree` has 0 elements; AND
+ *           the height of `tree` is 1; AND
+ *           the height balance factor of `tree` is 0; AND
+ *           the element-wise balance factor of `tree` is 0; AND
  *           the median of `tree` is 0.
  */
 TEST(MedianTreeTests, InitialStateNoArgs)
@@ -32,6 +38,9 @@ TEST(MedianTreeTests, InitialStateNoArgs)
  *           the value at the root of the left subtree of `tree` is v; AND
  *           `tree` has a null pointer for its right tree; AND
  *           `tree` has 1 element; AND
+ *           the height of `tree` is 2; AND
+ *           the height balance factor of `tree` is 1; AND
+ *           the element-wise balance factor of `tree` is 1; AND
  *           the median of `tree` is v.
  */
 TEST(MedianTreeTests, InitialStateSingleArg)
@@ -57,13 +66,15 @@ TEST(MedianTreeTests, InitialStateSingleArg)
 /*
  * GIVEN two initial values u and v
  * DO construct a MedianTree `tree` with arguments u and v; AND
- * TEST THAT `tree` has 1 element in its left tree; AND
+ * TEST THAT `tree` has 1 element in its left subtree; AND
  *           the value at the root of the left subtree is v; AND
+ *           `tree` has 1 element in its right subtree; AND
  *           the value at the root of the right subtree is u; AND
  *           `tree` has 2 elements; AND
- *           `tree` has a height of 2; AND
- *           `tree` is balanced; AND
- *           the median of `tree` is v.
+ *           the height of `tree` is 2; AND
+ *           the height balance factor of `tree` is 0; AND
+ *           the element-wise balance factor of `tree` is 0; AND
+ *           the median of `tree` is the mean of u and v.
  */
 TEST(MedianTreeTests, InitialStateTwoArgs)
 {
@@ -92,10 +103,13 @@ TEST(MedianTreeTests, InitialStateTwoArgs)
 /*
  * GIVEN an empty MedianTree `tree` and a value v
  * DO insert v into `tree` AND
- * TEST THAT `tree` has 1 element in its left tree; AND
+ * TEST THAT `tree` has 1 element in its left subtree; AND
  *           the value at the root of the left subtree of `tree` is v; AND
  *           `tree` has a null pointer for its right tree; AND
  *           `tree` has 1 element; AND
+ *           the height of `tree` is 2; AND
+ *           the height balance factor of `tree` is 1; AND
+ *           the element-wise balance factor of `tree` is 1; AND
  *           the median of `tree` is v.
  */
 TEST(MedianTreeTests, InsertIntoEmpty)
