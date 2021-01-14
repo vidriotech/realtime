@@ -47,7 +47,6 @@ public:
      */
     [[nodiscard]] std::shared_ptr<MedianTreeNode<T>>
     right() const { return rt; };
-
     /**
      * @brief Return the maximum value in the subtree rooted at this node.
      * @return The maximum value in this subtree.
@@ -144,7 +143,7 @@ MedianTreeNode<T>::InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node) {
 /**
  * @brief Remove a value from the subtree rooted at this node.
  * @tparam T The type of the value in this node.
- * @param val The value to remove the subtree rooted at this node.
+ * @param val The value to remove from the subtree rooted at this node.
  * @return 0 if value successfully found and removed, 1 otherwise.
  */
 template<class T>

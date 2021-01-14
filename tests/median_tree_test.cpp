@@ -122,6 +122,7 @@ TEST(MedianTreeTests, InsertIntoEmpty)
     EXPECT_EQ(1, tree.height());
     EXPECT_EQ(0, tree.balance());
     EXPECT_EQ(0, tree.el_balance());
+    EXPECT_EQ(0, tree.median());
     EXPECT_EQ(nullptr, tree.left());
 
     // perform the insert
@@ -142,4 +143,163 @@ TEST(MedianTreeTests, InsertIntoEmpty)
     // check element-wise balance and median
     EXPECT_EQ(1, tree.el_balance());
     EXPECT_EQ(v, tree.median());
+}
+
+/*
+ * GIVEN a MedianTreeNode with a single value v
+ * DO insert a value u > v AND
+ * TEST THAT `tree` has 1 element in its right subtree; AND
+ *           the value at the root of the right subtree is u; AND
+ *           `tree` has 2 elements; AND
+ *           the height of `tree` is 2; AND
+ *           the height balance factor of `tree` is 0; AND
+ *           the element-wise balance factor of `tree` is 0; AND
+ *           the median of `tree` is the mean of u and v.
+ */
+TEST(MedianTreeTests, InsertLargerValue)
+{
+    short v = -1;
+    MedianTree<short> tree(v);
+
+    // establish preconditions for the test
+    EXPECT_EQ(1, tree.count());
+    EXPECT_EQ(2, tree.height());
+    EXPECT_EQ(1, tree.balance());
+    EXPECT_EQ(1, tree.el_balance());
+    EXPECT_EQ(v, tree.median());
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_EQ(v, tree.left()->value());
+    EXPECT_EQ(nullptr, tree.right());
+
+    // perform the insert
+    auto u = v + 1;
+    tree.Insert(u);
+
+    // ensure that u is in the right subtree
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_EQ(u, tree.right()->value());
+    EXPECT_EQ(1, tree.count_right());
+
+    // check tree count, height, and balance factor
+    EXPECT_EQ(2, tree.count());
+    EXPECT_EQ(2, tree.height());
+    EXPECT_EQ(0, tree.balance());
+
+    // check element-wise balance and median
+    EXPECT_EQ(0, tree.el_balance());
+    EXPECT_EQ((u + v) / 2.0, tree.median());
+}
+
+/*
+ * GIVEN a MedianTree `tree` with 3 elements t < u < v in the left subtree
+ *       and 1 element w > v in the right subtree
+ * DO rebalance the tree: shift the largest element of the left subtree to the
+ *    right subtree AND
+ * TEST THAT the number of elements in `tree` remains 4; AND
+ *           the element-wise balance of `tree` is 0; AND
+ *           t is the minimum of the left subtree; AND
+ *           u is the maximum of the left subtree; AND
+ *           v is the minimum of the right subtree; AND
+ *           w is the maximum of the right subtree; AND
+ *           the median of `tree` is mean of u and v.
+ */
+TEST(MedianTreeTests, BalanceElementsLTR)
+{
+    short t = -1;
+    auto u = t + 1;
+    auto v = u + 1;
+    auto w = v + 1;
+
+    MedianTree<short> tree(v);
+    tree.Insert(w);
+    tree.Insert(u);
+    tree.Insert(t);
+
+    // establish preconditions for the test
+    EXPECT_EQ(4, tree.count());
+    EXPECT_EQ(2, tree.el_balance());
+    // equivalently:
+    // EXPECT_EQ(3, tree.count_left());
+    // EXPECT_EQ(1, tree.count_right());
+
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_EQ(t, tree.left()->min());
+    EXPECT_EQ(v, tree.left()->max());
+
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_EQ(w, tree.right()->min());
+    EXPECT_EQ(w, tree.right()->max());
+
+    // perform the rebalance
+    tree.BalanceElements();
+
+    EXPECT_EQ(4, tree.count());
+    EXPECT_EQ(0, tree.el_balance());
+
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_EQ(t, tree.left()->min());
+    EXPECT_EQ(u, tree.left()->max());
+
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_EQ(v, tree.right()->min());
+    EXPECT_EQ(w, tree.right()->max());
+
+    EXPECT_EQ((u + v) / 2.0, tree.median());
+}
+
+/*
+ * GIVEN a MedianTree `tree` with 3 elements u < v < w in the right subtree
+ *       and 1 element t < u in the left subtree
+ * DO rebalance the tree: shift the smallest element of the right subtree to the
+ *    left subtree AND
+ * TEST THAT the number of elements in `tree` remains 4; AND
+ *           the element-wise balance of `tree` is 0; AND
+ *           t is the minimum of the left subtree; AND
+ *           u is the maximum of the left subtree; AND
+ *           v is the minimum of the right subtree; AND
+ *           w is the maximum of the right subtree; AND
+ *           the median of `tree` is mean of u and v.
+ */
+TEST(MedianTreeTests, BalanceElementsRTL)
+{
+    short t = -1;
+    auto u = t + 1;
+    auto v = u + 1;
+    auto w = v + 1;
+
+    MedianTree<short> tree(t);
+    tree.Insert(u);
+    tree.Insert(v);
+    tree.Insert(w);
+
+    // establish preconditions for the test
+    EXPECT_EQ(4, tree.count());
+    EXPECT_EQ(-2, tree.el_balance());
+    // equivalently:
+    // EXPECT_EQ(3, tree.count_left());
+    // EXPECT_EQ(1, tree.count_right());
+
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_EQ(t, tree.left()->min());
+    EXPECT_EQ(t, tree.left()->max());
+
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_EQ(u, tree.right()->min());
+    EXPECT_EQ(w, tree.right()->max());
+
+    // perform the rebalance
+    tree.BalanceElements();
+
+    EXPECT_EQ(4, tree.count());
+    EXPECT_EQ(0, tree.el_balance());
+
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_EQ(t, tree.left()->min());
+    EXPECT_EQ(u, tree.left()->max());
+
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_EQ(v, tree.right()->min());
+    EXPECT_EQ(w, tree.right()->max());
+
+    EXPECT_EQ((u + v) / 2.0, tree.median());
 }
