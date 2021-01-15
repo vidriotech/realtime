@@ -598,7 +598,7 @@ TEST(MedianTreeNodeTests, RRRotation)
 /*
  * GIVEN a MedianTreeNode `node` with value u and no children
  * DO insert values v < w < x < y < z (with v > u), in that order, AND
- * TEST THAT the balance of the tree containing `node` never exceeds 1 and
+ * TEST THAT the balance of the tree containing `node` never exceeds 1 in
  *           absolute value; AND
  *           the height of the tree containing `node` never exceeds 3.
  */
@@ -654,7 +654,8 @@ TEST(MedianTreeNodeTests, RotateOnInsert)
  * GIVEN a MedianTreeNode `node` with 6 values u < v < w < x < y < z, inserted
  *       in that order without rotation
  * DO perform a recursive rotation AND
- * TEST THAT `node` is balanced.
+ * TEST THAT the subtree containing `node` is balanced; AND
+ *           the count of elements remains unchanged.
  */
 TEST(MedianTreeNodeTests, RecursiveRotate)
 {
@@ -683,10 +684,12 @@ TEST(MedianTreeNodeTests, RecursiveRotate)
     // perform the rotation
     base.RotateChildren(true);
 
-    // node no longer lives at base.left()
+    // node no longer lives at base.left(), so reassign node
     ASSERT_NE(nullptr, base.left());
     EXPECT_NE(node, base.left());
-
     node = base.left();
+
+    // ensure the node is balanced
     EXPECT_EQ(0, node->balance());
+    EXPECT_EQ(6, node->count());
 }

@@ -126,7 +126,7 @@ TEST(MedianTreeTests, InsertIntoEmpty)
     EXPECT_EQ(nullptr, tree.left());
 
     // perform the insert
-    tree.Insert(v);
+    tree.Insert(v, false, false);
 
     // ensure that v is in the left subtree
     ASSERT_NE(nullptr, tree.left());
@@ -173,7 +173,7 @@ TEST(MedianTreeTests, InsertLargerValue)
 
     // perform the insert
     auto u = v + 1;
-    tree.Insert(u);
+    tree.Insert(u, false, false);
 
     // ensure that u is in the right subtree
     ASSERT_NE(nullptr, tree.right());
@@ -209,8 +209,8 @@ TEST(MedianTreeTests, RemoveSubtreeRoot)
     auto w = v + 1;
 
     MedianTree<short> tree(v);
-    tree.Insert(w);
-    tree.Insert(u);
+    tree.Insert(w, false, false);
+    tree.Insert(u, false, false);
 
     // establish preconditions for the test
     EXPECT_EQ(3, tree.count());
@@ -265,8 +265,8 @@ TEST(MedianTreeTests, RemoveSubtreeDescendant)
     auto w = v + 1;
 
     MedianTree<short> tree(v);
-    tree.Insert(w);
-    tree.Insert(u);
+    tree.Insert(w, false, false);
+    tree.Insert(u, false, false);
 
     // establish preconditions for the test
     EXPECT_EQ(3, tree.count());
@@ -323,9 +323,9 @@ TEST(MedianTreeTests, BalanceElementsLTR)
     auto w = v + 1;
 
     MedianTree<short> tree(v);
-    tree.Insert(w);
-    tree.Insert(u);
-    tree.Insert(t);
+    tree.Insert(w, false, false);
+    tree.Insert(u, false, false);
+    tree.Insert(t, false, false);
 
     // establish preconditions for the test
     EXPECT_EQ(4, tree.count());
@@ -380,9 +380,9 @@ TEST(MedianTreeTests, BalanceElementsRTL)
     auto w = v + 1;
 
     MedianTree<short> tree(t);
-    tree.Insert(u);
-    tree.Insert(v);
-    tree.Insert(w);
+    tree.Insert(u, false, false);
+    tree.Insert(v, false, false);
+    tree.Insert(w, false, false);
 
     // establish preconditions for the test
     EXPECT_EQ(4, tree.count());

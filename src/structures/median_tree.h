@@ -16,7 +16,7 @@ public:
     MedianTree(T a, T b);
 
     // Insert and remove elements
-    void Insert(T val);
+    void Insert(T val, bool balance = true, bool rotate = true);
     short Remove(T val);
 
     // rotate and rebalance subtrees
@@ -92,12 +92,12 @@ MedianTree<T>::MedianTree(T a, T b) {
  * @param val The value to insert.
  */
 template<class T>
-void MedianTree<T>::Insert(T val) {
+void MedianTree<T>::Insert(T val, bool balance, bool rotate) {
     if (val <= median()) {
         if (lt == nullptr) {
             lt.reset(new MedianTreeNode<T>(val));
         } else {
-            lt->Insert(val, false);
+            lt->Insert(val, rotate);
         }
 
         left_max = count_left() == 1 ? val : std::max(left_max, val);
@@ -105,11 +105,13 @@ void MedianTree<T>::Insert(T val) {
         if (rt == nullptr) {
             rt.reset(new MedianTreeNode<T>(val));
         } else {
-            rt->Insert(val, false);
+            rt->Insert(val, rotate);
         }
 
         right_min = count_right() == 1 ? val : std::min(right_min, val);
     }
+
+
 }
 
 /**
@@ -258,7 +260,8 @@ float MedianTree<T>::median() const {
  * @param root The node to remove.
  */
 template<class T>
-std::shared_ptr<MedianTreeNode<T>> MedianTree<T>::RemoveRoot(std::shared_ptr<MedianTreeNode<T>> root) {
+std::shared_ptr<MedianTreeNode<T>>
+MedianTree<T>::RemoveRoot(std::shared_ptr<MedianTreeNode<T>> root) {
     auto left_child = root->left();
     auto right_child = root->right();
 
@@ -275,10 +278,16 @@ std::shared_ptr<MedianTreeNode<T>> MedianTree<T>::RemoveRoot(std::shared_ptr<Med
     return root;
 }
 
+/**
+ * @brief Shift the largest value in the left subtree to the right subtree.
+ * @tparam T The type of data stored in the nodes of this tree.
+ */
 template<class T>
 void MedianTree<T>::ShiftLTR() {
     auto max_val = left_max;
-    auto res = Remove(max_val); // resets left_max
+    auto res = Remove(max_val); // resets left_max for us
+    if (res == 1) // failure
+        return;
 
     if (rt == nullptr) {
         rt.reset(new MedianTreeNode<T>(max_val));
@@ -289,10 +298,16 @@ void MedianTree<T>::ShiftLTR() {
     }
 }
 
+/**
+ * @brief Shift the smallest value in the right subtree to the left subtree.
+ * @tparam T T The type of data stored in the nodes of this tree.
+ */
 template<class T>
 void MedianTree<T>::ShiftRTL() {
     auto min_val = right_min;
-    auto res = Remove(min_val); // resets right_min
+    auto res = Remove(min_val); // resets right_min for us
+    if (res == 1) // failure
+        return;
 
     if (lt == nullptr) {
         lt.reset(new MedianTreeNode<T>(min_val));

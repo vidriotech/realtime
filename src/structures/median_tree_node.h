@@ -197,10 +197,10 @@ template<class T>
 void MedianTreeNode<T>::RotateChildren(bool recursive) {
     if (recursive) {
         if (lt != nullptr)
-            lt->RotateChildren(false);
+            lt->RotateChildren(recursive);
 
         if (rt != nullptr)
-            rt->RotateChildren(false);
+            rt->RotateChildren(recursive);
     }
 
     lt = RotateChild(std::move(lt));
