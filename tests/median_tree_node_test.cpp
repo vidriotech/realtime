@@ -215,6 +215,42 @@ TEST(MedianTreeNodeTests, InsertSubtreeAsGrandchild)
 }
 
 /*
+ * GIVEN a MedianTreeNode `node` with three values t < u < v
+ * DO query the max value M of `node` AND
+ * TEST THAT M = v.
+ */
+TEST(MedianTreeNodeTests, MaxValue)
+{
+    short u = 0;
+    auto t = u - 1;
+    auto v = u + 1;
+
+    MedianTreeNode<short> node(u);
+    node.Insert(t, false);
+    node.Insert(v, false);
+
+    EXPECT_EQ(v, node.max());
+}
+
+/*
+ * GIVEN a MedianTreeNode `node` with three values t < u < v
+ * DO query the min value M of `node` AND
+ * TEST THAT M = t.
+ */
+TEST(MedianTreeNodeTests, MinValue)
+{
+    short u = 0;
+    auto t = u - 1;
+    auto v = u + 1;
+
+    MedianTreeNode<short> node(u);
+    node.Insert(t, false);
+    node.Insert(v, false);
+
+    EXPECT_EQ(t, node.min());
+}
+
+/*
  * GIVEN a MedianTreeNode `node` with value v and left child `child` with
  *       value u < v and no children
  * DO remove u from `node` AND
@@ -330,7 +366,7 @@ TEST(MedianTreeNodeTests, RemoveChildWithChildren)
  *           `node` has the correct number of children; AND
  *           both the left and right children of `node` are balanced.
  */
-TEST(MedianTreeNodeTests, TestLLRotation)
+TEST(MedianTreeNodeTests, LLRotation)
 {
     std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(6));
     node->Insert(4, false);
@@ -389,7 +425,7 @@ TEST(MedianTreeNodeTests, TestLLRotation)
  *           `node` has the correct number of children; AND
  *           both the left and right children of `node` are balanced.
  */
-TEST(MedianTreeNodeTests, TestLRRotation)
+TEST(MedianTreeNodeTests, LRRotation)
 {
     std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(6));
     node->Insert(2, false);
@@ -448,7 +484,7 @@ TEST(MedianTreeNodeTests, TestLRRotation)
  *           `node` has the correct number of children; AND
  *           both the left and right children of `node` are balanced.
  */
-TEST(MedianTreeNodeTests, TestRLRotation)
+TEST(MedianTreeNodeTests, RLRotation)
 {
     std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(2));
     node->Insert(1, false);
@@ -508,7 +544,7 @@ TEST(MedianTreeNodeTests, TestRLRotation)
  *           `node` has the correct number of children; AND
  *           both the left and right children of `node` are balanced.
  */
-TEST(MedianTreeNodeTests, TestRRRotation)
+TEST(MedianTreeNodeTests, RRRotation)
 {
     std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(2));
     node->Insert(1, false);
@@ -560,39 +596,58 @@ TEST(MedianTreeNodeTests, TestRRRotation)
 }
 
 /*
- * GIVEN a MedianTreeNode `node` with three values t < u < v
- * DO query the max value M of `node` AND
- * TEST THAT M = v.
+ * GIVEN a MedianTreeNode `node` with value u and no children
+ * DO insert values v < w < x < y < z (with v > u), in that order, AND
+ * TEST THAT the balance of the tree containing `node` never exceeds 1 and
+ *           absolute value; AND
+ *           the height of the tree containing `node` never exceeds 3.
  */
-TEST(MedianTreeNodeTests, MaxValue)
+TEST(MedianTreeNodeTests, RotateOnInsert)
 {
     short u = 0;
-    auto t = u - 1;
     auto v = u + 1;
+    auto w = v + 1;
+    auto x = w + 1;
+    auto y = x + 1;
+    auto z = y + 1;
 
-    MedianTreeNode<short> node(u);
-    node.Insert(t, false);
-    node.Insert(v, false);
+    std::shared_ptr<MedianTreeNode<short>> node(new MedianTreeNode<short>(u));
 
-    EXPECT_EQ(v, node.max());
-}
+    // hook node into another, higher node in order to do the rotates
+    MedianTreeNode<short> base(u - 1); // all insertions go to the right
+    base.InsertSubtree(node);
 
-/*
- * GIVEN a MedianTreeNode `node` with three values t < u < v
- * DO query the min value M of `node` AND
- * TEST THAT M = t.
- */
-TEST(MedianTreeNodeTests, MinValue)
-{
-    short u = 0;
-    auto t = u - 1;
-    auto v = u + 1;
+    // establish preconditions for the test
+    ASSERT_NE(nullptr, base.right());
+    EXPECT_GE(1, base.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, base.right()->balance()); // -1 <= balance
+    EXPECT_GE(3, base.right()->height()); // 3 >= height
 
-    MedianTreeNode<short> node(u);
-    node.Insert(t, false);
-    node.Insert(v, false);
+    // perform the inserts
+    base.Insert(v); // insert defaults to rotate on insert
+    EXPECT_GE(1, base.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, base.right()->balance()); // -1 <= balance
+    EXPECT_GE(3, base.right()->height()); // 3 >= height
 
-    EXPECT_EQ(t, node.min());
+    base.Insert(w);
+    EXPECT_GE(1, base.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, base.right()->balance()); // -1 <= balance
+    EXPECT_GE(3, base.right()->height()); // 3 >= height
+
+    base.Insert(x);
+    EXPECT_GE(1, base.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, base.right()->balance()); // -1 <= balance
+    EXPECT_GE(3, base.right()->height()); // 3 >= height
+
+    base.Insert(y);
+    EXPECT_GE(1, base.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, base.right()->balance()); // -1 <= balance
+    EXPECT_GE(3, base.right()->height()); // 3 >= height
+
+    base.Insert(z);
+    EXPECT_GE(1, base.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, base.right()->balance()); // -1 <= balance
+    EXPECT_GE(3, base.right()->height()); // 3 >= height
 }
 
 /*

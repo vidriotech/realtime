@@ -17,7 +17,7 @@ public:
     short Remove(T val, bool rotate = true);
 
     // rotate child elements
-    void RotateChildren(bool recursive = true);
+    void RotateChildren(bool recursive = false);
 
     // getters
     [[nodiscard]] short balance();
@@ -195,17 +195,16 @@ short MedianTreeNode<T>::Remove(T val, bool rotate) {
  */
 template<class T>
 void MedianTreeNode<T>::RotateChildren(bool recursive) {
+    if (recursive) {
+        if (lt != nullptr)
+            lt->RotateChildren(false);
+
+        if (rt != nullptr)
+            rt->RotateChildren(false);
+    }
+
     lt = RotateChild(std::move(lt));
     rt = RotateChild(std::move(rt));
-
-    if (recursive) {
-        if (lt != nullptr) {
-            lt->RotateChildren(recursive);
-        }
-        if (rt != nullptr) {
-            rt->RotateChildren(recursive);
-        }
-    }
 
     UpdateCount();
     UpdateHeight();
