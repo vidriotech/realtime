@@ -21,6 +21,7 @@ public:
 
     // rotate and rebalance subtrees
     void BalanceElements();
+    void RotateSubtrees(bool recursive = false);
 
     // getters
     /**
@@ -66,6 +67,17 @@ private:
 
     void ShiftLTR();
     void ShiftRTL();
+
+    std::shared_ptr<MedianTreeNode<T>>
+    RotateSubtree(std::shared_ptr<MedianTreeNode<T>> subtree);
+    std::shared_ptr<MedianTreeNode<T>>
+    LLRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
+    std::shared_ptr<MedianTreeNode<T>>
+    LRRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
+    std::shared_ptr<MedianTreeNode<T>>
+    RLRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
+    std::shared_ptr<MedianTreeNode<T>>
+    RRRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
 };
 
 /**
@@ -111,7 +123,15 @@ void MedianTree<T>::Insert(T val, bool balance, bool rotate) {
         right_min = count_right() == 1 ? val : std::min(right_min, val);
     }
 
+    // rebalance elements if necessary
+    if (balance) {
+        BalanceElements();
+    }
 
+    // perform rotations if necessary
+    if (rotate) {
+        RotateSubtrees();
+    }
 }
 
 /**
@@ -160,6 +180,24 @@ short MedianTree<T>::Remove(T val) {
     }
 
     return res;
+}
+
+/**
+ * @brief Perform tree rotations on left and right subtrees, if necessary.
+ * @tparam T The type of the value stored in the elements of each subtree.
+ */
+template<class T>
+void MedianTree<T>::RotateSubtrees(bool recursive) {
+    if (recursive) {
+        if (lt != nullptr)
+            lt->RotateChildren(recursive);
+
+        if (rt != nullptr)
+            rt->RotateChildren(recursive);
+    }
+
+    lt = RotateSubtree(std::move(lt));
+    rt = RotateSubtree(std::move(rt));
 }
 
 /**
@@ -279,6 +317,49 @@ MedianTree<T>::RemoveRoot(std::shared_ptr<MedianTreeNode<T>> root) {
 }
 
 /**
+ * @brief Perform an LL, LR, RL, or RR rotation on a subtree if it needs one.
+ * @tparam T The type of data stored in the subtree.
+ * @param subtree Pointer to the subtree to rotate.
+ * @return Root of the new subtree to be inserted into the old subtree's place.
+ */
+template<class T>
+std::shared_ptr<MedianTreeNode<T>>
+MedianTree<T>::RotateSubtree(std::shared_ptr<MedianTreeNode<T>> subtree) {
+    if (subtree == nullptr) {
+        return subtree;
+    }
+
+    if (subtree->balance() >= 2) {
+        if (subtree->left()->balance() >= 1) {
+            subtree = LLRotate(std::move(subtree));
+        } else if (subtree->left()->balance() <= -1) {
+            subtree = LRRotate(std::move(subtree));
+        }
+    } else if (subtree->balance() <= -2) {
+        if (subtree->right()->balance() >= 1) {
+            subtree = RLRotate(std::move(subtree));
+        }
+        else if (subtree->right() != nullptr && subtree->right()->balance() <= -1) {
+            subtree = RRRotate(std::move(subtree));
+        }
+    } else {
+        return subtree;
+    }
+
+    if (subtree->left() != nullptr) {
+        subtree->left()->UpdatePopulation();
+    }
+
+    if (subtree->right() != nullptr) {
+        subtree->right()->UpdatePopulation();
+    }
+
+    subtree->UpdatePopulation();
+
+    return subtree;
+}
+
+/**
  * @brief Shift the largest value in the left subtree to the right subtree.
  * @tparam T The type of data stored in the nodes of this tree.
  */
@@ -316,6 +397,103 @@ void MedianTree<T>::ShiftRTL() {
         lt->Insert(min_val, false);
         left_max = std::max(min_val, left_max);
     }
+}
+
+/**
+ * @brief Perform an LL rotation on a subtree node.
+ * @tparam T The type of data stored in the nodes of this subtree.
+ * @param subtree The subtree needing a rotation.
+ * @return Root of the new subtree to be inserted into the old subtree's place.
+ */
+template<class T>
+std::shared_ptr<MedianTreeNode<T>>
+MedianTree<T>::LLRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
+    std::shared_ptr<MedianTreeNode<T>> tmp;
+
+    auto left_child = subtree->DetachSubtree(1);
+    auto right_child = subtree->DetachSubtree(-1);
+
+    subtree->InsertSubtree(left_child->DetachSubtree(-1)); // inserts on the left
+    subtree->InsertSubtree(right_child); // inserts on the right
+
+    tmp.swap(subtree);
+    left_child->InsertSubtree(tmp);
+
+    subtree.swap(left_child);
+
+    return subtree;
+}
+
+/**
+ * @brief Perform an LR rotation on a subtree node.
+ * @tparam T The type of data stored in the nodes of this subtree.
+ * @param subtree The subtree needing a rotation.
+ * @return Root of the new subtree to be inserted into the old subtree's place.
+ */
+template<class T>
+std::shared_ptr<MedianTreeNode<T>>
+MedianTree<T>::LRRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
+    auto left_child = subtree->DetachSubtree(1);
+    auto tmp = left_child->DetachSubtree(-1);
+
+    subtree->InsertSubtree(tmp->DetachSubtree(-1)); // inserts on the left
+    left_child->InsertSubtree(tmp->DetachSubtree(1)); // inserts on the right
+
+    tmp->InsertSubtree(left_child); // inserts on the left
+    tmp->InsertSubtree(subtree); // inserts on the right
+
+    subtree.swap(tmp);
+
+    return subtree;
+}
+
+/**
+ * @brief Perform an RL rotation on a subtree.
+ * @tparam T The type of data stored in the nodes of this subtree.
+ * @param subtree The subtree needing a rotation.
+ * @return Root of the new subtree to be inserted into the old subtree's place.
+ */
+template<class T>
+std::shared_ptr<MedianTreeNode<T>>
+MedianTree<T>::RLRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
+    auto right_child = subtree->DetachSubtree(-1);
+    auto tmp = right_child->DetachSubtree(1);
+
+    subtree->InsertSubtree(tmp->DetachSubtree(1)); // inserts on the right
+    right_child->InsertSubtree(tmp->DetachSubtree(-1)); // inserts on the left
+
+    tmp->InsertSubtree(right_child); // inserts on the right
+    tmp->InsertSubtree(subtree); // inserts on the left
+
+    subtree.swap(tmp);
+
+    return subtree;
+}
+
+/**
+ * @brief Perform an RR rotation on a subtree.
+ * @tparam T The type of data stored in the nodes of this subtree.
+ * @param subtree The subtree needing a rotation.
+ * @return Root of the new subtree to be inserted into the old subtree's place.
+ */
+template<class T>
+std::shared_ptr<MedianTreeNode<T>>
+MedianTree<T>::RRRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
+    std::shared_ptr<MedianTreeNode<T>> tmp;
+
+    auto left_child = subtree->DetachSubtree(1);
+    auto right_child = subtree->DetachSubtree(-1);
+
+    // inserts on the right
+    subtree->InsertSubtree(right_child->DetachSubtree(1));
+    subtree->InsertSubtree(left_child); // inserts on the left
+
+    tmp.swap(subtree);
+    right_child->InsertSubtree(tmp);
+
+    subtree.swap(right_child);
+
+    return subtree;
 }
 
 #endif //RTS_2_MEDIAN_TREE_H

@@ -4,7 +4,7 @@
 
 /*
  * GIVEN a value v
- * DO construct a MedianTreeNode node from v AND
+ * DO construct a MedianTreeNode `node` from v AND
  * TEST THAT the value of `node` is v; AND
  *           the left and right children of `node` are null; AND
  *           the number of elements in the subtree rooted at `node` is 1; AND
@@ -25,7 +25,7 @@ TEST(MedianTreeNodeTests, InitialState)
 }
 
 /*
- * GIVEN a MedianTreeNode node with value v and no children
+ * GIVEN a MedianTreeNode `node` with value v and no children
  * DO Insert a value u smaller than v AND
  * TEST THAT the left child of node has value u;
  *           the height of the subtree rooted at node is 2; AND
@@ -56,7 +56,7 @@ TEST(MedianTreeNodeTests, InsertChildLeft)
 }
 
 /*
- * GIVEN a MedianTreeNode node with value v and no children
+ * GIVEN a MedianTreeNode `node` with value v and no children
  * DO Insert a value u larger than v AND
  * TEST THAT the right child of node has value u;
  *           the height of the subtree rooted at node is 2; AND
@@ -87,7 +87,7 @@ TEST(MedianTreeNodeTests, InsertChildRight)
 }
 
 /*
- * GIVEN a MedianTreeNode node with value v and left child with value u < v
+ * GIVEN a MedianTreeNode `node` with value v and left child with value u < v
  *       and no children
  * DO Insert a value t < u AND
  * TEST THAT the left child of the left child of `node` has value t; AND
@@ -428,7 +428,7 @@ TEST(MedianTreeNodeTests, LLRotation)
     // perform the rotation
     base.RotateChildren(false);
 
-    // node should no longer be base's left value
+    // node should no longer be base's left child
     ASSERT_NE(node, base.left());
 
     // reassign node symbol to be base's new left child, which should be 4
@@ -487,7 +487,7 @@ TEST(MedianTreeNodeTests, LRRotation)
     // perform the rotation
     base.RotateChildren(false);
 
-    // node should no longer be base's right value
+    // node should no longer be base's right child
     ASSERT_NE(node, base.right());
 
     // reassign node symbol to be base's new right child, which should be 4
@@ -546,7 +546,7 @@ TEST(MedianTreeNodeTests, RLRotation)
     // perform the rotation
     base.RotateChildren(false);
 
-    // node should no longer be base's left value
+    // node should no longer be base's left child
     ASSERT_NE(node, base.left());
 
     // reassign node symbol to be base's new left child, which should be 4
@@ -572,7 +572,6 @@ TEST(MedianTreeNodeTests, RLRotation)
     EXPECT_EQ(3, node->right()->count());
     EXPECT_EQ(0, node->right()->balance());
 }
-
 
 /*
  * GIVEN a MedianTreeNode `node` with a balance factor of -2 and whose own right
@@ -606,7 +605,7 @@ TEST(MedianTreeNodeTests, RRRotation)
     // perform the rotation
     base.RotateChildren(false);
 
-    // node should no longer be base's right value
+    // node should no longer be base's right child
     ASSERT_NE(node, base.right());
 
     // reassign node symbol to be base's new right child, which should be 4

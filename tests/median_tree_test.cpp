@@ -415,3 +415,284 @@ TEST(MedianTreeTests, BalanceElementsRTL)
 
     EXPECT_EQ((u + v) / 2.0, tree.median());
 }
+
+/*
+ * GIVEN a MedianTree `tree` whose left child `node` requires an LL rotation
+ * DO perform an LL rotation AND
+ * TEST THAT the balance factor of `node` is 0; AND
+ *           `node` has the correct number of children; AND
+ *           both the left and right children of `node` are balanced.
+ */
+TEST(MedianTreeTests, LLRotation)
+{
+    MedianTree<short> tree(6);
+    auto node = tree.left();
+    ASSERT_NE(nullptr, node);
+
+    node->Insert(4, false);
+    node->Insert(7, false);
+    node->Insert(2, false);
+    node->Insert(5, false);
+    node->Insert(1, false);
+    node->Insert(3, false);
+
+    // establish preconditions for the test
+    EXPECT_EQ(4, node->height());
+    EXPECT_EQ(7, node->count());
+    EXPECT_EQ(2, node->balance());
+    ASSERT_NE(nullptr, node->left());
+    EXPECT_EQ(1, node->left()->balance());
+
+    // perform the rotation
+    tree.RotateSubtrees(false);
+
+    // node should no longer be tree's left child
+    ASSERT_NE(node, tree.left());
+
+    // reassign node symbol to be tree's new left child, which should be 4
+    node = tree.left();
+    ASSERT_NE(nullptr, node);
+    EXPECT_EQ(4, node->value());
+
+    // check height, count, balance of node
+    EXPECT_EQ(3, node->height());
+    EXPECT_EQ(7, node->count());
+    EXPECT_EQ(0, node->balance());
+
+    // check value, height, and balance of both children of `node`
+    ASSERT_NE(nullptr, node->left());
+    EXPECT_EQ(2, node->left()->value());
+    EXPECT_EQ(2, node->left()->height());
+    EXPECT_EQ(3, node->left()->count());
+    EXPECT_EQ(0, node->left()->balance());
+
+    ASSERT_NE(nullptr, node->right());
+    EXPECT_EQ(6, node->right()->value());
+    EXPECT_EQ(2, node->right()->height());
+    EXPECT_EQ(3, node->right()->count());
+    EXPECT_EQ(0, node->right()->balance());
+}
+
+/*
+ * GIVEN a MedianTree `tree` whose left child `node` requires an LR rotation
+ * DO perform an LR rotation AND
+ * TEST THAT the balance factor of `node` is 0; AND
+ *           `node` has the correct number of children; AND
+ *           both the left and right children of `node` are balanced.
+ */
+TEST(MedianTreeTests, LRRotation)
+{
+    MedianTree<short> tree(6);
+    auto node = tree.left();
+    ASSERT_NE(nullptr, node);
+
+    node->Insert(2, false);
+    node->Insert(7, false);
+    node->Insert(1, false);
+    node->Insert(4, false);
+    node->Insert(3, false);
+    node->Insert(5, false);
+
+    // establish preconditions for the test
+    EXPECT_EQ(4, node->height());
+    EXPECT_EQ(7, node->count());
+    EXPECT_EQ(2, node->balance());
+    ASSERT_NE(nullptr, node->left());
+    EXPECT_EQ(-1, node->left()->balance());
+
+    // perform the rotation
+    tree.RotateSubtrees(false);
+
+    // node should no longer be tree's left child
+    ASSERT_NE(node, tree.left());
+
+    // reassign node symbol to be base's new left child, which should be 4
+    node = tree.left();
+    ASSERT_NE(nullptr, node);
+    EXPECT_EQ(4, node->value());
+
+    // check height, count, balance of node
+    EXPECT_EQ(3, node->height());
+    EXPECT_EQ(7, node->count());
+    EXPECT_EQ(0, node->balance());
+
+    // check height and balance of both children of `node`
+    ASSERT_NE(nullptr, node->left());
+    EXPECT_EQ(2, node->left()->value());
+    EXPECT_EQ(2, node->left()->height());
+    EXPECT_EQ(3, node->left()->count());
+    EXPECT_EQ(0, node->left()->balance());
+
+    ASSERT_NE(nullptr, node->right());
+    EXPECT_EQ(6, node->right()->value());
+    EXPECT_EQ(2, node->right()->height());
+    EXPECT_EQ(3, node->right()->count());
+    EXPECT_EQ(0, node->right()->balance());
+}
+
+/*
+ * GIVEN a MedianTree `tree` whose left child `node` requires an RL rotation
+ * DO perform an RL rotation AND
+ * TEST THAT the balance factor of `node` is 0; AND
+ *           `node` has the correct number of children; AND
+ *           both the left and right children of `node` are balanced.
+ */
+TEST(MedianTreeTests, RLRotation)
+{
+    MedianTree<short> tree(2);
+    auto node = tree.left();
+    ASSERT_NE(nullptr, node);
+
+    node->Insert(1, false);
+    node->Insert(6, false);
+    node->Insert(4, false);
+    node->Insert(7, false);
+    node->Insert(3, false);
+    node->Insert(5, false);
+
+    // establish preconditions for the test
+    EXPECT_EQ(4, node->height());
+    EXPECT_EQ(7, node->count());
+    EXPECT_EQ(-2, node->balance());
+    ASSERT_NE(nullptr, node->right());
+    EXPECT_EQ(1, node->right()->balance());
+
+    // perform the rotation
+    tree.RotateSubtrees(false);
+
+    // node should no longer be tree's left child
+    ASSERT_NE(node, tree.left());
+
+    // reassign node symbol to be tree's new left child, which should be 4
+    node = tree.left();
+    ASSERT_NE(nullptr, node);
+    EXPECT_EQ(4, node->value());
+
+    // check height, count, balance of node
+    EXPECT_EQ(3, node->height());
+    EXPECT_EQ(7, node->count());
+    EXPECT_EQ(0, node->balance());
+
+    // check height and balance of both children of `node`
+    ASSERT_NE(nullptr, node->left());
+    EXPECT_EQ(2, node->left()->value());
+    EXPECT_EQ(2, node->left()->height());
+    EXPECT_EQ(3, node->left()->count());
+    EXPECT_EQ(0, node->left()->balance());
+
+    ASSERT_NE(nullptr, node->right());
+    EXPECT_EQ(6, node->right()->value());
+    EXPECT_EQ(2, node->right()->height());
+    EXPECT_EQ(3, node->right()->count());
+    EXPECT_EQ(0, node->right()->balance());
+}
+
+/*
+ * GIVEN a MedianTreeNode `tree` whose left child `node` requires an RR rotation
+ * DO perform an RR rotation AND
+ * TEST THAT the balance factor of `node` is 0; AND
+ *           `node` has the correct number of children; AND
+ *           both the left and right children of `node` are balanced.
+ */
+TEST(MedianTreeTests, RRRotation)
+{
+    MedianTree<short> tree(2);
+    auto node = tree.left();
+    ASSERT_NE(nullptr, node);
+
+    node->Insert(1, false);
+    node->Insert(4, false);
+    node->Insert(3, false);
+    node->Insert(6, false);
+    node->Insert(5, false);
+    node->Insert(7, false);
+
+    // establish preconditions for the test
+    EXPECT_EQ(4, node->height());
+    EXPECT_EQ(7, node->count());
+    EXPECT_EQ(-2, node->balance());
+    ASSERT_NE(nullptr, node->right());
+    EXPECT_EQ(-1, node->right()->balance());
+
+    // perform the rotation
+    tree.RotateSubtrees(false);
+
+    // node should no longer be base's left child
+    ASSERT_NE(node, tree.left());
+
+    // reassign node symbol to be base's new left child, which should be 4
+    node = tree.left();
+    ASSERT_NE(nullptr, node);
+    EXPECT_EQ(4, node->value());
+
+    // check height, count, balance of node
+    EXPECT_EQ(3, node->height());
+    EXPECT_EQ(7, node->count());
+    EXPECT_EQ(0, node->balance());
+
+    // check height and balance of both children of `node`
+    ASSERT_NE(nullptr, node->left());
+    EXPECT_EQ(2, node->left()->value());
+    EXPECT_EQ(2, node->left()->height());
+    EXPECT_EQ(3, node->left()->count());
+    EXPECT_EQ(0, node->left()->balance());
+
+    ASSERT_NE(nullptr, node->right());
+    EXPECT_EQ(6, node->right()->value());
+    EXPECT_EQ(2, node->right()->height());
+    EXPECT_EQ(3, node->right()->count());
+    EXPECT_EQ(0, node->right()->balance());
+}
+
+/*
+ * GIVEN an empty MedianTree `tree` and values u < v < w < x < y < z
+ * DO insert u, v, w, x, y, z, in that order, maintaining balance AND
+ * TEST THAT the element-wise balance never exceeds 1 in absolute value; AND
+ *
+ */
+TEST(MedianTreeTests, AutoBalanceOnInsert)
+{
+    MedianTree<short> tree;
+
+    short u = 0;
+    auto v = u + 1;
+    auto w = v + 1;
+    auto x = w + 1;
+    auto y = x + 1;
+    auto z = y + 1;
+
+    // establish preconditions for the test
+    EXPECT_EQ(0, tree.balance());
+    EXPECT_EQ(0, tree.el_balance());
+
+    // perform the inserts
+    tree.Insert(u, true, false);
+    EXPECT_EQ(1, tree.balance());
+    EXPECT_EQ(1, tree.el_balance());
+    EXPECT_EQ(u, tree.median());
+
+    tree.Insert(v, true, false);
+    EXPECT_EQ(0, tree.balance());
+    EXPECT_EQ(0, tree.el_balance());
+    EXPECT_EQ((u + v) / 2.0, tree.median());
+
+    tree.Insert(w, true, false);
+    EXPECT_EQ(-1, tree.balance());
+    EXPECT_EQ(-1, tree.el_balance());
+    EXPECT_EQ(v, tree.median());
+
+    tree.Insert(x, true, false);
+    EXPECT_EQ(0, tree.balance());
+    EXPECT_EQ(0, tree.el_balance());
+    EXPECT_EQ((v + w) / 2.0, tree.median());
+
+    tree.Insert(y, true, false);
+    EXPECT_EQ(-1, tree.balance());
+    EXPECT_EQ(-1, tree.el_balance());
+    EXPECT_EQ(w, tree.median());
+
+    tree.Insert(z, true, false);
+    EXPECT_EQ(0, tree.balance());
+    EXPECT_EQ(0, tree.el_balance());
+    EXPECT_EQ((w + x) / 2.0, tree.median());
+}
