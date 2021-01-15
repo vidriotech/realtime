@@ -646,9 +646,10 @@ TEST(MedianTreeTests, RRRotation)
 
 /*
  * GIVEN an empty MedianTree `tree` and values u < v < w < x < y < z
- * DO insert u, v, w, x, y, z, in that order, maintaining balance AND
+ * DO insert u, v, w, x, y, z, in that order, maintaining element-wise balance,
+ * AND
  * TEST THAT the element-wise balance never exceeds 1 in absolute value; AND
- *
+ *           the median value updates as appropriate.
  */
 TEST(MedianTreeTests, AutoBalanceOnInsert)
 {
@@ -694,5 +695,107 @@ TEST(MedianTreeTests, AutoBalanceOnInsert)
     tree.Insert(z, true, false);
     EXPECT_EQ(0, tree.balance());
     EXPECT_EQ(0, tree.el_balance());
+    EXPECT_EQ((w + x) / 2.0, tree.median());
+}
+
+/*
+ * GIVEN an empty MedianTree `tree` and values u < v < w < x < y < z
+ * DO insert u, v, w, x, y, z, in that order, maintaining both element-wise
+ *    and rotational balance, AND
+ * TEST THAT the element-wise balance never exceeds 1 in absolute value; AND
+ *           the subtree balance never exceeds 1 in absolute value; AND
+ *           the balances of the subtrees themselves never exceed 1 in
+ *           absolute value; AND
+ *           the median value updates as appropriate.
+ */
+TEST(MedianTreeTests, AutoBalanceAndRotateOnInsert)
+{
+    MedianTree<short> tree;
+
+    short u = 0;
+    auto v = u + 1;
+    auto w = v + 1;
+    auto x = w + 1;
+    auto y = x + 1;
+    auto z = y + 1;
+
+    // establish preconditions for the test
+    EXPECT_EQ(0, tree.balance());
+    EXPECT_EQ(0, tree.el_balance());
+
+    // perform the inserts
+    tree.Insert(u, true, true);
+    EXPECT_GE(1, tree.balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.balance()); // -1 <= balance
+    EXPECT_GE(1, tree.el_balance()); // 1 >= el_balance
+    EXPECT_LE(-1, tree.el_balance()); // -1 <= el_balance
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_GE(1, tree.left()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.left()->balance()); // -1 <= balance
+    EXPECT_EQ(u, tree.median());
+
+    tree.Insert(v, true, true);
+    EXPECT_GE(1, tree.balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.balance()); // -1 <= balance
+    EXPECT_GE(1, tree.el_balance()); // 1 >= el_balance
+    EXPECT_LE(-1, tree.el_balance()); // -1 <= el_balance
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_GE(1, tree.left()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.left()->balance()); // -1 <= balance
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_GE(1, tree.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.right()->balance()); // -1 <= balance
+    EXPECT_EQ((u + v) / 2.0, tree.median());
+
+    tree.Insert(w, true, true);
+    EXPECT_GE(1, tree.balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.balance()); // -1 <= balance
+    EXPECT_GE(1, tree.el_balance()); // 1 >= el_balance
+    EXPECT_LE(-1, tree.el_balance()); // -1 <= el_balance
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_GE(1, tree.left()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.left()->balance()); // -1 <= balance
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_GE(1, tree.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.right()->balance()); // -1 <= balance
+    EXPECT_EQ(v, tree.median());
+
+    tree.Insert(x, true, true);
+    EXPECT_GE(1, tree.balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.balance()); // -1 <= balance
+    EXPECT_GE(1, tree.el_balance()); // 1 >= el_balance
+    EXPECT_LE(-1, tree.el_balance()); // -1 <= el_balance
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_GE(1, tree.left()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.left()->balance()); // -1 <= balance
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_GE(1, tree.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.right()->balance()); // -1 <= balance
+    EXPECT_EQ((v + w) / 2.0, tree.median());
+
+    tree.Insert(y, true, true);
+    EXPECT_GE(1, tree.balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.balance()); // -1 <= balance
+    EXPECT_GE(1, tree.el_balance()); // 1 >= el_balance
+    EXPECT_LE(-1, tree.el_balance()); // -1 <= el_balance
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_GE(1, tree.left()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.left()->balance()); // -1 <= balance
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_GE(1, tree.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.right()->balance()); // -1 <= balance
+    EXPECT_EQ(w, tree.median());
+
+    tree.Insert(z, true, true);
+    EXPECT_GE(1, tree.balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.balance()); // -1 <= balance
+    EXPECT_GE(1, tree.el_balance()); // 1 >= el_balance
+    EXPECT_LE(-1, tree.el_balance()); // -1 <= el_balance
+    ASSERT_NE(nullptr, tree.left());
+    EXPECT_GE(1, tree.left()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.left()->balance()); // -1 <= balance
+    ASSERT_NE(nullptr, tree.right());
+    EXPECT_GE(1, tree.right()->balance()); // 1 >= balance
+    EXPECT_LE(-1, tree.right()->balance()); // -1 <= balance
     EXPECT_EQ((w + x) / 2.0, tree.median());
 }
