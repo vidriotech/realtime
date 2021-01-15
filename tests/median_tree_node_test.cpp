@@ -359,6 +359,44 @@ TEST(MedianTreeNodeTests, RemoveChildWithChildren)
 }
 
 /*
+ * GIVEN a MedianTreeNode `node` with a left subtree `subtree`
+ * DO extract `subtree` AND
+ * TEST THAT `node` has only 1 element; AND
+ *           `subtree`
+ */
+TEST(MedianTreeNodeTests, DetachSubtree)
+{
+    short v = 0;
+    auto u = v - 1;
+
+    MedianTreeNode<short> node(v);
+    node.Insert(u);
+
+    // establish preconditions for the test
+    EXPECT_EQ(2, node.count());
+    EXPECT_EQ(2, node.height());
+    EXPECT_EQ(1, node.balance());
+    ASSERT_NE(nullptr, node.left());
+    EXPECT_EQ(u, node.left()->value());
+
+    // perform the detach
+    auto subtree = node.DetachSubtree(1);
+
+    // check that `subtree` has been detached from `node`
+    EXPECT_EQ(1, node.count());
+    EXPECT_EQ(1, node.height());
+    EXPECT_EQ(0, node.balance());
+    EXPECT_EQ(nullptr, node.left());
+
+    // check that `subtree` is what we expect
+    ASSERT_NE(nullptr, subtree);
+    EXPECT_EQ(1, subtree->count());
+    EXPECT_EQ(1, subtree->height());
+    EXPECT_EQ(0, subtree->balance());
+    EXPECT_EQ(u, subtree->value());
+}
+
+/*
  * GIVEN a MedianTreeNode `node` with a balance factor of 2 and whose own left
  *       child has a balance factor of 1, i.e., is in need of an LL rotation
  * DO perform an LL rotation AND

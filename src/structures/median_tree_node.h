@@ -15,9 +15,13 @@ public:
     short
     InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node, bool rotate = true);
     short Remove(T val, bool rotate = true);
+    std::shared_ptr<MedianTreeNode<T>> DetachSubtree(short child);
 
     // rotate child elements
     void RotateChildren(bool recursive = false);
+
+    // update counts and heights of subtrees
+    void UpdatePopulation();
 
     // getters
     [[nodiscard]] short balance();
@@ -80,8 +84,8 @@ private:
     std::shared_ptr<MedianTreeNode<T>>
     RRRotate(std::shared_ptr<MedianTreeNode<T>> child);
 
-    void UpdateHeight();
     void UpdateCount();
+    void UpdateHeight();
 };
 
 /**
@@ -106,8 +110,7 @@ short MedianTreeNode<T>::Insert(T val, bool rotate) {
         }
     }
 
-    UpdateCount();
-    UpdateHeight();
+    UpdatePopulation();
 
     if (rotate) {
         RotateChildren(false);
@@ -143,8 +146,7 @@ MedianTreeNode<T>::InsertSubtree(std::shared_ptr<MedianTreeNode<T>> node,
         }
     }
 
-    UpdateCount();
-    UpdateHeight();
+    UpdatePopulation();
 
     if (rotate) {
         RotateChildren(false);
@@ -179,12 +181,33 @@ short MedianTreeNode<T>::Remove(T val, bool rotate) {
         }
     }
 
-    UpdateCount();
-    UpdateHeight();
+    UpdatePopulation();
 
     if (rotate) {
         RotateChildren(false);
     }
+
+    return res;
+}
+
+/**
+ * @brief Detach and return the left or right subtree.
+ * @tparam T The type of data stored in the nodes of the subtree.
+ * @param child -1 for right child, 1 for left child
+ * @return Pointer to the (former) subtree.
+ */
+template<class T>
+std::shared_ptr<MedianTreeNode<T>>
+MedianTreeNode<T>::DetachSubtree(short child) {
+    std::shared_ptr<MedianTreeNode<T>> res;
+
+    if (child == -1) { // right child
+        res.swap(rt);
+    } else if (child == 1) { // left child
+        res.swap(lt);
+    }
+
+    UpdatePopulation();
 
     return res;
 }
@@ -206,6 +229,15 @@ void MedianTreeNode<T>::RotateChildren(bool recursive) {
     lt = RotateChild(std::move(lt));
     rt = RotateChild(std::move(rt));
 
+    UpdatePopulation();
+}
+
+/**
+ * @brief Update element count and subtree height.
+ * @tparam T T The type of data stored in the nodes of this subtree.
+ */
+template<class T>
+void MedianTreeNode<T>::UpdatePopulation() {
     UpdateCount();
     UpdateHeight();
 }
@@ -262,17 +294,14 @@ MedianTreeNode<T>::RotateChild(std::shared_ptr<MedianTreeNode<T>> child) {
     }
 
     if (child->left() != nullptr) {
-        child->left()->UpdateCount();
-        child->left()->UpdateHeight();
+        child->left()->UpdatePopulation();
     }
 
     if (child->right() != nullptr) {
-        child->right()->UpdateCount();
-        child->right()->UpdateHeight();
+        child->right()->UpdatePopulation();
     }
 
-    child->UpdateCount();
-    child->UpdateHeight();
+    child->UpdatePopulation();
 
     return child;
 }
