@@ -4,7 +4,7 @@
 
 #include "TestProbe.h"
 
-ProbeConfig make_probeconfig(unsigned n_channels, unsigned n_active, unsigned n_groups, double srate_hz)
+ProbeConfig make_probe_config(unsigned n_channels, unsigned n_active, unsigned n_groups, double srate_hz)
 {
     // don't check that n_total >= n_active for test purposes
     if (n_groups > n_active) {
@@ -53,5 +53,5 @@ ProbeConfig make_probeconfig(unsigned n_channels, unsigned n_active, unsigned n_
 
 Probe make_probe(unsigned n_channels, unsigned n_active, unsigned n_groups, double srate_hz)
 {
-    return Probe(make_probeconfig(n_channels, n_active, n_groups, srate_hz));
+    return Probe(make_probe_config(n_channels, n_active, n_groups, srate_hz));
 }

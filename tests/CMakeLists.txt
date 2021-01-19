@@ -9,7 +9,7 @@ set(SOURCE_FILES utilities/TestProbe.cpp utilities/TestException.cpp
         KernelTests.cu
         DistanceMatrixTests.cpp
         ../src/Probe.cpp ProbeTests.cpp
-        FileReaderTests.cpp
+        file_reader_test.cpp
         SnippetTests.cpp
         SnippetExtractorTests.cpp
         median_tree_node_test.cpp median_tree_test.cpp)

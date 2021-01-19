@@ -7,77 +7,77 @@
 
 #include "median_tree_node.h"
 
-template <class T>
+template<class T>
 class MedianTree {
-public:
-    MedianTree() {};
-    MedianTree(T a)
-        : lt(new MedianTreeNode<T>(a)), left_max(a) {};
-    MedianTree(T a, T b);
+ public:
+  MedianTree() {};
+  MedianTree(T a)
+      : lt(new MedianTreeNode<T>(a)), left_max(a) {};
+  MedianTree(T a, T b);
 
-    // Insert and remove elements
-    void Insert(T val, bool balance = true, bool rotate = true);
-    short Remove(T val);
+  // Insert and remove elements
+  void Insert(T val, bool balance = true, bool rotate = true);
+  short Remove(T val);
 
-    // rotate and rebalance subtrees
-    void BalanceElements();
-    void RotateSubtrees(bool recursive = false);
+  // rotate and rebalance subtrees
+  void BalanceElements();
+  void RotateSubtrees(bool recursive = false);
 
-    // getters
-    /**
-     * @brief Get a pointer to the left, or smaller, subtree.
-     * @return Pointer to the left subtree.
-     */
-    std::shared_ptr<MedianTreeNode<T>> left() const { return lt; };
-    /**
-     * @brief Get a pointer to the right, or larger, subtree.
-     * @return Pointer to the right subtree.
-     */
-    std::shared_ptr<MedianTreeNode<T>> right() const { return rt; };
-    /**
-     * @brief Get the number of elements in the left subtree.
-     * @return The number of elements in the left subtree.
-     */
-    [[nodiscard]] int
-    count_left() const { return lt == nullptr ? 0 : lt->count(); };
-    /**
-     * @brief Get the number of elements in the right subtree.
-     * @return The number of elements in the right subtree.
-     */
-    [[nodiscard]] int
-    count_right() const { return rt == nullptr ? 0 : rt->count(); };
-    /**
-     * @brief Get the number of elements in the tree.
-     * @return The sum of the number of elements in both subtrees.
-     */
-    [[nodiscard]] unsigned
-    count() const { return count_left() + count_right(); };
-    [[nodiscard]] unsigned short height();
-    [[nodiscard]] short balance();
-    [[nodiscard]] short el_balance();
-    [[nodiscard]] float median() const;
-private:
-    std::shared_ptr<MedianTreeNode<T>> lt; /*!< Left subtree. */
-    std::shared_ptr<MedianTreeNode<T>> rt; /*!< Right subtree. */
+  // getters
+  /**
+   * @brief Get a pointer to the left, or smaller, subtree.
+   * @return Pointer to the left subtree.
+   */
+  std::shared_ptr<MedianTreeNode<T>> left() const { return lt; };
+  /**
+   * @brief Get a pointer to the right, or larger, subtree.
+   * @return Pointer to the right subtree.
+   */
+  std::shared_ptr<MedianTreeNode<T>> right() const { return rt; };
+  /**
+   * @brief Get the number of elements in the left subtree.
+   * @return The number of elements in the left subtree.
+   */
+  [[nodiscard]] int
+  count_left() const { return lt == nullptr ? 0 : lt->count(); };
+  /**
+   * @brief Get the number of elements in the right subtree.
+   * @return The number of elements in the right subtree.
+   */
+  [[nodiscard]] int
+  count_right() const { return rt == nullptr ? 0 : rt->count(); };
+  /**
+   * @brief Get the number of elements in the tree.
+   * @return The sum of the number of elements in both subtrees.
+   */
+  [[nodiscard]] unsigned
+  count() const { return count_left() + count_right(); };
+  [[nodiscard]] unsigned short height();
+  [[nodiscard]] short balance();
+  [[nodiscard]] short el_balance();
+  [[nodiscard]] float median() const;
+ private:
+  std::shared_ptr<MedianTreeNode<T>> lt; /*!< Left subtree. */
+  std::shared_ptr<MedianTreeNode<T>> rt; /*!< Right subtree. */
 
-    T left_max = 0; /*!< Maximum value of the left subtree. */
-    T right_min = 0; /*!< Minimum value of the right subtree. */
+  T left_max = 0; /*!< Maximum value of the left subtree. */
+  T right_min = 0; /*!< Minimum value of the right subtree. */
 
-    std::shared_ptr<MedianTreeNode<T>> RemoveRoot(std::shared_ptr<MedianTreeNode<T>> root);
+  std::shared_ptr<MedianTreeNode<T>> RemoveRoot(std::shared_ptr<MedianTreeNode<T>> root);
 
-    void ShiftLTR();
-    void ShiftRTL();
+  void ShiftLTR();
+  void ShiftRTL();
 
-    std::shared_ptr<MedianTreeNode<T>>
-    RotateSubtree(std::shared_ptr<MedianTreeNode<T>> subtree);
-    std::shared_ptr<MedianTreeNode<T>>
-    LLRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
-    std::shared_ptr<MedianTreeNode<T>>
-    LRRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
-    std::shared_ptr<MedianTreeNode<T>>
-    RLRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
-    std::shared_ptr<MedianTreeNode<T>>
-    RRRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
+  std::shared_ptr<MedianTreeNode<T>>
+  RotateSubtree(std::shared_ptr<MedianTreeNode<T>> subtree);
+  std::shared_ptr<MedianTreeNode<T>>
+  LLRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
+  std::shared_ptr<MedianTreeNode<T>>
+  LRRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
+  std::shared_ptr<MedianTreeNode<T>>
+  RLRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
+  std::shared_ptr<MedianTreeNode<T>>
+  RRRotate(std::shared_ptr<MedianTreeNode<T>> subtree);
 };
 
 /**
@@ -88,14 +88,14 @@ private:
  */
 template<class T>
 MedianTree<T>::MedianTree(T a, T b) {
-    auto min_val = std::min(a, b);
-    auto max_val = std::max(a, b);
+  auto min_val = std::min(a, b);
+  auto max_val = std::max(a, b);
 
-    lt.reset(new MedianTreeNode<T>(min_val));
-    left_max = min_val;
+  lt.reset(new MedianTreeNode<T>(min_val));
+  left_max = min_val;
 
-    rt.reset(new MedianTreeNode<T>(max_val));
-    right_min = max_val;
+  rt.reset(new MedianTreeNode<T>(max_val));
+  right_min = max_val;
 }
 
 /**
@@ -105,33 +105,33 @@ MedianTree<T>::MedianTree(T a, T b) {
  */
 template<class T>
 void MedianTree<T>::Insert(T val, bool balance, bool rotate) {
-    if (val <= median()) {
-        if (lt == nullptr) {
-            lt.reset(new MedianTreeNode<T>(val));
-        } else {
-            lt->Insert(val, rotate);
-        }
-
-        left_max = count_left() == 1 ? val : std::max(left_max, val);
+  if (val <= median()) {
+    if (lt == nullptr) {
+      lt.reset(new MedianTreeNode<T>(val));
     } else {
-        if (rt == nullptr) {
-            rt.reset(new MedianTreeNode<T>(val));
-        } else {
-            rt->Insert(val, rotate);
-        }
-
-        right_min = count_right() == 1 ? val : std::min(right_min, val);
+      lt->Insert(val, rotate);
     }
 
-    // rebalance elements if necessary
-    if (balance) {
-        BalanceElements();
+    left_max = count_left() == 1 ? val : std::max(left_max, val);
+  } else {
+    if (rt == nullptr) {
+      rt.reset(new MedianTreeNode<T>(val));
+    } else {
+      rt->Insert(val, rotate);
     }
 
-    // perform rotations if necessary
-    if (rotate) {
-        RotateSubtrees();
-    }
+    right_min = count_right() == 1 ? val : std::min(right_min, val);
+  }
+
+  // rebalance elements if necessary
+  if (balance) {
+    BalanceElements();
+  }
+
+  // perform rotations if necessary
+  if (rotate) {
+    RotateSubtrees();
+  }
 }
 
 /**
@@ -140,46 +140,46 @@ void MedianTree<T>::Insert(T val, bool balance, bool rotate) {
  * @param val The value to remove from this tree.
  * @return 0 if value successfully found and removed, 1 otherwise.
  */
-template <class T>
+template<class T>
 short MedianTree<T>::Remove(T val) {
-    short res = 1;
+  short res = 1;
 
-    if (val <= left_max && lt != nullptr) {
-        if (lt->value() == val) {
-            lt = RemoveRoot(std::move(lt));
-            res = 0;
-        } else { // search for the value in the left subtree
-            res = lt->Remove(val, false);
-        }
-
-        // update right_min if we need to
-        if (res == 0 && val == left_max) {
-            if (lt != nullptr) {
-                left_max = lt->max();
-            } else {
-                left_max = 0;
-            }
-        }
-    } else if (val >= right_min && rt != nullptr) {
-        if (rt->value() == val) {
-            // actually remove the value at the root node
-            rt = RemoveRoot(std::move(rt));
-            res = 0;
-        } else { // search for the value in the right subtree
-            res = rt->Remove(val, false);
-        }
-
-        // update right_min if we need to
-        if (res == 0 && val == right_min) {
-            if (rt != nullptr) {
-                right_min = rt->min();
-            } else {
-                right_min = 0;
-            }
-        }
+  if (val <= left_max && lt != nullptr) {
+    if (lt->value() == val) {
+      lt = RemoveRoot(std::move(lt));
+      res = 0;
+    } else { // search for the value in the left subtree
+      res = lt->Remove(val, false);
     }
 
-    return res;
+    // update right_min if we need to
+    if (res == 0 && val == left_max) {
+      if (lt != nullptr) {
+        left_max = lt->max();
+      } else {
+        left_max = 0;
+      }
+    }
+  } else if (val >= right_min && rt != nullptr) {
+    if (rt->value() == val) {
+      // actually remove the value at the root node
+      rt = RemoveRoot(std::move(rt));
+      res = 0;
+    } else { // search for the value in the right subtree
+      res = rt->Remove(val, false);
+    }
+
+    // update right_min if we need to
+    if (res == 0 && val == right_min) {
+      if (rt != nullptr) {
+        right_min = rt->min();
+      } else {
+        right_min = 0;
+      }
+    }
+  }
+
+  return res;
 }
 
 /**
@@ -188,16 +188,16 @@ short MedianTree<T>::Remove(T val) {
  */
 template<class T>
 void MedianTree<T>::RotateSubtrees(bool recursive) {
-    if (recursive) {
-        if (lt != nullptr)
-            lt->RotateChildren(recursive);
+  if (recursive) {
+    if (lt != nullptr)
+      lt->RotateChildren(recursive);
 
-        if (rt != nullptr)
-            rt->RotateChildren(recursive);
-    }
+    if (rt != nullptr)
+      rt->RotateChildren(recursive);
+  }
 
-    lt = RotateSubtree(std::move(lt));
-    rt = RotateSubtree(std::move(rt));
+  lt = RotateSubtree(std::move(lt));
+  rt = RotateSubtree(std::move(rt));
 }
 
 /**
@@ -207,17 +207,17 @@ void MedianTree<T>::RotateSubtrees(bool recursive) {
  */
 template<class T>
 void MedianTree<T>::BalanceElements() {
-    if (-2 < el_balance() && el_balance() < 2) { // tree is already balanced
-        return;
-    }
+  if (-2 < el_balance() && el_balance() < 2) { // tree is already balanced
+    return;
+  }
 
-    while (el_balance() < - 1) {
-        ShiftRTL();
-    }
+  while (el_balance() < -1) {
+    ShiftRTL();
+  }
 
-    while (el_balance() > 1) {
-        ShiftLTR();
-    }
+  while (el_balance() > 1) {
+    ShiftLTR();
+  }
 }
 
 /**
@@ -227,10 +227,10 @@ void MedianTree<T>::BalanceElements() {
  */
 template<class T>
 unsigned short MedianTree<T>::height() {
-    auto left_height = lt == nullptr ? 0 : lt->height();
-    auto right_height = rt == nullptr ? 0 : rt->height();
+  auto left_height = lt == nullptr ? 0 : lt->height();
+  auto right_height = rt == nullptr ? 0 : rt->height();
 
-    return 1 + std::max(left_height, right_height);
+  return 1 + std::max(left_height, right_height);
 }
 
 /**
@@ -248,10 +248,10 @@ unsigned short MedianTree<T>::height() {
  */
 template<class T>
 short MedianTree<T>::balance() {
-    auto left_height = lt == nullptr ? 0 : lt->height();
-    auto right_height = rt == nullptr ? 0 : rt->height();
+  auto left_height = lt == nullptr ? 0 : lt->height();
+  auto right_height = rt == nullptr ? 0 : rt->height();
 
-    return left_height - right_height;
+  return left_height - right_height;
 }
 
 /**
@@ -262,10 +262,10 @@ short MedianTree<T>::balance() {
  */
 template<class T>
 short MedianTree<T>::el_balance() {
-    auto left_count = lt == nullptr ? 0 : lt->count();
-    auto right_count = rt == nullptr ? 0 : rt->count();
+  auto left_count = lt == nullptr ? 0 : lt->count();
+  auto right_count = rt == nullptr ? 0 : rt->count();
 
-    return left_count - right_count;
+  return left_count - right_count;
 }
 
 /**
@@ -275,17 +275,17 @@ short MedianTree<T>::el_balance() {
  */
 template<class T>
 float MedianTree<T>::median() const {
-    float med;
+  float med;
 
-    if (count_left() == count_right()) {
-        med = (left_max + right_min) / 2.0f;
-    } else if (count_left() > count_right()) {
-        med = left_max;
-    } else { // count_right() > count_left()
-        med = right_min;
-    }
+  if (count_left() == count_right()) {
+    med = (left_max + right_min) / 2.0f;
+  } else if (count_left() > count_right()) {
+    med = left_max;
+  } else { // count_right() > count_left()
+    med = right_min;
+  }
 
-    return med;
+  return med;
 }
 
 /**
@@ -300,20 +300,20 @@ float MedianTree<T>::median() const {
 template<class T>
 std::shared_ptr<MedianTreeNode<T>>
 MedianTree<T>::RemoveRoot(std::shared_ptr<MedianTreeNode<T>> root) {
-    auto left_child = root->left();
-    auto right_child = root->right();
+  auto left_child = root->left();
+  auto right_child = root->right();
 
-    if (left_child != nullptr) {
-        root.swap(left_child);
-        left_child.reset();
+  if (left_child != nullptr) {
+    root.swap(left_child);
+    left_child.reset();
 
-        root->InsertSubtree(right_child, false);
-    } else {
-        root.swap(right_child);
-        right_child.reset();
-    }
+    root->InsertSubtree(right_child, false);
+  } else {
+    root.swap(right_child);
+    right_child.reset();
+  }
 
-    return root;
+  return root;
 }
 
 /**
@@ -325,38 +325,38 @@ MedianTree<T>::RemoveRoot(std::shared_ptr<MedianTreeNode<T>> root) {
 template<class T>
 std::shared_ptr<MedianTreeNode<T>>
 MedianTree<T>::RotateSubtree(std::shared_ptr<MedianTreeNode<T>> subtree) {
-    if (subtree == nullptr) {
-        return subtree;
-    }
-
-    if (subtree->balance() >= 2) {
-        if (subtree->left()->balance() >= 1) {
-            subtree = LLRotate(std::move(subtree));
-        } else if (subtree->left()->balance() <= -1) {
-            subtree = LRRotate(std::move(subtree));
-        }
-    } else if (subtree->balance() <= -2) {
-        if (subtree->right()->balance() >= 1) {
-            subtree = RLRotate(std::move(subtree));
-        }
-        else if (subtree->right() != nullptr && subtree->right()->balance() <= -1) {
-            subtree = RRRotate(std::move(subtree));
-        }
-    } else {
-        return subtree;
-    }
-
-    if (subtree->left() != nullptr) {
-        subtree->left()->UpdatePopulation();
-    }
-
-    if (subtree->right() != nullptr) {
-        subtree->right()->UpdatePopulation();
-    }
-
-    subtree->UpdatePopulation();
-
+  if (subtree == nullptr) {
     return subtree;
+  }
+
+  if (subtree->balance() >= 2) {
+    if (subtree->left()->balance() >= 1) {
+      subtree = LLRotate(std::move(subtree));
+    } else if (subtree->left()->balance() <= -1) {
+      subtree = LRRotate(std::move(subtree));
+    }
+  } else if (subtree->balance() <= -2) {
+    if (subtree->right()->balance() >= 1) {
+      subtree = RLRotate(std::move(subtree));
+    } else if (subtree->right() != nullptr
+        && subtree->right()->balance() <= -1) {
+      subtree = RRRotate(std::move(subtree));
+    }
+  } else {
+    return subtree;
+  }
+
+  if (subtree->left() != nullptr) {
+    subtree->left()->UpdatePopulation();
+  }
+
+  if (subtree->right() != nullptr) {
+    subtree->right()->UpdatePopulation();
+  }
+
+  subtree->UpdatePopulation();
+
+  return subtree;
 }
 
 /**
@@ -365,18 +365,18 @@ MedianTree<T>::RotateSubtree(std::shared_ptr<MedianTreeNode<T>> subtree) {
  */
 template<class T>
 void MedianTree<T>::ShiftLTR() {
-    auto max_val = left_max;
-    auto res = Remove(max_val); // resets left_max for us
-    if (res == 1) // failure
-        return;
+  auto max_val = left_max;
+  auto res = Remove(max_val); // resets left_max for us
+  if (res == 1) // failure
+    return;
 
-    if (rt == nullptr) {
-        rt.reset(new MedianTreeNode<T>(max_val));
-        right_min = max_val;
-    } else {
-        rt->Insert(max_val, false);
-        right_min = std::min(max_val, right_min);
-    }
+  if (rt == nullptr) {
+    rt.reset(new MedianTreeNode<T>(max_val));
+    right_min = max_val;
+  } else {
+    rt->Insert(max_val, false);
+    right_min = std::min(max_val, right_min);
+  }
 }
 
 /**
@@ -385,18 +385,18 @@ void MedianTree<T>::ShiftLTR() {
  */
 template<class T>
 void MedianTree<T>::ShiftRTL() {
-    auto min_val = right_min;
-    auto res = Remove(min_val); // resets right_min for us
-    if (res == 1) // failure
-        return;
+  auto min_val = right_min;
+  auto res = Remove(min_val); // resets right_min for us
+  if (res == 1) // failure
+    return;
 
-    if (lt == nullptr) {
-        lt.reset(new MedianTreeNode<T>(min_val));
-        left_max = min_val;
-    } else {
-        lt->Insert(min_val, false);
-        left_max = std::max(min_val, left_max);
-    }
+  if (lt == nullptr) {
+    lt.reset(new MedianTreeNode<T>(min_val));
+    left_max = min_val;
+  } else {
+    lt->Insert(min_val, false);
+    left_max = std::max(min_val, left_max);
+  }
 }
 
 /**
@@ -408,20 +408,20 @@ void MedianTree<T>::ShiftRTL() {
 template<class T>
 std::shared_ptr<MedianTreeNode<T>>
 MedianTree<T>::LLRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
-    std::shared_ptr<MedianTreeNode<T>> tmp;
+  std::shared_ptr<MedianTreeNode<T>> tmp;
 
-    auto left_child = subtree->DetachSubtree(1);
-    auto right_child = subtree->DetachSubtree(-1);
+  auto left_child = subtree->DetachSubtree(1);
+  auto right_child = subtree->DetachSubtree(-1);
 
-    subtree->InsertSubtree(left_child->DetachSubtree(-1)); // inserts on the left
-    subtree->InsertSubtree(right_child); // inserts on the right
+  subtree->InsertSubtree(left_child->DetachSubtree(-1)); // inserts on the left
+  subtree->InsertSubtree(right_child); // inserts on the right
 
-    tmp.swap(subtree);
-    left_child->InsertSubtree(tmp);
+  tmp.swap(subtree);
+  left_child->InsertSubtree(tmp);
 
-    subtree.swap(left_child);
+  subtree.swap(left_child);
 
-    return subtree;
+  return subtree;
 }
 
 /**
@@ -433,18 +433,18 @@ MedianTree<T>::LLRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
 template<class T>
 std::shared_ptr<MedianTreeNode<T>>
 MedianTree<T>::LRRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
-    auto left_child = subtree->DetachSubtree(1);
-    auto tmp = left_child->DetachSubtree(-1);
+  auto left_child = subtree->DetachSubtree(1);
+  auto tmp = left_child->DetachSubtree(-1);
 
-    subtree->InsertSubtree(tmp->DetachSubtree(-1)); // inserts on the left
-    left_child->InsertSubtree(tmp->DetachSubtree(1)); // inserts on the right
+  subtree->InsertSubtree(tmp->DetachSubtree(-1)); // inserts on the left
+  left_child->InsertSubtree(tmp->DetachSubtree(1)); // inserts on the right
 
-    tmp->InsertSubtree(left_child); // inserts on the left
-    tmp->InsertSubtree(subtree); // inserts on the right
+  tmp->InsertSubtree(left_child); // inserts on the left
+  tmp->InsertSubtree(subtree); // inserts on the right
 
-    subtree.swap(tmp);
+  subtree.swap(tmp);
 
-    return subtree;
+  return subtree;
 }
 
 /**
@@ -456,18 +456,18 @@ MedianTree<T>::LRRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
 template<class T>
 std::shared_ptr<MedianTreeNode<T>>
 MedianTree<T>::RLRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
-    auto right_child = subtree->DetachSubtree(-1);
-    auto tmp = right_child->DetachSubtree(1);
+  auto right_child = subtree->DetachSubtree(-1);
+  auto tmp = right_child->DetachSubtree(1);
 
-    subtree->InsertSubtree(tmp->DetachSubtree(1)); // inserts on the right
-    right_child->InsertSubtree(tmp->DetachSubtree(-1)); // inserts on the left
+  subtree->InsertSubtree(tmp->DetachSubtree(1)); // inserts on the right
+  right_child->InsertSubtree(tmp->DetachSubtree(-1)); // inserts on the left
 
-    tmp->InsertSubtree(right_child); // inserts on the right
-    tmp->InsertSubtree(subtree); // inserts on the left
+  tmp->InsertSubtree(right_child); // inserts on the right
+  tmp->InsertSubtree(subtree); // inserts on the left
 
-    subtree.swap(tmp);
+  subtree.swap(tmp);
 
-    return subtree;
+  return subtree;
 }
 
 /**
@@ -479,21 +479,21 @@ MedianTree<T>::RLRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
 template<class T>
 std::shared_ptr<MedianTreeNode<T>>
 MedianTree<T>::RRRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
-    std::shared_ptr<MedianTreeNode<T>> tmp;
+  std::shared_ptr<MedianTreeNode<T>> tmp;
 
-    auto left_child = subtree->DetachSubtree(1);
-    auto right_child = subtree->DetachSubtree(-1);
+  auto left_child = subtree->DetachSubtree(1);
+  auto right_child = subtree->DetachSubtree(-1);
 
-    // inserts on the right
-    subtree->InsertSubtree(right_child->DetachSubtree(1));
-    subtree->InsertSubtree(left_child); // inserts on the left
+  // inserts on the right
+  subtree->InsertSubtree(right_child->DetachSubtree(1));
+  subtree->InsertSubtree(left_child); // inserts on the left
 
-    tmp.swap(subtree);
-    right_child->InsertSubtree(tmp);
+  tmp.swap(subtree);
+  right_child->InsertSubtree(tmp);
 
-    subtree.swap(right_child);
+  subtree.swap(right_child);
 
-    return subtree;
+  return subtree;
 }
 
 #endif //RTS_2_MEDIAN_TREE_H

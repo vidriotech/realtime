@@ -5,7 +5,7 @@
 #include "device_launch_parameters.h"
 
 #include "Probe.h"
-#include "acquisition/FileReader.h"
+#include "acquisition/file_reader.h"
 #include "structures/median_tree.h"
 
 std::string get_env_var(std::string const &key)
@@ -14,7 +14,7 @@ std::string get_env_var(std::string const &key)
     return val == nullptr ? std::string("") : std::string(val);
 }
 
-ProbeConfig make_probeconfig(unsigned n_channels, unsigned n_active, unsigned n_groups, double srate_hz)
+ProbeConfig make_probe_config(unsigned n_channels, unsigned n_active, unsigned n_groups, double srate_hz)
 {
     // don't check that n_total >= n_active for test purposes
     if (n_groups > n_active) {
@@ -63,7 +63,7 @@ ProbeConfig make_probeconfig(unsigned n_channels, unsigned n_active, unsigned n_
 
 Probe make_probe(unsigned n_channels, unsigned n_active, unsigned n_groups, double srate_hz)
 {
-    return Probe(make_probeconfig(n_channels, n_active, n_groups, srate_hz));
+    return Probe(make_probe_config(n_channels, n_active, n_groups, srate_hz));
 }
 
 int main()
@@ -80,8 +80,12 @@ int main()
     auto nsamples = n_channels * (int)ceil(srate_hz);
     auto buf = new short[nsamples];
 
-    reader.acquire_frames(0, nsamples, buf);
-    auto trees = new OldMedianTree<short>[n_channels];
+    reader.AcquireFrames(0, nsamples, buf);
+    auto trees = new MedianTree<short>[n_channels];
+
+    for (auto i = 0; i < nsamples; i++) {
+        for (auto j = 0; i < )
+    }
 
 //    cudaMallocManaged(&buf, (int)ceil(srate_hz) * n_channels);
 

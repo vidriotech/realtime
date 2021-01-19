@@ -9,7 +9,7 @@ TEST(ProbeTestSuite, TestInitOK)
     unsigned n_tot = 385, n_active = 384, n_groups = 4;
     double srate_hz = 30000.0;
 
-    ProbeConfig cfg = make_probeconfig(n_tot, n_active, n_groups, srate_hz);
+    ProbeConfig cfg = make_probe_config(n_tot, n_active, n_groups, srate_hz);
     Probe prb(cfg);
 
     EXPECT_EQ(n_tot, prb.n_total());
@@ -21,7 +21,7 @@ TEST(ProbeTestSuite, TestInitMoreActiveThanTotalFails)
     unsigned n_tot = 385, n_active = 388, n_groups = 4; // 388 > 385
     double srate_hz = 30000.0;
 
-    ProbeConfig cfg = make_probeconfig(n_tot, n_active, n_groups, srate_hz);
+    ProbeConfig cfg = make_probe_config(n_tot, n_active, n_groups, srate_hz);
 
     EXPECT_THROW(Probe prb(cfg), std::domain_error);
 }
