@@ -6,7 +6,7 @@
 
 #include "Probe.h"
 #include "acquisition/FileReader.h"
-#include "structures/OldMedianTree.h"
+#include "structures/median_tree.h"
 
 std::string get_env_var(std::string const &key)
 {
