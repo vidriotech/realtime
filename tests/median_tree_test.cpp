@@ -220,7 +220,7 @@ TEST(MedianTreeTest, RemoveSubtreeRoot) {
   EXPECT_EQ(w, tree.right()->value());
 
   // perform the remove
-  ASSERT_EQ(0, tree.Remove(v));
+  ASSERT_EQ(0, tree.Remove(v, 0));
 
   // ensure that u now resides in tree.left()
   ASSERT_NE(nullptr, tree.left());
@@ -275,7 +275,7 @@ TEST(MedianTreeTest, RemoveSubtreeDescendant) {
   EXPECT_EQ(w, tree.right()->value());
 
   // perform the remove
-  ASSERT_EQ(0, tree.Remove(u));
+  ASSERT_EQ(0, tree.Remove(u, 0));
 
   // ensure that u now resides in tree.left()
   ASSERT_NE(nullptr, tree.left());

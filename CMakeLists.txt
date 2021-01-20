@@ -6,10 +6,10 @@ set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CXX_STANDARD 17)
 
 # RTS
-set(HEADER_FILES src/Probe.h src/DistanceMatrix.h
+set(HEADER_FILES src/probe.h src/DistanceMatrix.h
         src/acquisition/file_reader.h src/extraction/SnippetExtractor.h src/extraction/Snippet.h
         src/structures/median_tree.h)
-set(SOURCE_FILES src/main.cpp src/Probe.cpp src/DistanceMatrix.cpp
+set(SOURCE_FILES src/main.cpp src/probe.cpp src/DistanceMatrix.cpp
         src/acquisition/file_reader.cpp src/extraction/SnippetExtractor.cpp src/extraction/Snippet.cpp
         src/structures/median_tree_node.h src/structures/median_tree_node.cpp src/structures/median_tree.cpp)
 

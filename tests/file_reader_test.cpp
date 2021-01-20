@@ -26,38 +26,56 @@ FileReader<T> make_file_reader() {
   return FileReader<T>(filename, probe);
 }
 
-// test that, given an existing file, a FileReader will initialize ok
-TEST(FileReaderTest, InitOK) {
-  auto reader = make_file_reader<short>();
+/*
+ * GIVEN a file name `filename` and Probe `probe`
+ * DO construct a FileReader AND
+ * TEST THAT
+ */
+TEST(FileReaderTest, InitialState) {
+auto reader = make_file_reader<short>();
 }
 
 // test that, given a binary file, interpreted as a recording with Probe probe,
 // the correct number of frames is reported
-TEST(FileReaderTest, NframesOK) {
-  auto srate_hz = std::stod(get_env_var("TEST_SRATE_HZ"));
-  auto reader = make_file_reader<short>();
+TEST(FileReaderTest, NframesOK
+) {
+auto srate_hz = std::stod(get_env_var("TEST_SRATE_HZ"));
+auto reader = make_file_reader<short>();
 
-  EXPECT_EQ(unsigned (srate_hz *60 * 10), reader.n_frames());
+EXPECT_EQ(unsigned(srate_hz * 60 * 10), reader.n_frames());
 }
 
 // test that, given a binary file, AcquireFrames returns the proper data
-TEST(FileReaderTest, AcquireFramesOK) {
-  auto reader = make_file_reader<short>();
+TEST(FileReaderTest, AcquireFramesOK
+) {
+auto reader = make_file_reader<short>();
 
-  auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
-  auto *framebuf = new short[n_channels * 5]; // 5 frames' worth
-  auto *filebuf = new short[n_channels * 5]; // 5 frames' worth
+auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
+auto *framebuf = new short[n_channels * 5]; // 5 frames' worth
+auto *filebuf = new short[n_channels * 5]; // 5 frames' worth
 
-  std::ifstream fp;
-  fp.open(reader.filename());
-  fp.read((char *) filebuf, sizeof(short) * n_channels * 5);
-  fp.close();
+std::ifstream fp;
+fp.
+open(reader
+.
+filename()
+);
+fp.read((char *) filebuf, sizeof(short) * n_channels * 5);
+fp.
+close();
 
-  reader.AcquireFrames(0, 5 * n_channels, framebuf);
+reader.AcquireFrames(0, 5 * n_channels, framebuf);
 
-  for (auto i = 0; i < 5 * n_channels; i++)
-    EXPECT_EQ(filebuf[i], framebuf[i]);
+for (
+auto i = 0;
+i < 5 *
+n_channels;
+i++)
+EXPECT_EQ(filebuf[i], framebuf[i]
+);
 
-  delete[] framebuf;
-  delete[] filebuf;
+delete[]
+framebuf;
+delete[]
+filebuf;
 }

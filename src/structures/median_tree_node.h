@@ -8,7 +8,7 @@
 template <class T>
 class MedianTreeNode {
 public:
-    MedianTreeNode(T val) : data(val), ht(1), n(1) {};
+    explicit MedianTreeNode(T val) : data(val), ht(1), n(1) {};
 
     // Insert and remove elements/subtrees
     short Insert(T val, bool rotate = true);

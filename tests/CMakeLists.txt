@@ -8,7 +8,7 @@ set(HEADER_FILES utilities/TestProbe.h utilities/TestException.h)
 set(SOURCE_FILES utilities/TestProbe.cpp utilities/TestException.cpp
         KernelTests.cu
         DistanceMatrixTests.cpp
-        ../src/Probe.cpp ProbeTests.cpp
+        ../src/probe.cpp ProbeTests.cpp
         file_reader_test.cpp
         SnippetTests.cpp
         SnippetExtractorTests.cpp

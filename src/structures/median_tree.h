@@ -4,20 +4,21 @@
 #include <algorithm>
 #include <memory>
 #include <utility>
+//#include <iostream>
 
 #include "median_tree_node.h"
 
 template<class T>
 class MedianTree {
  public:
-  MedianTree() {};
-  MedianTree(T a)
+  MedianTree() = default;;
+  explicit MedianTree(T a)
       : lt(new MedianTreeNode<T>(a)), left_max(a) {};
   MedianTree(T a, T b);
 
   // Insert and remove elements
   void Insert(T val, bool balance = true, bool rotate = true);
-  short Remove(T val);
+  short Remove(T val, short subtree = 0);
 
   // rotate and rebalance subtrees
   void BalanceElements();
@@ -105,6 +106,8 @@ MedianTree<T>::MedianTree(T a, T b) {
  */
 template<class T>
 void MedianTree<T>::Insert(T val, bool balance, bool rotate) {
+  std::cout << "left_max: " << left_max << " (actually " << (lt == nullptr ?
+  0 : lt->max()) << ")" << std::endl;
   if (val <= median()) {
     if (lt == nullptr) {
       lt.reset(new MedianTreeNode<T>(val));
@@ -138,44 +141,39 @@ void MedianTree<T>::Insert(T val, bool balance, bool rotate) {
  * @brief Remove a value from this tree.
  * @tparam T The type of the data stored in the nodes of this tree.
  * @param val The value to remove from this tree.
+ * @param subtree Force remove from left subtree if 1, right subtree if -1,
+ *                or detect if 0.
  * @return 0 if value successfully found and removed, 1 otherwise.
  */
 template<class T>
-short MedianTree<T>::Remove(T val) {
+short MedianTree<T>::Remove(T val, short subtree) {
   short res = 1;
 
-  if (val <= left_max && lt != nullptr) {
+  if (lt != nullptr && (subtree == 1 || (subtree == 0 && val <= left_max))) {
     if (lt->value() == val) {
       lt = RemoveRoot(std::move(lt));
       res = 0;
     } else { // search for the value in the left subtree
-      res = lt->Remove(val, false);
+      res = lt->Remove(val, true);
     }
 
     // update right_min if we need to
     if (res == 0 && val == left_max) {
-      if (lt != nullptr) {
-        left_max = lt->max();
-      } else {
-        left_max = 0;
-      }
+      left_max = lt == nullptr ? 0 : lt->max();
     }
-  } else if (val >= right_min && rt != nullptr) {
+  } else if (rt != nullptr &&
+      (subtree == -1 || (subtree == 0 && val >= right_min))) {
     if (rt->value() == val) {
       // actually remove the value at the root node
       rt = RemoveRoot(std::move(rt));
       res = 0;
     } else { // search for the value in the right subtree
-      res = rt->Remove(val, false);
+      res = rt->Remove(val, true);
     }
 
     // update right_min if we need to
     if (res == 0 && val == right_min) {
-      if (rt != nullptr) {
-        right_min = rt->min();
-      } else {
-        right_min = 0;
-      }
+      right_min = rt == nullptr ? 0 : rt->min();
     }
   }
 
@@ -196,7 +194,10 @@ void MedianTree<T>::RotateSubtrees(bool recursive) {
       rt->RotateChildren(recursive);
   }
 
+
+  std::cout << "left_max before: " << lt->max() << std::endl;
   lt = RotateSubtree(std::move(lt));
+  std::cout << "left_max after: " << lt->max() << std::endl;
   rt = RotateSubtree(std::move(rt));
 }
 
@@ -211,11 +212,11 @@ void MedianTree<T>::BalanceElements() {
     return;
   }
 
-  while (el_balance() < -1) {
+  if (el_balance() < -1) {
     ShiftRTL();
   }
 
-  while (el_balance() > 1) {
+  if (el_balance() > 1) {
     ShiftLTR();
   }
 }
@@ -366,7 +367,7 @@ MedianTree<T>::RotateSubtree(std::shared_ptr<MedianTreeNode<T>> subtree) {
 template<class T>
 void MedianTree<T>::ShiftLTR() {
   auto max_val = left_max;
-  auto res = Remove(max_val); // resets left_max for us
+  auto res = Remove(max_val, 1); // resets left_max for us
   if (res == 1) // failure
     return;
 
@@ -374,7 +375,7 @@ void MedianTree<T>::ShiftLTR() {
     rt.reset(new MedianTreeNode<T>(max_val));
     right_min = max_val;
   } else {
-    rt->Insert(max_val, false);
+    rt->Insert(max_val, true);
     right_min = std::min(max_val, right_min);
   }
 }
@@ -386,7 +387,7 @@ void MedianTree<T>::ShiftLTR() {
 template<class T>
 void MedianTree<T>::ShiftRTL() {
   auto min_val = right_min;
-  auto res = Remove(min_val); // resets right_min for us
+  auto res = Remove(min_val, -1); // resets right_min for us
   if (res == 1) // failure
     return;
 
@@ -394,7 +395,7 @@ void MedianTree<T>::ShiftRTL() {
     lt.reset(new MedianTreeNode<T>(min_val));
     left_max = min_val;
   } else {
-    lt->Insert(min_val, false);
+    lt->Insert(min_val, true);
     left_max = std::max(min_val, left_max);
   }
 }
