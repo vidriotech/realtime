@@ -87,13 +87,23 @@ int main() {
   auto trees = new MedianTree<short>[n_channels];
 
   for (auto i = 0; i < n_frames; i++) {
-    auto j = 30;
-//    for (auto j = 0; j < n_channels; j++) {
+    for (auto j = 0; j < n_channels; j++) {
       auto k = i * n_channels + j;
-      std::cout << std::endl;
-      std::cout << k << " " << buf[k] << std::endl;
       trees[j].Insert(buf[k]);
-//    }
+
+      std::cout << "channel: " << j <<
+                " count: " << trees[j].count() <<
+                " balance: " << trees[j].balance() <<
+                " el_balance: " << trees[j].el_balance() <<
+                " median: " << trees[j].median() <<
+                std::endl;
+
+      if (i >= 100) {
+        std::cout << "\tremoving: " <<
+                  trees[j].Remove(buf[k - 100 * n_channels]) << std::endl;
+      }
+    }
+    std::cout << std::endl;
   }
 
 //    cudaMallocManaged(&buf, (int)ceil(srate_hz) * n_channels);

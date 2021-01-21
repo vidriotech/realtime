@@ -106,8 +106,6 @@ MedianTree<T>::MedianTree(T a, T b) {
  */
 template<class T>
 void MedianTree<T>::Insert(T val, bool balance, bool rotate) {
-  std::cout << "left_max: " << left_max << " (actually " << (lt == nullptr ?
-  0 : lt->max()) << ")" << std::endl;
   if (val <= median()) {
     if (lt == nullptr) {
       lt.reset(new MedianTreeNode<T>(val));
@@ -194,10 +192,7 @@ void MedianTree<T>::RotateSubtrees(bool recursive) {
       rt->RotateChildren(recursive);
   }
 
-
-  std::cout << "left_max before: " << lt->max() << std::endl;
   lt = RotateSubtree(std::move(lt));
-  std::cout << "left_max after: " << lt->max() << std::endl;
   rt = RotateSubtree(std::move(rt));
 }
 
