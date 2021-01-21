@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(HEADER_FILES utilities/TestProbe.h utilities/TestException.h)
 set(SOURCE_FILES utilities/TestProbe.cpp utilities/TestException.cpp
         KernelTests.cu
-        DistanceMatrixTests.cpp
-        ../src/probe.cpp ProbeTests.cpp
+        distance_matrix_test.cpp
+        ../src/probe/probe.cpp ProbeTests.cpp
         file_reader_test.cpp
         SnippetTests.cpp
         SnippetExtractorTests.cpp

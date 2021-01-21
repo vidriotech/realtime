@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <stdexcept>
-#include "../src/probe.h"
+#include "../src/probe/probe.h"
 #include "utilities/TestProbe.h"
 
 TEST(ProbeTestSuite, TestInitOK)

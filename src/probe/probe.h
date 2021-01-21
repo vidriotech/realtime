@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-#include "DistanceMatrix.h"
+#include "../structures/distance_matrix.h"
 
 struct ChannelGroup {
   // indices of the channels in this group

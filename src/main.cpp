@@ -4,7 +4,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
-#include "probe.h"
+#include "probe/probe.h"
 #include "acquisition/file_reader.h"
 #include "structures/median_tree.h"
 

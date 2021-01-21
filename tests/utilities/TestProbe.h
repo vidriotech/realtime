@@ -2,7 +2,7 @@
 #define RTS_2_TESTPROBE_H
 
 #include <stdexcept>
-#include "../../src/probe.h"
+#include "../../src/probe/probe.h"
 
 ProbeConfig make_probe_config(unsigned, unsigned, unsigned, double);
 Probe make_probe(unsigned, unsigned, unsigned, double);

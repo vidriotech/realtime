@@ -9,7 +9,7 @@
 #include <fstream>
 #include <utility>
 #include <vector>
-#include "../probe.h"
+#include "../probe/probe.h"
 
 /**
  * @brief A class for reading data from a flat binary file.

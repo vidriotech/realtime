@@ -1,0 +1,8 @@
+#ifndef RTS_2_SRC_PROBE_PROBE_READER_H_
+#define RTS_2_SRC_PROBE_PROBE_READER_H_
+
+class ProbeReader {
+
+};
+
+#endif //RTS_2_SRC_PROBE_PROBE_READER_H_

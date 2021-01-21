@@ -6,15 +6,18 @@ set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CXX_STANDARD 17)
 
 # RTS
-set(HEADER_FILES src/probe.h src/DistanceMatrix.h
-        src/acquisition/file_reader.h src/extraction/SnippetExtractor.h src/extraction/Snippet.h
-        src/structures/median_tree.h)
-set(SOURCE_FILES src/main.cpp src/probe.cpp src/DistanceMatrix.cpp
-        src/acquisition/file_reader.cpp src/extraction/SnippetExtractor.cpp src/extraction/Snippet.cpp
-        src/structures/median_tree_node.h src/structures/median_tree_node.cpp src/structures/median_tree.cpp)
+set(HEADER_FILES src/probe/probe.h src/probe/probe_reader.h
+        src/structures/median_tree_node.h src/structures/median_tree.h src/structures/distance_matrix.h
+        src/acquisition/file_reader.h
+        src/detection/threshold_computer.h
+        src/extraction/Snippet.h src/extraction/SnippetExtractor.h)
+set(SOURCE_FILES src/main.cpp
+        src/probe/probe.cpp src/probe/probe_reader.cpp
+        src/structures/median_tree_node.cpp src/structures/median_tree.cpp src/structures/distance_matrix.cpp
+        src/acquisition/file_reader.cpp
+        src/detection/threshold_computer.cpp
+        src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp)
 
-#set(HEADER_FILES)
-#set(SOURCE_FILES main.cpp)
 add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
 
 set_target_properties(
