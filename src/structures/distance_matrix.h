@@ -40,7 +40,7 @@ unsigned DistanceMatrix<T>::index_at(unsigned i, unsigned j)
         return index_at(j, i);
     }
 
-    // the index in the data array of the (i, j) element
+    // the index in the data_ array of the (i, j) element
     return i * N - (i + 1) * (i + 2) / 2 + j;
 }
 

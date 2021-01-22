@@ -53,7 +53,7 @@ class Probe {
   // the number of samples taken per channel per second
   double _srate_hz = 0.0;
 
-  // row indices of active sites in the data matrix
+  // row indices of active sites in the data_ matrix
   std::vector<unsigned> chan_idx;
   // (unique) label of each site in the probe mapping
   std::vector<unsigned> site_labels;

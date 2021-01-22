@@ -16,7 +16,7 @@ set(SOURCE_FILES src/main.cpp
         src/structures/median_tree_node.cpp src/structures/median_tree.cpp src/structures/distance_matrix.cpp
         src/acquisition/file_reader.cpp
         src/detection/threshold_computer.cpp
-        src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp)
+        src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp src/utilities.h)
 
 add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
 

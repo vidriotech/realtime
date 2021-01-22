@@ -43,8 +43,8 @@ TEST(FileReaderTest, InitialState) {
 
 /*
  * GIVEN a FileReader `reader`
- * DO acquire 5 frames' worth of data from the beginning of the file AND
- * TEST THAT the data so acquired is equal to the data as read directly.
+ * DO acquire 5 frames' worth of data_ from the beginning of the file AND
+ * TEST THAT the data_ so acquired is equal to the data_ as read directly.
  */
 TEST(FileReaderTest, AcquireFrames) {
   auto reader = make_file_reader<short>();

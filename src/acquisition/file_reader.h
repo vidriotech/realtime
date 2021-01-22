@@ -12,8 +12,8 @@
 #include "../probe/probe.h"
 
 /**
- * @brief A class for reading data from a flat binary file.
- * @tparam T The type of data stored in the underlying file.
+ * @brief A class for reading data_ from a flat binary file.
+ * @tparam T The type of data_ stored in the underlying file.
  */
 template<class T>
 class FileReader {
@@ -60,11 +60,11 @@ FileReader<T>::FileReader(std::string &filename, Probe &probe)
 }
 
 /**
- * @brief Acquire data from the file, so many frames at a time.
- * @tparam T The type of data stored in the underlying file.
+ * @brief Acquire data_ from the file, so many frames at a time.
+ * @tparam T The type of data_ stored in the underlying file.
  * @param frame_offset Number of frames after the beginning to start acquiring.
  * @param n_frames Number of frames to acquire.
- * @param buf Buffer where the acquired data will be stored.
+ * @param buf Buffer where the acquired data_ will be stored.
  */
 template<class T>
 void FileReader<T>::AcquireFrames(int frame_offset, int n_frames, T *buf) {
@@ -79,7 +79,7 @@ void FileReader<T>::AcquireFrames(int frame_offset, int n_frames, T *buf) {
 
 /**
  * @brief Open the underlying file for reading.
- * @tparam T The type of data stored in the underlying file.
+ * @tparam T The type of data_ stored in the underlying file.
  */
 template<class T>
 void FileReader<T>::Open() {
@@ -89,7 +89,7 @@ void FileReader<T>::Open() {
 
 /**
  * @brief Close the underlying file.
- * @tparam T The type of data stored in the underlying file.
+ * @tparam T The type of data_ stored in the underlying file.
  */
 template<class T>
 void FileReader<T>::Close() {
@@ -98,9 +98,9 @@ void FileReader<T>::Close() {
 }
 
 /**
- * @brief Compute and return the number of frames in the underlying data file.
- * @tparam T The type of data stored in the underlying file.
- * @return The number of frames in the underlying data file.
+ * @brief Compute and return the number of frames in the underlying data_ file.
+ * @tparam T The type of data_ stored in the underlying file.
+ * @return The number of frames in the underlying data_ file.
  */
 template<class T>
 unsigned long FileReader<T>::n_frames() const {
