@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 #include "../src/probe/probe.h"
-#include "./test_utilities/test_probe.h"
+#include "./test_utilities/test_utilities.h"
 
 TEST(ProbeTestSuite, TestInitOK) {
   unsigned n_tot = 385, n_active = 384, n_groups = 4;
@@ -41,4 +41,22 @@ TEST(ProbeTestSuite, TestMakeDistMatrixOK) {
   EXPECT_EQ(0.0, prb.dist_between(2, 2));
   EXPECT_NEAR(20.0, prb.dist_between(2, 3), 1e-12);
   EXPECT_EQ(0.0, prb.dist_between(3, 3));
+}
+
+/*
+ * GIVEN a Probe probe
+ * TEST THAT each active channel is actually reported as active.
+ */
+TEST(ProbeTestSuite, IsActive) {
+  auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
+  auto n_active = std::stoi(get_env_var("TEST_NACTIVE"));
+  auto probe = probe_from_env();
+
+  for (auto i = 0; i < n_active; ++i) {
+    EXPECT_TRUE(probe.is_active(i));
+  }
+
+  for (auto i = n_active; i < n_channels; i++) {
+    EXPECT_FALSE(probe.is_active((i)));
+  }
 }

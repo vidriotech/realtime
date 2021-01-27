@@ -14,7 +14,7 @@ class ThresholdComputer {
       : data_(bufsize) {};
 
   void UpdateBuffer(T *buf, int n = -1);
-  double ComputeThreshold(double multiplier);
+  float ComputeThreshold(float multiplier);
 
   // getters
   /**
@@ -47,7 +47,7 @@ void ThresholdComputer<T>::UpdateBuffer(T *buf, int n) {
 }
 
 template<class T>
-double ThresholdComputer<T>::ComputeThreshold(double multiplier) {
+float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
   if (is_cached) {
     return multiplier * mad / 0.6745;
   }

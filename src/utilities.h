@@ -8,7 +8,7 @@
 namespace utilities {
 
 template<class T>
-double median(std::vector<T> data, bool is_sorted) {
+double median(std::vector<T> &data, bool is_sorted) {
   if (data.size() == 0) {
     return 0;
   }

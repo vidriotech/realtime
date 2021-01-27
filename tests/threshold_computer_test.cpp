@@ -85,10 +85,10 @@ TEST(ThresholdComputerTest, ComputeThreshold) {
 
   computer.UpdateBuffer(buf);
 
-  EXPECT_DOUBLE_EQ(185.32246108228318, computer.ComputeThreshold(5));
+  EXPECT_FLOAT_EQ(185.32246, computer.ComputeThreshold(5));
 
   // should be cached now, check that it hasn't changed
-  EXPECT_DOUBLE_EQ(185.32246108228318, computer.ComputeThreshold(5));
+  EXPECT_FLOAT_EQ(185.32246, computer.ComputeThreshold(5));
 
   // clean up
   delete[] buf;

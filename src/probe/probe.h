@@ -8,32 +8,31 @@
 #include "../structures/distance_matrix.h"
 
 struct ChannelGroup {
-  // indices of the channels in this group
+  /*!< indices of the channels in this group */
   std::vector<unsigned> channels;
 
-  // unique (across the entire probe_) labels of channels in this group
+  /*!< unique (across the entire probe) labels of channels in this group. */
   std::vector<unsigned> site_labels;
 
-  // x coordinates of sites in this group, in microns
+  /*!< x coordinates of sites in this group, in microns. */
   std::vector<double> x_coords;
-  // y coordinates of sites in this group, in microns
+  /*!< y coordinates of sites in this group, in microns. */
   std::vector<double> y_coords;
 
-  [[nodiscard]] unsigned n_channels() const {
-    return channels.size();
-  }
+  [[nodiscard]] unsigned n_channels() const { return channels.size(); }
 };
 
 struct ProbeConfig {
-  // the total number of channels currently recorded
+  /*!< the total number of channels currently recorded. */
   unsigned n_total;
-  // physical or logical groups of channels on the probe_
+  /*!< physical or logical groups of channels on the probe. */
   std::map<unsigned, ChannelGroup> channel_groups;
 
-  // number of samples collected per channel per second
+  /*!< number of samples collected per channel per second. */
   double srate_hz;
 
-  // default spatial extent (in microns) of the templates that will be considered for the probe_
+  /*!< spatial extent (radius in microns) of templates that will be
+   * considered for the probe */
   double spatial_extent;
 
   unsigned n_active() {
@@ -46,26 +45,59 @@ struct ProbeConfig {
 };
 
 class Probe {
+ public:
+  explicit Probe(ProbeConfig cfg);
+
+  void make_distance_matrix();
+
+  // unindexed getters
+  /**
+   * @brief Get the *total* number of channels on the probe.
+   * @return The total number of channels on the probe.
+   */
+  [[nodiscard]] unsigned n_total() const { return n_total_; };
+  /**
+   * @brief Get the number of *active* channels on the probe.
+   * @return The number of active channels on the probe.
+   */
+  [[nodiscard]] unsigned n_active() const { return chan_idx.size(); };
+  /**
+   * @brief Get the sample rate, in Hz.
+   * @return The sample rate, in Hz.
+   */
+  [[nodiscard]] double sample_rate() const { return srate_hz_; };
+
+  // indexed getters
+  [[nodiscard]] bool is_active(unsigned i) const;
+
+  unsigned index_at(unsigned i);
+  unsigned label_at(unsigned i);
+  unsigned group_at(unsigned i);
+  double x_at(unsigned i);
+  double y_at(unsigned j);
+
+  float dist_between(unsigned i, unsigned j);
+
  private:
-  unsigned _n_total = 0;  // the TOTAL number of channels on the probe_
+  unsigned n_total_ = 0;  // the TOTAL number of channels on the probe
   // the number of neighbors to consider for each active channel
-  unsigned _n_neigh = 0;
+  unsigned n_neigh_ = 0;
   // the number of samples taken per channel per second
-  double _srate_hz = 0.0;
+  double srate_hz_ = 0.0;
 
   // row indices of active sites in the data_ matrix
   std::vector<unsigned> chan_idx;
-  // (unique) label of each site in the probe_ mapping
+  // (unique) label of each site in the probe mapping
   std::vector<unsigned> site_labels;
   // channel group ID of each active site
   std::vector<unsigned> chan_grps;
-  // x coordinates of sites on the probe_, in microns
+  // x coordinates of sites on the probe, in microns
   std::vector<double> x_coords;
-  // y coordinates of sites on the probe_, in microns
+  // y coordinates of sites on the probe, in microns
   std::vector<double> y_coords;
 
-  // entries are true if the channel is active (size: _n_total)
-  std::vector<bool> is_active;
+  // entries are true if the channel is active (size: n_total_)
+  std::vector<bool> is_active_;
 
   // true iff the distance matrix has been built
   bool dist_mat_complete = false;
@@ -76,27 +108,8 @@ class Probe {
   void sort_channels();
   // ensure channel indices/site labels are unique
   void ensure_unique();
-  // find inactive channels, populate is_active
+  // find inactive channels, populate is_active_
   void find_inactive();
-
- public:
-  explicit Probe(ProbeConfig cfg);
-
-  // getter for _n_total, the total number of channels on this Probe
-  [[nodiscard]] unsigned n_total() const;
-  // getter for _n_active, the number of active channels on this Probe
-  [[nodiscard]] unsigned n_active() const;
-  // getter for _srate_hz, the number of samples per channel per second
-  [[nodiscard]] double sample_rate() const;
-
-  unsigned index_at(unsigned i);
-  unsigned label_at(unsigned i);
-  unsigned group_at(unsigned i);
-  double x_at(unsigned i);
-  double y_at(unsigned j);
-
-  float dist_between(unsigned i, unsigned j);
-  void make_distance_matrix();
 };
 
 #endif //RTS_2_PROBE_H
