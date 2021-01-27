@@ -17,6 +17,7 @@ class Detector {
 
   void UpdateBuffers(T *buf, int n = -1);
   void ComputeThresholds(float multiplier);
+  std::vector<bool> FindCrossings();
 
   // getters
   std::vector<float> &thresholds() { return thresholds_; };
@@ -72,7 +73,7 @@ void Detector<T>::UpdateBuffers(T *buf, int n) {
 
 /**
  * @brief Compute thresholds for each active site.
- * @param buf Buffer of threshold values.
+ * @param multiplier Multiple of MAD to serve as threshold.
  */
 template<class T>
 void Detector<T>::ComputeThresholds(float multiplier) {
@@ -84,6 +85,11 @@ void Detector<T>::ComputeThresholds(float multiplier) {
       thresholds_[i] = threshold_computers[site_idx++].ComputeThreshold(multiplier);
     }
   }
+}
+template<class T>
+std::vector<bool> Detector<T>::FindCrossings() {
+  auto n_samples = n_frames_ * probe_.n_total();
+  std::vector<bool> crossings(n_samples);
 }
 
 #endif //RTS_2_SRC_DETECTION_DETECTOR_H_

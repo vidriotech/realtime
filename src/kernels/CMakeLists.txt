@@ -4,7 +4,7 @@ project(RTSKernels CUDA)
 set(CMAKE_CUDA_STANDARD 14)
 
 set(HEADER_FILES ChanAdd.cuh filters.cuh thresholds.cuh)
-set(SOURCE_FILES ChanAdd.cu filters.cu thresholds.cu)
+set(SOURCE_FILES ChanAdd.cu filters.cu thresholds.cu kernels.cuh)
 
 add_library(RTSKernels STATIC ${SOURCE_FILES} ${HEADER_FILES})
 
