@@ -11,7 +11,7 @@ struct ChannelGroup {
   // indices of the channels in this group
   std::vector<unsigned> channels;
 
-  // unique (across the entire probe) labels of channels in this group
+  // unique (across the entire probe_) labels of channels in this group
   std::vector<unsigned> site_labels;
 
   // x coordinates of sites in this group, in microns
@@ -27,13 +27,13 @@ struct ChannelGroup {
 struct ProbeConfig {
   // the total number of channels currently recorded
   unsigned n_total;
-  // physical or logical groups of channels on the probe
+  // physical or logical groups of channels on the probe_
   std::map<unsigned, ChannelGroup> channel_groups;
 
   // number of samples collected per channel per second
   double srate_hz;
 
-  // default spatial extent (in microns) of the templates that will be considered for the probe
+  // default spatial extent (in microns) of the templates that will be considered for the probe_
   double spatial_extent;
 
   unsigned n_active() {
@@ -47,7 +47,7 @@ struct ProbeConfig {
 
 class Probe {
  private:
-  unsigned _n_total = 0;  // the TOTAL number of channels on the probe
+  unsigned _n_total = 0;  // the TOTAL number of channels on the probe_
   // the number of neighbors to consider for each active channel
   unsigned _n_neigh = 0;
   // the number of samples taken per channel per second
@@ -55,13 +55,13 @@ class Probe {
 
   // row indices of active sites in the data_ matrix
   std::vector<unsigned> chan_idx;
-  // (unique) label of each site in the probe mapping
+  // (unique) label of each site in the probe_ mapping
   std::vector<unsigned> site_labels;
   // channel group ID of each active site
   std::vector<unsigned> chan_grps;
-  // x coordinates of sites on the probe, in microns
+  // x coordinates of sites on the probe_, in microns
   std::vector<double> x_coords;
-  // y coordinates of sites on the probe, in microns
+  // y coordinates of sites on the probe_, in microns
   std::vector<double> y_coords;
 
   // entries are true if the channel is active (size: _n_total)

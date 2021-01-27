@@ -3,31 +3,18 @@
 #include <string>
 
 #include "../src/acquisition/file_reader.h"
-#include "utilities/TestProbe.h"
-#include "utilities/TestException.h"
-
-std::string get_env_var(std::string const &key) {
-  char *val = getenv(key.c_str());
-  if (val == nullptr) {
-    throw TestException(key + " is not defined.");
-  }
-  return std::string(val);
-}
+#include "./test_utilities/test_utilities.h"
 
 template<class T>
 FileReader<T> make_file_reader() {
   auto filename = get_env_var("TEST_FILE");
-  auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
-  auto n_active = std::stoi(get_env_var("TEST_NACTIVE"));
-  auto n_groups = std::stoi(get_env_var("TEST_NGROUPS"));
-  auto srate_hz = std::stod(get_env_var("TEST_SRATE_HZ"));
+  auto probe = probe_from_env();
 
-  auto probe = make_probe(n_channels, n_active, n_groups, srate_hz);
   return FileReader<T>(filename, probe);
 }
 
 /*
- * GIVEN a file name `filename` and Probe `probe`
+ * GIVEN a file name `filename` and Probe `probe_`
  * DO construct a FileReader AND
  * TEST THAT the filename getter returns the correct filename; AND
  *           the correct number of frames is computed and returned.

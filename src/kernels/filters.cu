@@ -1,4 +1,4 @@
-#include "Filters.cuh"
+#include "filters.cuh"
 
 __global__ void ndiff2_i16(int N, const short *in, short *out, int nchans) {
     unsigned int offset = blockIdx.x * blockDim.x + threadIdx.x;

@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "../src/kernels/ChanAdd.cuh"
-#include "../src/kernels/Filters.cuh"
+#include "../src/kernels/filters.cuh"
 
 TEST(KernelTestSuite, TestSqAdd) {
     float *x, *y;

@@ -5,16 +5,15 @@ set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CXX_STANDARD 17)
 
 set(HEADER_FILES
-        utilities/TestProbe.h utilities/TestException.h)
+        test_utilities/test_utilities.h test_utilities/test_probe.h test_utilities/test_exception.h)
 set(SOURCE_FILES
-        utilities/TestProbe.cpp utilities/TestException.cpp
+        test_utilities/test_probe.cpp
         kernel_test.cu
         distance_matrix_test.cpp
         ../src/probe/probe.cpp probe_test.cpp
         file_reader_test.cpp
-        SnippetTests.cpp
-        SnippetExtractorTests.cpp
-        median_tree_node_test.cpp median_tree_test.cpp threshold_computer_test.cpp)
+        SnippetTests.cpp SnippetExtractorTests.cpp
+        median_tree_node_test.cpp median_tree_test.cpp threshold_computer_test.cpp detector_test.cpp test_utilities/test_utilities.h test_utilities/test_utilities.cpp)
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 
 add_subdirectory(lib)

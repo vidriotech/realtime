@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 #include "../src/probe/probe.h"
-#include "utilities/TestProbe.h"
+#include "./test_utilities/test_probe.h"
 
 TEST(ProbeTestSuite, TestInitOK) {
   unsigned n_tot = 385, n_active = 384, n_groups = 4;

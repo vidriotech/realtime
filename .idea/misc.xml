@@ -5,5 +5,8 @@
     <libraryRoots>
       <file path="$PROJECT_DIR$/tests/lib" />
     </libraryRoots>
+    <excludeRoots>
+      <file path="$PROJECT_DIR$/cmake-build-debug-coverage-1" />
+    </excludeRoots>
   </component>
 </project>
