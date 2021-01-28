@@ -3,6 +3,7 @@
 #include <limits>
 #include <vector>
 
+#include "../src/params/params.h"
 #include "../src/detection/detector.h"
 #include "./test_utilities/test_utilities.h"
 
@@ -38,7 +39,7 @@ TEST(DetectorTest, DetectThresholds) {
   auto n_frames = detector.n_frames();
   auto n_samples = n_frames * probe.n_total();
 
-  auto data = new short[n_samples];
+  std::unique_ptr<short[]> data(new short[n_samples]);
   for (auto i = 0; i < n_frames; ++i) {
     for (auto j = 0; j < probe.n_total(); ++j) {
       auto k = i * probe.n_total() + j;
@@ -55,7 +56,7 @@ TEST(DetectorTest, DetectThresholds) {
   std::vector<float> thresholds;
 
   // update buffers
-  detector.UpdateBuffers(data, n_samples);
+  detector.UpdateBuffer(std::move(data), n_samples);
   // compute thresholds
   detector.ComputeThresholds(1.0);
 
@@ -67,6 +68,4 @@ TEST(DetectorTest, DetectThresholds) {
     EXPECT_FLOAT_EQ(std::numeric_limits<float>::infinity(),
                     detector.thresholds().at(i));
   }
-
-  delete[] data;
 }

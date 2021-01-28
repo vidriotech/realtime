@@ -38,6 +38,9 @@ class FileReader : public Reader<T> {
    */
   unsigned long n_frames() const;
 
+  // setters
+  void set_filename(std::string &filename);
+
  protected:
   void Open();
   void Close();

@@ -3,14 +3,8 @@
 
 template<class T>
 FileReader<T>::FileReader(std::string &filename, Probe &probe)
-    : Reader<T>(probe), filename_(filename) {
-  FileReader<T>::Open();
-
-  // seek to the end to get the size in bytes
-  fp.seekg(0, std::ios::end);
-  fsize = fp.tellg();
-
-  FileReader<T>::Close();
+    : Reader<T>(probe) {
+  set_filename(filename);
 }
 
 /**
@@ -52,13 +46,32 @@ void FileReader<T>::Close() {
 }
 
 /**
- * @brief Compute and return the number of frames in the underlying data_ file.
- * @tparam T The type of data_ stored in the underlying file.
- * @return The number of frames in the underlying data_ file.
+ * @brief Compute and return the number of frames in the underlying data file.
+ * @tparam T The type of data stored in the underlying file.
+ * @return The number of frames in the underlying data file.
  */
 template<class T>
 unsigned long FileReader<T>::n_frames() const {
   return fsize / (this->probe_.n_total() * sizeof(T));
 }
+
+/**
+ * @brief Set the path for the underlying file.
+ * @tparam T The type of data stored in the underlying file.
+ * @param filename
+ */
+template<class T>
+void FileReader<T>::set_filename(std::string &filename) {
+  filename_ = filename;
+
+  FileReader<T>::Open();
+
+  // seek to the end to get the size in bytes
+  fp.seekg(0, std::ios::end);
+  fsize = fp.tellg();
+
+  FileReader<T>::Close();
+}
+
 
 template class FileReader<short>;

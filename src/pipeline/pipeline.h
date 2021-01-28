@@ -1,18 +1,29 @@
 #ifndef RTS_2_SRC_PIPELINE_H_
 #define RTS_2_SRC_PIPELINE_H_
 
+#include <cmath>
+#include <memory>
+
 #include "../params/params.h"
 #include "../acquisition/reader.h"
 
-template<class R>
+template<class T>
 class Pipeline {
  public:
-  explicit Pipeline(Params &params, Probe &probe)
-      : params_(params), reader_(probe) {};
+  Pipeline(Params &params, Probe &probe);
 
- private:
+  virtual void Run() = 0;
+
+  // getters
+  [[nodiscard]] unsigned n_frames() const;
+  [[nodiscard]] unsigned frame_offset() const { return frame_offset_; };
+
+ protected:
   Params params_;
-  R reader_;
+  Probe probe_;
+  std::unique_ptr<T[]> buf_;
+
+  unsigned frame_offset_ = 0;
 };
 
 #endif //RTS_2_SRC_PIPELINE_H_

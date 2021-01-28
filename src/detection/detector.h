@@ -4,18 +4,21 @@
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <memory>
+#include <utility>
 #include <vector>
 
 #include "../params/params.h"
 #include "../probe/probe.h"
 #include "threshold_computer.h"
+#include "../kernels/thresholds.cuh"
 
 template<class T>
 class Detector {
  public:
-  explicit Detector(Params &params, Probe &probe);
+  Detector(Params &params, Probe &probe);
 
-  void UpdateBuffers(T *buf, int n = -1);
+  void UpdateBuffer(std::unique_ptr<T[]> buf, int n = -1);
   void ComputeThresholds(float multiplier);
   std::vector<bool> FindCrossings();
 
@@ -27,6 +30,9 @@ class Detector {
   unsigned n_frames_;
   Params params_;
   Probe probe_;
+
+  std::unique_ptr<T[]> buf_;
+  unsigned buf_size_;
   std::vector<ThresholdComputer<T>> threshold_computers;
   std::vector<float> thresholds_;
 };
