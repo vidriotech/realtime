@@ -12,12 +12,14 @@ set(HEADER_FILES src/utilities.h
         src/params/acquire_params.h src/params/threshold_params.h
         src/acquisition/file_reader.h
         src/detection/threshold_computer.h src/detection/detector.h
-        src/extraction/Snippet.h src/extraction/SnippetExtractor.h src/pipeline.h)
+        src/extraction/Snippet.h src/extraction/SnippetExtractor.h
+        src/pipeline/pipeline.h)
 set(SOURCE_FILES src/main.cpp
         src/probe/probe.cpp src/probe/probe_reader.cpp
         src/structures/median_tree_node.cpp src/structures/median_tree.cpp
         src/acquisition/file_reader.cpp
-        src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp src/params/params.h src/detection/detector.cpp src/pipeline.cpp)
+        src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp src/params/params.h src/detection/detector.cpp
+        src/pipeline/pipeline.cpp src/acquisition/reader.cpp src/acquisition/reader.h)
 
 add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
 

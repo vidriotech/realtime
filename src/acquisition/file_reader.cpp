@@ -1,8 +1,9 @@
 #include "file_reader.h"
+#include "reader.h"
 
 template<class T>
 FileReader<T>::FileReader(std::string &filename, Probe &probe)
-    : filename_(filename), probe(probe) {
+    : Reader<T>(probe), filename_(filename) {
   Open();
 
   // seek to the end to get the size in bytes
@@ -23,7 +24,7 @@ template<class T>
 void FileReader<T>::AcquireFrames(int frame_offset, int n_frames, T *buf) {
   Open(); // no-op if already Open
 
-  auto n_channels = probe.n_total();
+  auto n_channels = this->probe_.n_total();
   auto n_samples = n_frames * n_channels;
 
   fp.seekg(frame_offset * n_channels * sizeof(T), std::ios::beg);
@@ -57,7 +58,7 @@ void FileReader<T>::Close() {
  */
 template<class T>
 unsigned long FileReader<T>::n_frames() const {
-  return fsize / (probe.n_total() * sizeof(T));
+  return fsize / (this->probe_.n_total() * sizeof(T));
 }
 
 template class FileReader<short>;

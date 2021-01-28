@@ -7,7 +7,7 @@
 #include "./test_utilities/test_utilities.h"
 
 /*
- * GIVEN a Params `params` and a Probe `probe`
+ * GIVEN a Params `params_` and a Probe `probe_`
  * DO construct a Detector `detector` AND
  * TEST THAT `thresholds` is a vector of zeros.
  */

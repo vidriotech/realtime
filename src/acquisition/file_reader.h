@@ -5,18 +5,20 @@
 #include <fstream>
 #include <utility>
 #include <vector>
-#include "../probe/probe.h"
+
+#include "reader.h"
 
 /**
  * @brief A class for reading data_ from a flat binary file.
  * @tparam T The type of data_ stored in the underlying file.
  */
 template<class T>
-class FileReader {
+class FileReader : public Reader<T> {
  public:
   explicit FileReader(std::string &filename, Probe &probe);
   FileReader(FileReader &other)
-      : filename_(other.filename_), probe(other.probe), fsize(other.fsize) {};
+      : Reader<T>(other.probe_), filename_(other.filename_), fsize(other.fsize)
+      {};
   ~FileReader() { Close(); };
 
   void AcquireFrames(int frame_offset, int n_frames, T *buf);
@@ -34,7 +36,6 @@ class FileReader {
   unsigned long n_frames() const;
  private:
   std::string filename_;
-  Probe probe;
   std::ifstream fp;
 
   unsigned long long fsize;

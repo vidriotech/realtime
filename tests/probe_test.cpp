@@ -44,7 +44,7 @@ TEST(ProbeTestSuite, TestMakeDistMatrixOK) {
 }
 
 /*
- * GIVEN a Probe probe
+ * GIVEN a Probe probe_
  * TEST THAT each active channel is actually reported as active.
  */
 TEST(ProbeTestSuite, IsActive) {
