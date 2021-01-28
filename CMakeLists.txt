@@ -16,7 +16,8 @@ set(HEADER_FILES src/utilities.h
 set(SOURCE_FILES src/main.cpp
         src/probe/probe.cpp src/probe/probe_reader.cpp
         src/structures/median_tree_node.cpp src/structures/median_tree.cpp
-        src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp src/params/params.h)
+        src/acquisition/file_reader.cpp
+        src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp src/params/params.h src/detection/detector.cpp)
 
 add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
 

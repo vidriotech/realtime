@@ -11,9 +11,10 @@ set(SOURCE_FILES
         kernel_test.cu
         distance_matrix_test.cpp
         ../src/probe/probe.cpp probe_test.cpp
-        file_reader_test.cpp
+        ../src/acquisition/file_reader.cpp file_reader_test.cpp
+        ../src/detection/detector.cpp detector_test.cpp
         SnippetTests.cpp SnippetExtractorTests.cpp
-        median_tree_node_test.cpp median_tree_test.cpp threshold_computer_test.cpp detector_test.cpp test_utilities/test_utilities.h test_utilities/test_utilities.cpp)
+        median_tree_node_test.cpp median_tree_test.cpp threshold_computer_test.cpp test_utilities/test_utilities.h test_utilities/test_utilities.cpp)
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 
 add_subdirectory(lib)
