@@ -7,7 +7,7 @@ TEST(KernelTestSuite, TestSqAdd) {
   auto N = 1 << 20;
 
   cudaMallocManaged(&x, N * sizeof(float));
-  cudaMallocManaged(&y, N * sizeof(float));;
+  cudaMallocManaged(&y, N * sizeof(float));
 
   for (int i = 0; i < N; i++) {
     x[i] = 1.0;
@@ -34,7 +34,7 @@ TEST(KernelTestSuite, TestSqDiff) {
   auto N = 1 << 20;
 
   cudaMallocManaged(&x, N * sizeof(float));
-  cudaMallocManaged(&y, N * sizeof(float));;
+  cudaMallocManaged(&y, N * sizeof(float));
 
   for (int i = 0; i < N; i++) {
     x[i] = 1.0;
@@ -132,7 +132,9 @@ TEST(KernelTestSuite, TestNdiff2Float) {
 }
 
 /*
- * GIVEN a buffer `buf`
+ * GIVEN a buffer `buf` of int16 and a constant threshold `const_thresh`
+ * TEST THAT values in `buf` which exceed `const_thresh` correspond to true
+ *           values in a boolean buffer `crossings`.
  */
 TEST(KernelTestSuite, FindCrossingsShort) {
   auto n_channels = 100;
@@ -155,6 +157,67 @@ TEST(KernelTestSuite, FindCrossingsShort) {
   // column j gets all j's
   for (auto k = 0; k < n_samples; ++k) {
     data[k] = (short) (k / n_channels);
+  }
+
+  // establish preconditions for the test
+  for (auto k = 0; k < n_samples; k++) {
+    EXPECT_FALSE(crossings[k]);
+
+    if (k < n_channels * (const_thresh + 1)) {
+      EXPECT_FALSE(data[k] > const_thresh);
+    } else {
+      EXPECT_TRUE(data[k] > const_thresh);
+    }
+  }
+
+  // perform the thresholding
+  auto n_threads = 256;
+  auto n_bloacks = (n_samples + n_threads - 1) / n_threads;
+  find_crossings<<<n_bloacks, n_threads>>>(n_samples, n_channels, data,
+                                           thresholds, crossings);
+  cudaDeviceSynchronize();
+
+  // test crossings detected correctly
+  for (auto k = 0; k < n_samples; k++) {
+    if (k < n_channels * (const_thresh + 1)) {
+      EXPECT_FALSE(crossings[k]);
+    } else {
+      EXPECT_TRUE(crossings[k]);
+    }
+  }
+
+  // clean up
+  cudaFree(data);
+  cudaFree(crossings);
+  cudaFree(thresholds);
+}
+
+/*
+* GIVEN a buffer `buf` of float32 and a constant threshold `const_thresh`
+* TEST THAT values in `buf` which exceed `const_thresh` correspond to true
+*           values in a boolean buffer `crossings`.
+*/
+TEST(KernelTestSuite, FindCrossingsFloat) {
+  auto n_channels = 100;
+  auto n_frames = 100;
+  auto n_samples = n_channels * n_frames;
+  auto const_thresh = 9.0f;
+
+  float *data;
+  bool *crossings;
+  float *thresholds;
+
+  cudaMallocManaged(&data, n_samples * sizeof(float));
+  cudaMallocManaged(&crossings, n_samples * sizeof(bool));
+  cudaMallocManaged(&thresholds, n_channels * sizeof(float));
+
+  for (auto i = 0; i < n_channels; ++i) {
+    thresholds[i] = const_thresh;
+  }
+
+  // column j gets all j's
+  for (auto k = 0; k < n_samples; ++k) {
+    data[k] = (float) (k / n_channels); // NOLINT(bugprone-integer-division)
   }
 
   // establish preconditions for the test

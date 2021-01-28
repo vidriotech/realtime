@@ -21,7 +21,7 @@ class Detector {
 
   // getters
   std::vector<float> &thresholds() { return thresholds_; };
-  unsigned n_frames() const { return n_frames_; };
+  [[nodiscard]] unsigned n_frames() const { return n_frames_; };
 
  private:
   unsigned n_frames_;
