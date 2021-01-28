@@ -4,13 +4,13 @@
 template<class T>
 FileReader<T>::FileReader(std::string &filename, Probe &probe)
     : Reader<T>(probe), filename_(filename) {
-  Open();
+  FileReader<T>::Open();
 
   // seek to the end to get the size in bytes
   fp.seekg(0, std::ios::end);
   fsize = fp.tellg();
 
-  Close();
+  FileReader<T>::Close();
 }
 
 /**

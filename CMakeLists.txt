@@ -7,19 +7,20 @@ set(CMAKE_CXX_STANDARD 17)
 
 # RTS
 set(HEADER_FILES src/utilities.h
-        src/probe/probe.h src/probe/probe_reader.h
         src/structures/median_tree_node.h src/structures/median_tree.h src/structures/distance_matrix.h
+        src/probe/probe.h src/probe/probe_reader.h
         src/params/acquire_params.h src/params/threshold_params.h
-        src/acquisition/file_reader.h
+        src/acquisition/reader.h src/acquisition/file_reader.h src/acquisition/socket_reader.h
         src/detection/threshold_computer.h src/detection/detector.h
         src/extraction/Snippet.h src/extraction/SnippetExtractor.h
         src/pipeline/pipeline.h)
 set(SOURCE_FILES src/main.cpp
-        src/probe/probe.cpp src/probe/probe_reader.cpp
         src/structures/median_tree_node.cpp src/structures/median_tree.cpp
-        src/acquisition/file_reader.cpp
-        src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp src/params/params.h src/detection/detector.cpp
-        src/pipeline/pipeline.cpp src/acquisition/reader.cpp src/acquisition/reader.h)
+        src/probe/probe.cpp src/probe/probe_reader.cpp
+        src/acquisition/reader.cpp src/acquisition/file_reader.cpp src/acquisition/socket_reader.cpp
+        src/detection/detector.cpp src/detection/threshold_computer.cpp
+        src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp src/params/params.h
+        src/pipeline/pipeline.cpp)
 
 add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
 
