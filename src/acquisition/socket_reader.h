@@ -8,7 +8,7 @@ class SocketReader : public Reader<T> {
  public:
   explicit SocketReader(Probe &probe)
       : Reader<T>(probe) {};
-  void AcquireFrames(int frame_offset, int n_frames, T *buf);
+  unsigned AcquireFrames(unsigned long frame_offset, int n_frames, T *buf);
 
  protected:
   void Open();

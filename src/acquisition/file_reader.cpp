@@ -13,16 +13,23 @@ FileReader<T>::FileReader(std::string &filename, Probe &probe)
  * @param frame_offset Number of frames after the beginning to start acquiring.
  * @param n_frames Number of frames to acquire.
  * @param buf Buffer where the acquired data_ will be stored.
+ * @return The number of frames read.
  */
 template<class T>
-void FileReader<T>::AcquireFrames(int frame_offset, int n_frames, T *buf) {
+unsigned int
+FileReader<T>::AcquireFrames(unsigned long frame_offset, int n_frames, T *buf) {
   Open(); // no-op if already Open
-
   auto n_channels = this->probe_.n_total();
   auto n_samples = n_frames * n_channels;
 
-  fp.seekg(frame_offset * n_channels * sizeof(T), std::ios::beg);
-  fp.read((char *) buf, sizeof(T) * n_samples);
+  auto nb = sizeof(T);
+  auto fpos = frame_offset * n_channels * nb;
+  auto n_bytes = nb * n_samples < fsize - fpos ? nb * n_samples : fsize - fpos;
+
+  fp.seekg(fpos, std::ios::beg);
+  fp.read((char *) buf, n_bytes);
+
+  return n_bytes / (nb * this->probe_.n_total());
 }
 
 /**
@@ -73,5 +80,5 @@ void FileReader<T>::set_filename(std::string &filename) {
   FileReader<T>::Close();
 }
 
-
-template class FileReader<short>;
+template
+class FileReader<short>;

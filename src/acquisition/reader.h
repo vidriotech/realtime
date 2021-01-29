@@ -13,7 +13,7 @@ class Reader {
  public:
   explicit Reader(Probe &probe)
       : probe_(probe) {};
-  virtual void AcquireFrames(int frame_offset, int n_frames, T *buf) = 0;
+  virtual unsigned AcquireFrames(unsigned long frame_offset, int n_frames, T *buf) = 0;
 
  protected:
   Probe probe_;

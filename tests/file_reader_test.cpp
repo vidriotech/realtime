@@ -30,15 +30,15 @@ TEST(FileReaderTest, InitialState) {
 
 /*
  * GIVEN a FileReader `reader`
- * DO acquire 5 frames' worth of data_ from the beginning of the file AND
- * TEST THAT the data_ so acquired is equal to the data_ as read directly.
+ * DO acquire 5 frames' worth of data from the beginning of the file AND
+ * TEST THAT the number of frames reported as acquired is 5; AND
+ *           the data so acquired is equal to the data as read directly.
  */
 TEST(FileReaderTest, AcquireFrames) {
   auto reader = make_file_reader<short>();
 
   auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
-  auto n_frames = std::stoi(get_env_var("TEST_NFRAMES"));
-  n_frames = std::min(5, n_frames); // try to use 5 frames' worth
+  auto n_frames = std::min(5, (int) reader.n_frames()); // try to use 5 frames
   auto n_samples = n_frames * n_channels;
 
   auto *framebuf = new short[n_samples];
@@ -49,9 +49,49 @@ TEST(FileReaderTest, AcquireFrames) {
   fp.read((char *) filebuf, sizeof(short) * n_samples);
   fp.close();
 
-  reader.AcquireFrames(0, n_frames, framebuf);
+  EXPECT_EQ(n_frames, reader.AcquireFrames(0, n_frames, framebuf));
 
   for (auto i = 0; i < n_samples; i++)
+    EXPECT_EQ(filebuf[i], framebuf[i]);
+
+  delete[] framebuf;
+  delete[] filebuf;
+}
+
+/*
+* GIVEN a FileReader `reader`
+* DO try to acquire 5 frames' worth of data when 4 frames out from the end of
+ *   the file AND
+* TEST THAT the number of frames reported as acquired is 4; AND
+ *          the data so acquired is equal to the data as read directly from
+ *          the end of the file.
+*/
+TEST(FileReaderTest, AcquireFramesEOF) {
+  auto reader = make_file_reader<short>();
+
+  auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
+  auto n_frames_desired = std::min(5, (int) reader.n_frames());
+  auto n_samples_desired = n_frames_desired * n_channels;
+
+  auto n_frames_expected = n_frames_desired - 1;
+  auto n_samples_expected = n_frames_expected * n_channels;
+
+  auto *framebuf = new short[n_samples_desired];
+  auto *filebuf = new short[n_samples_expected];
+
+  // acquire frames from the end of the file
+  std::ifstream fp;
+  fp.open(reader.filename());
+  fp.seekg(-n_samples_expected * sizeof(short), std::ios::end);
+  fp.read((char *) filebuf, sizeof(short) * n_samples_expected);
+  fp.close();
+
+  // acquire using the Reader method
+  auto frame_offset = reader.n_frames() - n_frames_desired + 1;
+  ASSERT_EQ(n_frames_expected,
+            reader.AcquireFrames(frame_offset, n_frames_desired, framebuf));
+
+  for (auto i = 0; i < n_samples_expected; i++)
     EXPECT_EQ(filebuf[i], framebuf[i]);
 
   delete[] framebuf;

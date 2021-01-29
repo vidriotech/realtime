@@ -24,7 +24,7 @@ class FileReader : public Reader<T> {
         fsize(other.fsize) {};
   ~FileReader() { Close(); };
 
-  void AcquireFrames(int frame_offset, int n_frames, T *buf);
+  unsigned int AcquireFrames(unsigned long frame_offset, int n_frames, T *buf);
 
   // getters
   /**
