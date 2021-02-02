@@ -15,9 +15,9 @@ TEST(ThresholdComputerTest, InitialState) {
 }
 
 /*
- * GIVEN a ThresholdComputer `computer` and a buffer `buf`
- * DO update buffer underlying `computer` with the data_ from `buf` AND
- * TEST THAT the data_ in the `computer` buffer matches that in `buf`.
+ * GIVEN a ThresholdComputer `computer` and a buffer `buf_`
+ * DO update buffer underlying `computer` with the data_ from `buf_` AND
+ * TEST THAT the data_ in the `computer` buffer matches that in `buf_`.
  */
 TEST(ThresholdComputerTest, UpdateData) {
   unsigned bufsize = 100;

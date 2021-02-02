@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -13,13 +14,14 @@ class Reader {
  public:
   explicit Reader(Probe &probe)
       : probe_(probe) {};
-  virtual unsigned AcquireFrames(unsigned long frame_offset, int n_frames, T *buf) = 0;
-
- protected:
-  Probe probe_;
+  virtual uint32_t AcquireFrames(uint64_t frame_offset, uint32_t n_frames,
+                                 T *buf) = 0;
 
   virtual void Open() = 0;
   virtual void Close() = 0;
+
+ protected:
+  Probe probe_;
 };
 
 #endif //RTS_2_SRC_ACQUISITION_READER_H_

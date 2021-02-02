@@ -1,8 +1,9 @@
 #include "socket_reader.h"
 
 template<class T>
-unsigned SocketReader<T>::AcquireFrames(unsigned long frame_offset, int n_frames, T *buf)
-{};
+unsigned
+SocketReader<T>::AcquireFrames(uint32_t frame_offset, int n_frames,
+                               T *buf) { return 0; };
 
 template<class T>
 void SocketReader<T>::Open() {};

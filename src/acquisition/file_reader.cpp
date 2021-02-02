@@ -3,7 +3,7 @@
 
 template<class T>
 FileReader<T>::FileReader(std::string &filename, Probe &probe)
-    : Reader<T>(probe) {
+    : Reader<T>(probe), fsize(0) {
   set_filename(filename);
 }
 
@@ -16,8 +16,8 @@ FileReader<T>::FileReader(std::string &filename, Probe &probe)
  * @return The number of frames read.
  */
 template<class T>
-unsigned int
-FileReader<T>::AcquireFrames(unsigned long frame_offset, int n_frames, T *buf) {
+uint32_t
+FileReader<T>::AcquireFrames(uint64_t frame_offset, uint32_t n_frames, T *buf) {
   Open(); // no-op if already Open
   auto n_channels = this->probe_.n_total();
   auto n_samples = n_frames * n_channels;
@@ -58,8 +58,8 @@ void FileReader<T>::Close() {
  * @return The number of frames in the underlying data file.
  */
 template<class T>
-unsigned long FileReader<T>::n_frames() const {
-  return fsize / (this->probe_.n_total() * sizeof(T));
+uint32_t FileReader<T>::n_frames() const {
+  return fsize / (Reader<T>::probe_.n_total() * sizeof(T));
 }
 
 /**

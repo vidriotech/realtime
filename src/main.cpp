@@ -106,9 +106,9 @@ int main() {
     std::cout << std::endl;
   }
 
-//    cudaMallocManaged(&buf, (int)ceil(srate_hz) * n_channels);
+//    cudaMallocManaged(&buf_, (int)ceil(srate_hz) * n_channels);
 
-//    cudaFree(buf);
+//    cudaFree(buf_);
 
   delete[] buf;
   delete[] trees;

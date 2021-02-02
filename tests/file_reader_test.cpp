@@ -41,21 +41,18 @@ TEST(FileReaderTest, AcquireFrames) {
   auto n_frames = std::min(5, (int) reader.n_frames()); // try to use 5 frames
   auto n_samples = n_frames * n_channels;
 
-  auto *framebuf = new short[n_samples];
-  auto *filebuf = new short[n_samples];
+  std::shared_ptr<short[]> framebuf(new short[n_samples]);
+  std::shared_ptr<short[]> filebuf(new short[n_samples]);
 
   std::ifstream fp;
   fp.open(reader.filename());
-  fp.read((char *) filebuf, sizeof(short) * n_samples);
+  fp.read((char *) filebuf.get(), sizeof(short) * n_samples);
   fp.close();
 
-  EXPECT_EQ(n_frames, reader.AcquireFrames(0, n_frames, framebuf));
+  EXPECT_EQ(n_frames, reader.AcquireFrames(0, n_frames, framebuf.get()));
 
   for (auto i = 0; i < n_samples; i++)
     EXPECT_EQ(filebuf[i], framebuf[i]);
-
-  delete[] framebuf;
-  delete[] filebuf;
 }
 
 /*
@@ -76,24 +73,22 @@ TEST(FileReaderTest, AcquireFramesEOF) {
   auto n_frames_expected = n_frames_desired - 1;
   auto n_samples_expected = n_frames_expected * n_channels;
 
-  auto *framebuf = new short[n_samples_desired];
-  auto *filebuf = new short[n_samples_expected];
+  std::shared_ptr<short[]> framebuf(new short[n_samples_desired]);
+  std::shared_ptr<short[]> filebuf(new short[n_samples_expected]);
 
   // acquire frames from the end of the file
   std::ifstream fp;
   fp.open(reader.filename());
   fp.seekg(-n_samples_expected * sizeof(short), std::ios::end);
-  fp.read((char *) filebuf, sizeof(short) * n_samples_expected);
+  fp.read((char *) filebuf.get(), sizeof(short) * n_samples_expected);
   fp.close();
 
   // acquire using the Reader method
   auto frame_offset = reader.n_frames() - n_frames_desired + 1;
   ASSERT_EQ(n_frames_expected,
-            reader.AcquireFrames(frame_offset, n_frames_desired, framebuf));
+            reader.AcquireFrames(frame_offset, n_frames_desired, framebuf.get
+                ()));
 
   for (auto i = 0; i < n_samples_expected; i++)
     EXPECT_EQ(filebuf[i], framebuf[i]);
-
-  delete[] framebuf;
-  delete[] filebuf;
 }

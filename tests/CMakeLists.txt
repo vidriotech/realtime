@@ -17,7 +17,7 @@ set(SOURCE_FILES
         ../src/detection/detector.cpp detector_test.cpp
         threshold_computer_test.cpp
         SnippetTests.cpp SnippetExtractorTests.cpp
-        ../src/pipeline/pipeline.cpp ../src/pipeline/offline_pipeline.cpp offline_pipeline_test.cpp)
+        ../src/pipeline/pipeline.cpp pipeline_test.cpp)
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 
 add_subdirectory(lib)

@@ -2,29 +2,28 @@
 
 template<class T>
 Detector<T>::Detector(Params &params, Probe &probe)
-    : params_(params), probe_(probe), thresholds_(probe.n_total()) {
-  n_frames_ = (int) std::ceil(params_.acquire.n_seconds * probe_.sample_rate());
-  buf_size_ = n_frames_ * probe_.n_total();
+    : params_(params),
+      probe_(probe),
+      thresholds_(probe.n_total()) {
+  auto nf = (int) std::ceil(params_.acquire.n_seconds * probe_.sample_rate());
+  buf_size_ = nf * probe.n_total();
 
   for (auto i = 0; i < probe.n_active(); i++) {
-    threshold_computers.push_back(ThresholdComputer<T>(n_frames_));
+    threshold_computers.push_back(ThresholdComputer<T>(nf));
   }
 }
 
 /**
  * @brief Update ThresholdDetector buffers.
- * @param buf Incoming data, n_total x n_frames, column-major.
- * @param n The *total* number of samples (n_total * n_frames) in `buf`.
+ * @param buf Incoming data, n_total x n_frames_buf, column-major.
+ * @param n The *total* number of samples (n_total * n_frames_buf) in `buf_`.
  */
 template<class T>
-void Detector<T>::UpdateBuffer(std::unique_ptr<T[]> buf, int n) {
-  buf_ = std::move(buf);
+void Detector<T>::UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size) {
+  buf_ = buf;
+  buf_size_ = buf_size;
 
-  auto n_frames = n == -1 ? (int) std::ceil(
-      params_.acquire.n_seconds * probe_.sample_rate()) :
-                  n / probe_.n_total();
-
-  T *threshold_buffer = new short[n_frames];
+  std::shared_ptr<T[]> threshold_buffer(new T[n_frames()]);
 
   auto site_idx = 0;
   for (auto j = 0; j < probe_.n_total(); ++j) {
@@ -32,14 +31,13 @@ void Detector<T>::UpdateBuffer(std::unique_ptr<T[]> buf, int n) {
       continue;
     }
 
-    for (auto i = 0; i < n_frames; ++i) {
+    for (auto i = 0; i < n_frames(); ++i) {
       threshold_buffer[i] = buf_[j + i * probe_.n_total()];
     }
 
-    threshold_computers[site_idx++].UpdateBuffer(threshold_buffer, n_frames);
+    threshold_computers[site_idx++].UpdateBuffer(threshold_buffer.get(),
+                                                 n_frames());
   }
-
-  delete[] threshold_buffer; // cleanup
 }
 
 /**
@@ -58,6 +56,7 @@ void Detector<T>::ComputeThresholds(float multiplier) {
     }
   }
 }
+
 template<class T>
 std::vector<bool> Detector<T>::FindCrossings() {
   auto n_samples = buf_size_;

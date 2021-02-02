@@ -25,8 +25,8 @@ TEST(DetectorTest, InitialState) {
 }
 
 /*
- * GIVEN a ThresholdDetector `detector` and test data buffer `buf`
- * DO update `detector`'s buffers with `buf` AND
+ * GIVEN a ThresholdDetector `detector` and test data buffer `buf_`
+ * DO update `detector`'s buffers with `buf_` AND
  *    compute the thresholds of each channel AND
  * TEST THAT each threshold is as expected.
  */
@@ -39,7 +39,7 @@ TEST(DetectorTest, DetectThresholds) {
   auto n_frames = detector.n_frames();
   auto n_samples = n_frames * probe.n_total();
 
-  std::unique_ptr<short[]> data(new short[n_samples]);
+  std::shared_ptr<short[]> data(new short[n_samples]);
   for (auto i = 0; i < n_frames; ++i) {
     for (auto j = 0; j < probe.n_total(); ++j) {
       auto k = i * probe.n_total() + j;
@@ -56,7 +56,7 @@ TEST(DetectorTest, DetectThresholds) {
   std::vector<float> thresholds;
 
   // update buffers
-  detector.UpdateBuffer(std::move(data), n_samples);
+  detector.UpdateBuffer(data, n_samples);
   // compute thresholds
   detector.ComputeThresholds(1.0);
 

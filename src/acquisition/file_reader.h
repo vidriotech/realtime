@@ -24,7 +24,7 @@ class FileReader : public Reader<T> {
         fsize(other.fsize) {};
   ~FileReader() { Close(); };
 
-  unsigned int AcquireFrames(unsigned long frame_offset, int n_frames, T *buf);
+  uint32_t AcquireFrames(uint64_t frame_offset, uint32_t n_frames, T *buf);
 
   // getters
   /**
@@ -36,12 +36,11 @@ class FileReader : public Reader<T> {
    * @brief Calculate and return the number of frames in the file.
    * @return The number of complete frames in the file.
    */
-  unsigned long n_frames() const;
+  uint32_t n_frames() const;
 
   // setters
   void set_filename(std::string &filename);
 
- protected:
   void Open();
   void Close();
 
@@ -49,7 +48,7 @@ class FileReader : public Reader<T> {
   std::string filename_;
   std::ifstream fp;
 
-  unsigned long long fsize;
+  uint64_t fsize = 0;
 };
 
 #endif //RTS_2_FILE_READER_H
