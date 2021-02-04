@@ -115,7 +115,7 @@ float Probe::dist_between(unsigned i, unsigned j) {
     make_distance_matrix();
   }
 
-  return channel_distances.get_at(i, j);
+  return channel_distances.at(i, j);
 }
 
 void Probe::make_distance_matrix() {

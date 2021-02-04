@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 17)
 # RTS
 set(HEADER_FILES src/utilities.h
         src/structures/median_tree_node.h src/structures/median_tree.h src/structures/distance_matrix.h
+        src/pipeline/pipeline_thread_pool.h
         src/probe/probe.h src/probe/probe_reader.h
         src/params/acquire_params.h src/params/threshold_params.h
         src/acquisition/reader.h src/acquisition/file_reader.h src/acquisition/socket_reader.h
@@ -15,7 +16,8 @@ set(HEADER_FILES src/utilities.h
         src/extraction/Snippet.h src/extraction/SnippetExtractor.h
         src/pipeline/pipeline.h)
 set(SOURCE_FILES src/main.cpp
-        src/structures/median_tree_node.cpp src/structures/median_tree.cpp
+        src/structures/median_tree_node.cpp src/structures/median_tree.cpp src/structures/distance_matrix.cpp
+        src/pipeline/pipeline_thread_pool.cpp
         src/probe/probe.cpp src/probe/probe_reader.cpp
         src/acquisition/reader.cpp src/acquisition/file_reader.cpp src/acquisition/socket_reader.cpp
         src/detection/detector.cpp src/detection/threshold_computer.cpp

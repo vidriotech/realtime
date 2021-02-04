@@ -58,7 +58,7 @@ void FileReader<T>::Close() {
  * @return The number of frames in the underlying data file.
  */
 template<class T>
-uint32_t FileReader<T>::n_frames() const {
+uint64_t FileReader<T>::n_frames() const {
   return fsize / (Reader<T>::probe_.n_total() * sizeof(T));
 }
 

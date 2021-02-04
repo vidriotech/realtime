@@ -4,9 +4,11 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
+#include "params/params.h"
 #include "probe/probe.h"
 #include "acquisition/file_reader.h"
 #include "structures/median_tree.h"
+#include "pipeline/pipeline_thread_pool.h"
 
 std::string get_env_var(std::string const &key) {
   char *val = getenv(key.c_str());
@@ -77,39 +79,34 @@ int main() {
   auto n_groups = std::stoi(get_env_var("TEST_NGROUPS"));
   auto srate_hz = std::stod(get_env_var("TEST_SRATE_HZ"));
 
+  Params params;
   auto probe = make_probe(n_channels, n_active, n_groups, srate_hz);
   FileReader<short> reader(filename, probe);
 
-  auto n_frames = (int) std::ceil(srate_hz);
-  auto buf = new short[n_frames * n_channels];
+  auto n_frames = (uint64_t) std::ceil(srate_hz);
+  auto n_samples = n_frames * n_channels;
+  auto buf = new short[n_samples];
+  std::shared_ptr<short[]> shared_buf(new short[n_samples]);
 
-  reader.AcquireFrames(0, n_frames, buf);
-  auto trees = new MedianTree<short>[n_channels];
+  PipelineThreadPool<short> pool(params, probe, 12);
+  auto tic = std::chrono::high_resolution_clock::now();
+  for (uint64_t frame_offset = 0; frame_offset < reader.n_frames();
+       frame_offset += n_frames) {
+    reader.AcquireFrames(frame_offset, n_frames, buf);
+    std::memcpy(shared_buf.get(), buf, n_samples * sizeof(short));
 
-  for (auto i = 0; i < n_frames; i++) {
-    for (auto j = 0; j < n_channels; j++) {
-      auto k = i * n_channels + j;
-      trees[j].Insert(buf[k]);
-
-      std::cout << "channel: " << j <<
-                " count: " << trees[j].count() <<
-                " balance: " << trees[j].balance() <<
-                " el_balance: " << trees[j].el_balance() <<
-                " median: " << trees[j].median() <<
-                std::endl;
-
-      if (i >= 100) {
-        std::cout << "\tremoving: " <<
-                  trees[j].Remove(buf[k - 100 * n_channels]) << std::endl;
-      }
-    }
-    std::cout << std::endl;
+    pool.BlockEnqueueData(shared_buf, n_samples, frame_offset);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 
-//    cudaMallocManaged(&buf_, (int)ceil(srate_hz) * n_channels);
-
-//    cudaFree(buf_);
-
-  delete[] buf;
-  delete[] trees;
+  pool.StopWaiting();
+  while (pool.is_working()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  }
+  auto toc = std::chrono::high_resolution_clock::now();
+  auto proc_dur =
+      std::chrono::duration_cast<std::chrono::milliseconds>(toc - tic);
+  auto rec_dur = reader.n_frames() / probe.sample_rate() * 1000;
+  std::cout << "processing " << rec_dur << " ms took " << proc_dur.count() <<
+            " ms" << std::endl;
 }

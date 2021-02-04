@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <memory>
+#include <thread>
 
 #include "../params/params.h"
 #include "../acquisition/reader.h"
@@ -14,6 +15,8 @@ class Pipeline {
   Pipeline(Params &params, Probe &probe);
 
   void Update(T *buf, uint32_t buf_size, uint64_t frame_offset);
+  void Update(std::shared_ptr<T[]> buf, uint32_t buf_size,
+              uint64_t frame_offset);
   void Process();
 
   // getters

@@ -33,19 +33,38 @@ void Pipeline<T>::Update(T *buf, uint32_t buf_size, uint64_t frame_offset) {
 }
 
 /**
+ * @brief Update the data buffer, buffer size, and frame offset.
+ * @param buf Shared pointer wrapping the new data buffer.
+ * @param buf_size Size of new data buffer.
+ * @param frame_offset Timestep at the beginning of the new data buffer.
+ */
+template<class T>
+void Pipeline<T>::Update(std::shared_ptr<T[]> buf,
+                         uint32_t buf_size,
+                         uint64_t frame_offset) {
+  buf_ = buf;
+  buf_size_ = buf_size;
+  frame_offset_ = frame_offset;
+}
+
+/**
  * @brief Process the data in the buffer.
  */
 template<class T>
 void Pipeline<T>::Process() {
+  auto thread_id = std::this_thread::get_id();
+//  std::cout << "hey I'm processing on thread " << thread_id << "!" << std::endl;
   Detector<T> detector(params_, probe_);
 
   detector.UpdateBuffer(buf_, buf_size_);
-  //    detector.Filter();
-  detector.FindCrossings();
+//  detector.Filter();
+  detector.ComputeThresholds(1.0);
 
-//    extractor.Update(detector.buffer(), n_samples);
-//    extractor.MakeSnippets();
-//    auto features = extractor.ExtractFeatures();
+//  detector.FindCrossings();
+//
+////    extractor.Update(detector.buffer(), n_samples);
+////    extractor.MakeSnippets();
+////    auto features = extractor.ExtractFeatures();
 }
 
 template

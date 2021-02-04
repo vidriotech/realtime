@@ -36,7 +36,7 @@ class FileReader : public Reader<T> {
    * @brief Calculate and return the number of frames in the file.
    * @return The number of complete frames in the file.
    */
-  uint32_t n_frames() const;
+  uint64_t n_frames() const;
 
   // setters
   void set_filename(std::string &filename);

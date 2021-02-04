@@ -8,22 +8,22 @@ TEST(DistanceMatrixTest, TestDiagonalAlwaysZero) {
   DistanceMatrix<double> dm(N);
 
   for (int i = 0; i < N; i++)
-    EXPECT_EQ(0.0, dm.get_at(i, i));
+    EXPECT_EQ(0.0, dm.at(i, i));
 }
 
 TEST(DistanceMatrixTest, TestTransposeEntriesAsExpected) {
   DistanceMatrix<float> dm(2);
 
   dm.set_at(0, 1, 1.0);
-  EXPECT_EQ(1.0, dm.get_at(0, 1));
-  EXPECT_EQ(1.0, dm.get_at(1, 0));
+  EXPECT_EQ(1.0, dm.at(0, 1));
+  EXPECT_EQ(1.0, dm.at(1, 0));
 }
 
 TEST(DistanceMatrixTest, TestSetAllGetAll) {
   const auto N = 1000;
   auto k = 0;
 
-  DistanceMatrix<int> dm(N);
+  DistanceMatrix<float> dm(N);
   for (auto i = 0; i < N; i++) {
     for (auto j = i + 1; j < N; j++) {
       dm.set_at(i, j, k++);
@@ -33,8 +33,8 @@ TEST(DistanceMatrixTest, TestSetAllGetAll) {
   k = 0;
   for (auto i = 0; i < N; i++) {
     for (auto j = i + 1; j < N; j++) {
-      EXPECT_EQ(k, dm.get_at(i, j));
-      EXPECT_EQ(k++, dm.get_at(j, i));
+      EXPECT_EQ(k, dm.at(i, j));
+      EXPECT_EQ(k++, dm.at(j, i));
     }
   }
 }
@@ -42,7 +42,7 @@ TEST(DistanceMatrixTest, TestSetAllGetAll) {
 TEST(DistanceMatrixTest, TestSetDiagonalFails) {
   const auto N = 2;
 
-  DistanceMatrix<int> dm(N);
+  DistanceMatrix<float> dm(N);
   EXPECT_THROW(dm.set_at(0, 0, 1), std::domain_error);
   EXPECT_THROW(dm.set_at(1, 1, 1), std::domain_error);
 }
@@ -50,6 +50,6 @@ TEST(DistanceMatrixTest, TestSetDiagonalFails) {
 TEST(DistanceMatrixTest, SetOutOfRangeFails) {
   const auto N = 1;
 
-  DistanceMatrix<int> dm(N);
+  DistanceMatrix<float> dm(N);
   EXPECT_THROW(dm.set_at(0, N, 1), std::out_of_range);
 }
