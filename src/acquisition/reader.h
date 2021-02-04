@@ -14,11 +14,13 @@ class Reader {
  public:
   explicit Reader(Probe &probe)
       : probe_(probe) {};
-  virtual uint32_t AcquireFrames(uint64_t frame_offset, uint32_t n_frames,
-                                 T *buf) = 0;
 
-  virtual void Open() = 0;
-  virtual void Close() = 0;
+  [[maybe_unused]] virtual uint32_t
+  AcquireFrames(std::shared_ptr<T[]> buf, uint64_t frame_offset,
+                uint32_t n_frames) = 0;
+
+  [[maybe_unused]] virtual void Open() = 0;
+  [[maybe_unused]] virtual void Close() = 0;
 
  protected:
   Probe probe_;

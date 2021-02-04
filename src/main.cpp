@@ -1,8 +1,6 @@
 #include <cmath>
 #include <iostream>
 #include <thread>
-#include "cuda_runtime.h"
-#include "device_launch_parameters.h"
 
 #include "params/params.h"
 #include "probe/probe.h"
@@ -15,9 +13,9 @@ std::string get_env_var(std::string const &key) {
   return val == nullptr ? std::string("") : std::string(val);
 }
 
-ProbeConfig make_probe_config(unsigned n_channels,
-                              unsigned n_active,
-                              unsigned n_groups,
+ProbeConfig make_probe_config(uint32_t n_channels,
+                              uint32_t n_active,
+                              uint32_t n_groups,
                               double srate_hz) {
   // don't check that n_total >= n_active for test purposes
   if (n_groups > n_active) {
@@ -40,8 +38,8 @@ ProbeConfig make_probe_config(unsigned n_channels,
 
   for (auto i = 0; i < n_groups; ++i) {
     ChannelGroup grp = ChannelGroup{
-        std::vector<unsigned>(chans_per_group), // channels
-        std::vector<unsigned>(chans_per_group), // site_labels
+        std::vector<uint32_t>(chans_per_group), // channels
+        std::vector<uint32_t>(chans_per_group), // site_labels
         std::vector<double>(chans_per_group), // x_coords
         std::vector<double>(chans_per_group), // y_coords
     };
@@ -59,15 +57,15 @@ ProbeConfig make_probe_config(unsigned n_channels,
       }
     }
 
-    cfg.channel_groups.insert(std::pair<unsigned, ChannelGroup>(i, grp));
+    cfg.channel_groups.insert(std::pair<uint32_t, ChannelGroup>(i, grp));
   }
 
   return cfg;
 }
 
-Probe make_probe(unsigned n_channels,
-                 unsigned n_active,
-                 unsigned n_groups,
+Probe make_probe(uint32_t n_channels,
+                 uint32_t n_active,
+                 uint32_t n_groups,
                  double srate_hz) {
   return Probe(make_probe_config(n_channels, n_active, n_groups, srate_hz));
 }
@@ -83,30 +81,42 @@ int main() {
   auto probe = make_probe(n_channels, n_active, n_groups, srate_hz);
   FileReader<short> reader(filename, probe);
 
-  auto n_frames = (uint64_t) std::ceil(srate_hz);
-  auto n_samples = n_frames * n_channels;
-  auto buf = new short[n_samples];
-  std::shared_ptr<short[]> shared_buf(new short[n_samples]);
+  auto n_frames_buf = (uint64_t) std::ceil(srate_hz);
+  auto n_samples_buf = n_frames_buf * n_channels;
 
-  PipelineThreadPool<short> pool(params, probe, 12);
+  std::shared_ptr<short[]> buf(new short[n_samples_buf]);
+//  std::shared_ptr<short[]> shared_buf(new short[n_samples_buf]);
+
+  // set up thread pool
+  auto n_threads = std::max((uint32_t) 1,
+                            std::thread::hardware_concurrency() / 2);
+  PipelineThreadPool<short> pool(params, probe, n_threads);
+
+  // start acquiring!
   auto tic = std::chrono::high_resolution_clock::now();
   for (uint64_t frame_offset = 0; frame_offset < reader.n_frames();
-       frame_offset += n_frames) {
-    reader.AcquireFrames(frame_offset, n_frames, buf);
-    std::memcpy(shared_buf.get(), buf, n_samples * sizeof(short));
+       frame_offset += n_frames_buf) {
+    reader.AcquireFrames(buf, frame_offset, n_frames_buf);
+//    std::memcpy(shared_buf.get(), buf.get(), n_samples_buf * sizeof(short));
+    const std::shared_ptr<short[]>& shared_buf(buf);
 
-    pool.BlockEnqueueData(shared_buf, n_samples, frame_offset);
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    pool.BlockEnqueueData(shared_buf, n_samples_buf, frame_offset);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
+  // finish up
   pool.StopWaiting();
   while (pool.is_working()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
+
+  // gather stats
   auto toc = std::chrono::high_resolution_clock::now();
   auto proc_dur =
       std::chrono::duration_cast<std::chrono::milliseconds>(toc - tic);
   auto rec_dur = reader.n_frames() / probe.sample_rate() * 1000;
+  auto ratio{proc_dur.count() / rec_dur};
+
   std::cout << "processing " << rec_dur << " ms took " << proc_dur.count() <<
-            " ms" << std::endl;
+            " ms (" << ratio << " of record time)" << std::endl;
 }

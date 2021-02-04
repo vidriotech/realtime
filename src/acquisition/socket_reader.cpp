@@ -2,8 +2,9 @@
 
 template<class T>
 unsigned
-SocketReader<T>::AcquireFrames(uint32_t frame_offset, int n_frames,
-                               T *buf) { return 0; };
+SocketReader<T>::AcquireFrames(T *buf, uint32_t frame_offset, int n_frames) {
+  return 0;
+};
 
 template<class T>
 void SocketReader<T>::Open() {};

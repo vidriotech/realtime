@@ -3,7 +3,7 @@
 
 template<class T>
 FileReader<T>::FileReader(std::string &filename, Probe &probe)
-    : Reader<T>(probe), fsize(0) {
+    : Reader<T>(probe), file_size_(0) {
   set_filename(filename);
 }
 
@@ -17,17 +17,19 @@ FileReader<T>::FileReader(std::string &filename, Probe &probe)
  */
 template<class T>
 uint32_t
-FileReader<T>::AcquireFrames(uint64_t frame_offset, uint32_t n_frames, T *buf) {
+FileReader<T>::AcquireFrames(std::shared_ptr<T[]> buf,
+                             uint64_t frame_offset,
+                             uint32_t n_frames) {
   Open(); // no-op if already Open
   auto n_channels = this->probe_.n_total();
   auto n_samples = n_frames * n_channels;
 
   auto nb = sizeof(T);
   auto fpos = frame_offset * n_channels * nb;
-  auto n_bytes = nb * n_samples < fsize - fpos ? nb * n_samples : fsize - fpos;
+  auto n_bytes = nb * n_samples < file_size_ - fpos ? nb * n_samples : file_size_ - fpos;
 
   fp.seekg(fpos, std::ios::beg);
-  fp.read((char *) buf, n_bytes);
+  fp.read((char *) buf.get(), n_bytes);
 
   return n_bytes / (nb * this->probe_.n_total());
 }
@@ -59,7 +61,7 @@ void FileReader<T>::Close() {
  */
 template<class T>
 uint64_t FileReader<T>::n_frames() const {
-  return fsize / (Reader<T>::probe_.n_total() * sizeof(T));
+  return file_size_ / (Reader<T>::probe_.n_total() * sizeof(T));
 }
 
 /**
@@ -75,7 +77,7 @@ void FileReader<T>::set_filename(std::string &filename) {
 
   // seek to the end to get the size in bytes
   fp.seekg(0, std::ios::end);
-  fsize = fp.tellg();
+  file_size_ = fp.tellg();
 
   FileReader<T>::Close();
 }

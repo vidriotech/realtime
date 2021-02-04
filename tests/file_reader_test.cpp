@@ -49,7 +49,7 @@ TEST(FileReaderTest, AcquireFrames) {
   fp.read((char *) filebuf.get(), sizeof(short) * n_samples);
   fp.close();
 
-  EXPECT_EQ(n_frames, reader.AcquireFrames(0, n_frames, framebuf.get()));
+  EXPECT_EQ(n_frames, reader.AcquireFrames(framebuf, 0, n_frames));
 
   for (auto i = 0; i < n_samples; i++)
     EXPECT_EQ(filebuf[i], framebuf[i]);
@@ -86,8 +86,7 @@ TEST(FileReaderTest, AcquireFramesEOF) {
   // acquire using the Reader method
   auto frame_offset = reader.n_frames() - n_frames_desired + 1;
   ASSERT_EQ(n_frames_expected,
-            reader.AcquireFrames(frame_offset, n_frames_desired, framebuf.get
-                ()));
+            reader.AcquireFrames(framebuf, frame_offset, n_frames_desired));
 
   for (auto i = 0; i < n_samples_expected; i++)
     EXPECT_EQ(filebuf[i], framebuf[i]);

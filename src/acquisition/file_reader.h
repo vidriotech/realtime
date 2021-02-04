@@ -16,15 +16,17 @@ template<class T>
 class FileReader : public Reader<T> {
  public:
   explicit FileReader(Probe &probe)
-      : Reader<T>(probe), fsize(0) {};
+      : Reader<T>(probe), file_size_(0) {};
   explicit FileReader(std::string &filename, Probe &probe);
   FileReader(FileReader &other)
       : Reader<T>(other.probe_),
         filename_(other.filename_),
-        fsize(other.fsize) {};
+        file_size_(other.file_size_) {};
   ~FileReader() { Close(); };
 
-  uint32_t AcquireFrames(uint64_t frame_offset, uint32_t n_frames, T *buf);
+  uint32_t
+  AcquireFrames(std::shared_ptr<T[]> buf, uint64_t frame_offset,
+                uint32_t n_frames);
 
   // getters
   /**
@@ -48,7 +50,7 @@ class FileReader : public Reader<T> {
   std::string filename_;
   std::ifstream fp;
 
-  uint64_t fsize = 0;
+  uint64_t file_size_ = 0;
 };
 
 #endif //RTS_2_FILE_READER_H
