@@ -23,18 +23,15 @@ TEST(ThresholdComputerTest, UpdateData) {
   unsigned bufsize = 100;
   ThresholdComputer<short> computer(bufsize);
 
-  auto buf = new short[bufsize];
+  std::shared_ptr<short[]> buf(new short[bufsize]);
   for (auto i = 0; i < bufsize; i++)
     buf[i] = i;
 
   // perform the update
-  computer.UpdateBuffer(buf);
+  computer.UpdateBuffer(buf, bufsize);
 
   for (auto i = 0; i < bufsize; i++)
     EXPECT_EQ(buf[i], computer.data().at(i));
-
-  // clean up
-  delete[] buf;
 }
 
 /*
@@ -47,11 +44,11 @@ TEST(ThresholdComputerTest, CopyConstructor) {
   unsigned bufsize = 100;
   ThresholdComputer<short> computer(bufsize);
 
-  auto buf = new short[bufsize];
+  std::shared_ptr<short[]> buf(new short[bufsize]);
   for (auto i = 0; i < bufsize; i++)
     buf[i] = i;
 
-  computer.UpdateBuffer(buf);
+  computer.UpdateBuffer(buf, bufsize);
 
   // establish preconditions for the test
   for (auto i = 0; i < bufsize; i++)
@@ -63,9 +60,6 @@ TEST(ThresholdComputerTest, CopyConstructor) {
   EXPECT_EQ(computer.buffer_size(), computer_copy.buffer_size());
   for (auto i = 0; i < bufsize; i++)
     EXPECT_EQ(computer.data().at(i), computer_copy.data().at(i));
-
-  // clean up
-  delete[] buf;
 }
 
 /*
@@ -79,17 +73,14 @@ TEST(ThresholdComputerTest, ComputeThreshold) {
   unsigned bufsize = 100;
   ThresholdComputer<short> computer(bufsize);
 
-  auto buf = new short[bufsize];
+  std::shared_ptr<short[]> buf(new short[bufsize]);
   for (auto i = 0; i < bufsize; i++)
     buf[i] = i;
 
-  computer.UpdateBuffer(buf);
+  computer.UpdateBuffer(buf, bufsize);
 
   EXPECT_FLOAT_EQ(185.32246, computer.ComputeThreshold(5));
 
   // should be cached now, check that it hasn't changed
   EXPECT_FLOAT_EQ(185.32246, computer.ComputeThreshold(5));
-
-  // clean up
-  delete[] buf;
 }

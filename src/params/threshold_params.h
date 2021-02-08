@@ -2,7 +2,8 @@
 #define RTS_2_THRESHOLDPARAMS_H
 
 class ThresholdParams {
-
+ public:
+  float multiplier = 1.0;
 };
 
 

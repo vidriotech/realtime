@@ -1,8 +1,8 @@
 #ifndef RTS_2_SRC_UTILITIES_H_
 #define RTS_2_SRC_UTILITIES_H_
 
-#include <cstring>
 #include <algorithm>
+#include <cstring>
 #include <vector>
 
 namespace utilities {

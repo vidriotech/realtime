@@ -6,7 +6,7 @@
  */
 class AcquireParams {
  public:
-  unsigned n_seconds = 1; /*<! Number of seconds in initial buffer. */
+  double n_seconds = 0.1; /*<! Number of seconds in initial buffer. */
 };
 
 #endif //RTS_2_SRC_PARAMS_ACQUIRE_PARAMS_H_

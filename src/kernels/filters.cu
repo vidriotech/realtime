@@ -1,7 +1,9 @@
 #include "./filters.cuh"
 
+#include <vector>
+
 template<class T>
-__global__ void ndiff2(int n_samples, int n_channels, const T *in, T *out) {
+__global__ void ndiff2_(int n_samples, int n_channels, const T *in, T *out) {
   unsigned int offset = blockIdx.x * blockDim.x + threadIdx.x;
   unsigned int stride = gridDim.x * blockDim.x;
 
@@ -15,8 +17,23 @@ __global__ void ndiff2(int n_samples, int n_channels, const T *in, T *out) {
   }
 }
 
-template __global__
-void ndiff2<short>(int n_samples, int n_chans, const short *in, short *out);
+template<class T>
+void ndiff2(int n_samples, int n_channels, const T *in, T *out,
+            long n_blocks, long n_threads) {
+  ndiff2_<<<n_blocks, n_threads>>>(n_samples, n_channels, in, out);
+  cudaDeviceSynchronize();
+}
 
 template __global__
-void ndiff2<float>(int n_samples, int n_chans, const float *in, float *out);
+void ndiff2_<short>(int n_samples, int n_chans, const short *in, short *out);
+
+template __global__
+void ndiff2_<float>(int n_samples, int n_chans, const float *in, float *out);
+
+template
+void ndiff2<short>(int n_samples, int n_channels, const short *in, short *out,
+                   long n_blocks, long n_threads);
+
+template
+void ndiff2<float>(int n_samples, int n_channels, const float *in, float *out,
+                   long n_blocks, long n_threads);

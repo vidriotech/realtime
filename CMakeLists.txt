@@ -22,7 +22,7 @@ set(SOURCE_FILES src/main.cpp
         src/acquisition/reader.cpp src/acquisition/file_reader.cpp src/acquisition/socket_reader.cpp
         src/detection/detector.cpp src/detection/threshold_computer.cpp
         src/extraction/Snippet.cpp src/extraction/SnippetExtractor.cpp src/params/params.h
-        src/pipeline/pipeline.cpp)
+        src/pipeline/pipeline.cpp src/params/device_params.h)
 
 add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
 

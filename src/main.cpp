@@ -81,15 +81,16 @@ int main() {
   auto probe = make_probe(n_channels, n_active, n_groups, srate_hz);
   FileReader<short> reader(filename, probe);
 
-  auto n_frames_buf = (uint64_t) std::ceil(srate_hz);
+  auto n_frames_buf = (uint64_t) std::ceil(params.acquire.n_seconds * srate_hz);
   auto n_samples_buf = n_frames_buf * n_channels;
 
   std::shared_ptr<short[]> buf(new short[n_samples_buf]);
 //  std::shared_ptr<short[]> shared_buf(new short[n_samples_buf]);
 
   // set up thread pool
-  auto n_threads = std::max((uint32_t) 1,
-                            std::thread::hardware_concurrency() / 2);
+  auto n_threads = 1;
+//  auto n_threads = std::max((uint32_t) 1,
+//                            std::thread::hardware_concurrency() / 2);
   PipelineThreadPool<short> pool(params, probe, n_threads);
 
   // start acquiring!

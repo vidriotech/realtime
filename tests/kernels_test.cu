@@ -55,7 +55,7 @@ TEST(KernelTestSuite, TestSqDiff) {
   cudaFree(y);
 }
 
-TEST(KernelTestSuite, TestNdiff2Short) {
+TEST(KernelTestSuite, TestNdiff2KernelShort) {
   auto nchans = 64;
 
   short *data, *filtered;
@@ -78,7 +78,7 @@ TEST(KernelTestSuite, TestNdiff2Short) {
   auto nthreads = 256;
   auto nblocks = (4 * nchans + nthreads - 1) / nthreads;
 
-  ndiff2<<<nblocks, nthreads>>>(4 * nchans, nchans, data, filtered);
+  ndiff2_<<<nblocks, nthreads>>>(4 * nchans, nchans, data, filtered);
   cudaDeviceSynchronize();
 
   /*
@@ -93,7 +93,7 @@ TEST(KernelTestSuite, TestNdiff2Short) {
   cudaFree(filtered);
 }
 
-TEST(KernelTestSuite, TestNdiff2Float) {
+TEST(KernelTestSuite, TestNdiff2KernelFloat) {
   auto nchans = 64;
 
   float *data, *filtered;
@@ -116,7 +116,7 @@ TEST(KernelTestSuite, TestNdiff2Float) {
   auto nthreads = 256;
   auto nblocks = (4 * nchans + nthreads - 1) / nthreads;
 
-  ndiff2<<<nblocks, nthreads>>>(4 * nchans, nchans, data, filtered);
+  ndiff2_<<<nblocks, nthreads>>>(4 * nchans, nchans, data, filtered);
   cudaDeviceSynchronize();
 
   /*
@@ -124,6 +124,44 @@ TEST(KernelTestSuite, TestNdiff2Float) {
    */
   for (auto i = 0; i < 4 * nchans; i++) {
     EXPECT_EQ((i >= nchans && i < 2 * nchans) ? 3.0f : 0.0f, filtered[i]);
+  }
+
+  // cleanup
+  cudaFree(data);
+  cudaFree(filtered);
+}
+
+TEST(KernelTestSuite, TestNdiff2Short) {
+  auto nchans = 64;
+
+  auto n_frames = 4;
+  short *data, *filtered;
+  cudaMallocManaged(&data, n_frames * nchans * sizeof(short));
+  cudaMallocManaged(&filtered, n_frames * nchans * sizeof(short));
+
+  /*
+   * channel values: 1 1 2 2 -> (-1 * 1) + (-2 * 1) + (2 * 2) + (1 * 2) = 3
+   */
+  for (auto i = 0; i < n_frames * nchans; i++) {
+    if (i < 2 * nchans) {
+      data[i] = 1;
+    } else {
+      data[i] = 2;
+    }
+
+    filtered[i] = 0;
+  }
+
+  auto nthreads = 256;
+  auto nblocks = (n_frames * nchans + nthreads - 1) / nthreads;
+
+  ndiff2(n_frames * nchans, nchans, data, filtered, nblocks, nthreads);
+
+  /*
+   * filtered values at indices 0, 2, and 3 get 0, while channel value at index 1 gets 3
+   */
+  for (auto i = 0; i < n_frames * nchans; i++) {
+    EXPECT_EQ((i >= nchans && i < 2 * nchans) ? 3 : 0, filtered[i]);
   }
 
   // cleanup

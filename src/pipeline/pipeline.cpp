@@ -38,15 +38,15 @@ void Pipeline<T>::Process() {
   Detector<T> detector(params_, probe_);
   detector.UpdateBuffer(buf_, buf_size_);
   detector.Filter();
-  detector.ComputeThresholds(1.0);
+  detector.ComputeThresholds(params_.threshold.multiplier);
   auto crossings = detector.FindCrossings();
 
-  auto n_crossings = 0;
-  for (auto i = 0; i < buf_size_; i++) {
-    n_crossings += crossings[i];
+  uint32_t n_crossings = 0;
+  for (auto i = 0; i < buf_size_; ++i) {
+    if (crossings[i]) n_crossings++;
   }
 
-  std::cout << n_crossings << " found" << std::endl;
+  std::cout << n_crossings << "/" << buf_size_ << " found" << std::endl;
 
 //  Extractor<T> extractor(params_, probe_);
 //  extractor.Update(detector.buffer(), n_samples);

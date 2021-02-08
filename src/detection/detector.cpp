@@ -51,8 +51,9 @@ void Detector<T>::UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size) {
       threshold_buffer[i] = buf_[j + i * probe_.n_total()];
     }
 
-    threshold_computers[site_idx++].UpdateBuffer(threshold_buffer.get(),
-                                                 n_frames());
+    std::vector<T> vec_buf(n_frames());
+    std::memcpy(vec_buf.data(), threshold_buffer.get(), n_frames() * sizeof(T));
+    threshold_computers[site_idx++].UpdateBuffer(threshold_buffer, n_frames());
   }
 
   // (re)allocate memory on GPU
@@ -74,8 +75,13 @@ void Detector<T>::Filter() {
     return;
   }
 
-  ndiff2<T>(buf_size_, probe_.n_total(), cubuf_in, cubuf_out);
+  auto n_blocks = params_.device.n_blocks(buf_size_);
+  auto n_threads = params_.device.n_threads;
+  ndiff2<T>(buf_size_, probe_.n_total(), cubuf_in, cubuf_out, n_blocks,
+            n_threads);
+
   cudaMemcpy(buf_.get(), cubuf_out, buf_size_ * sizeof(T), cudaMemcpyDeviceToHost);
+
   cudaMemcpy(cubuf_in, cubuf_out, buf_size_ * sizeof(T),
              cudaMemcpyDeviceToDevice);
 }

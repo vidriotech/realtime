@@ -16,7 +16,7 @@ set(SOURCE_FILES
         ../src/acquisition/file_reader.cpp file_reader_test.cpp
         ../src/acquisition/socket_reader.cpp socket_reader_test.cpp
         ../src/detection/detector.cpp detector_test.cpp
-        threshold_computer_test.cpp
+        ../src/detection/threshold_computer.cpp threshold_computer_test.cpp
         SnippetTests.cpp SnippetExtractorTests.cpp
         ../src/pipeline/pipeline.cpp pipeline_test.cpp
         ../src/pipeline/pipeline_thread_pool.cpp pipeline_thread_pool_test.cpp)
