@@ -6,5 +6,4 @@ class ThresholdParams {
   float multiplier = 1.0;
 };
 
-
 #endif //RTS_2_THRESHOLDPARAMS_H

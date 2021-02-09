@@ -1,9 +1,7 @@
 #include "pipeline_thread_pool.h"
 
-
 template<class T>
-PipelineThreadPool<T>::PipelineThreadPool(Params &params,
-                                          Probe &probe,
+PipelineThreadPool<T>::PipelineThreadPool(Params &params, Probe &probe,
                                           uint32_t n_threads)
     : params_(params), probe_(probe) {
   auto n_threads_available = std::thread::hardware_concurrency();

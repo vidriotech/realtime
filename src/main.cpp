@@ -63,9 +63,7 @@ ProbeConfig make_probe_config(uint32_t n_channels,
   return cfg;
 }
 
-Probe make_probe(uint32_t n_channels,
-                 uint32_t n_active,
-                 uint32_t n_groups,
+Probe make_probe(uint32_t n_channels, uint32_t n_active, int32_t n_groups,
                  double srate_hz) {
   return Probe(make_probe_config(n_channels, n_active, n_groups, srate_hz));
 }
@@ -85,31 +83,33 @@ int main() {
   auto n_samples_buf = n_frames_buf * n_channels;
 
   std::shared_ptr<short[]> buf(new short[n_samples_buf]);
-//  std::shared_ptr<short[]> shared_buf(new short[n_samples_buf]);
+  std::shared_ptr<short[]> shared_buf(new short[n_samples_buf]);
 
   // set up thread pool
   auto n_threads = 1;
 //  auto n_threads = std::max((uint32_t) 1,
 //                            std::thread::hardware_concurrency() / 2);
-  PipelineThreadPool<short> pool(params, probe, n_threads);
+//  PipelineThreadPool<short> pool(params, probe, n_threads);
+  Pipeline<short> pipeline(params, probe); // TODO: delete me
 
   // start acquiring!
   auto tic = std::chrono::high_resolution_clock::now();
   for (uint64_t frame_offset = 0; frame_offset < reader.n_frames();
        frame_offset += n_frames_buf) {
     reader.AcquireFrames(buf, frame_offset, n_frames_buf);
-//    std::memcpy(shared_buf.get(), buf.get(), n_samples_buf * sizeof(short));
-    const std::shared_ptr<short[]>& shared_buf(buf);
+    std::memcpy(shared_buf.get(), buf.get(), n_samples_buf * sizeof(short));
 
-    pool.BlockEnqueueData(shared_buf, n_samples_buf, frame_offset);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//    pool.BlockEnqueueData(shared_buf, n_samples_buf, frame_offset);
+    pipeline.Update(buf, n_samples_buf, frame_offset); // TODO: delete me
+    pipeline.Process();
+//    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
   // finish up
-  pool.StopWaiting();
-  while (pool.is_working()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  }
+//  pool.StopWaiting();
+//  while (pool.is_working()) {
+//    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//  }
 
   // gather stats
   auto toc = std::chrono::high_resolution_clock::now();

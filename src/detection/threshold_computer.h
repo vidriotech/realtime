@@ -12,7 +12,7 @@ template<class T>
 class ThresholdComputer {
  public:
   explicit ThresholdComputer(unsigned buf_size)
-      : data_(buf_size) {};
+      : data_(buf_size), abs_dev_(buf_size) {};
 
   void UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size);
   float ComputeThreshold(float multiplier);
@@ -32,6 +32,7 @@ class ThresholdComputer {
 
  private:
   std::vector<T> data_;
+  std::vector<double> abs_dev_;
   double mad = 0.0; /*!< cached median absolute deviation from the median. */
   bool is_sorted = false; /*!< true iff the data is already sorted. */
   bool is_cached = false; /*!< true iff the mad is already computed. */

@@ -25,7 +25,7 @@ class Detector {
   void UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size);
   void Filter();
   void ComputeThresholds(float multiplier);
-  std::shared_ptr<bool[]> FindCrossings();
+  std::vector<uint8_t> FindCrossings();
 
   // getters
   std::shared_ptr<T[]> buffer() const { return buf_; };
@@ -37,16 +37,17 @@ class Detector {
   Params params_;
   Probe probe_;
   std::vector<ThresholdComputer<T>> threshold_computers;
-  std::vector<float> thresholds_;
 
   uint32_t buf_size_;
   std::shared_ptr<T[]> buf_;
+  std::vector<float> thresholds_;
+  std::vector<uint8_t> crossings_;
 
   // CUDA buffers
   T *cubuf_in = nullptr;
   T *cubuf_out = nullptr;
 
-  void CudaRealloc();
+  void Realloc();
 };
 
 #endif //RTS_2_SRC_DETECTION_DETECTOR_H_

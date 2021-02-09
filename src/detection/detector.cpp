@@ -12,7 +12,7 @@ Detector<T>::Detector(Params &params, Probe &probe)
     threshold_computers.push_back(ThresholdComputer<T>(nf));
   }
 
-  CudaRealloc();
+  Realloc();
 }
 
 
@@ -58,7 +58,7 @@ void Detector<T>::UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size) {
 
   // (re)allocate memory on GPU
   if (do_realloc) {
-    CudaRealloc();
+    Realloc();
   }
 
   // copy buffer over
@@ -104,26 +104,26 @@ void Detector<T>::ComputeThresholds(float multiplier) {
 }
 
 /**
- * @brief Find threshold crossings.
- * @return A vector of threshold crossings.
+ * @brief Find threshold crossings_.
+ * @return A vector of threshold crossings_.
  */
 template<class T>
-std::shared_ptr<bool[]> Detector<T>::FindCrossings() {
-  std::shared_ptr<bool[]> crossings(new bool[buf_size_]);
-
+std::vector<uint8_t> Detector<T>::FindCrossings() {
+  auto n_blocks = params_.device.n_blocks(buf_size_);
+  auto n_threads = params_.device.n_threads;
   find_crossings(buf_size_, probe_.n_total(), cubuf_in, thresholds_.data(),
-                 (bool *) cubuf_out);
-  cudaMemcpy(crossings.get(), cubuf_out, buf_size_ * sizeof(bool),
+                  (unsigned char *) cubuf_out, n_blocks, n_threads);
+  cudaMemcpy(crossings_.data(), cubuf_out, buf_size_ * sizeof(char),
              cudaMemcpyDeviceToHost);
 
-  return crossings;
+  return crossings_;
 }
 
 /**
  * @brief (Re)allocate pointers to in/out GPU memory buffers.
  */
 template<class T>
-void Detector<T>::CudaRealloc() {
+void Detector<T>::Realloc() {
   if (cubuf_in != nullptr) {
     cudaFree(cubuf_in);
     cubuf_in = nullptr;
@@ -132,6 +132,8 @@ void Detector<T>::CudaRealloc() {
     cudaFree(cubuf_out);
     cubuf_out = nullptr;
   }
+
+  crossings_.resize(buf_size_);
 
   if (buf_size_ == 0) {
     return;

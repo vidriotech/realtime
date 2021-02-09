@@ -172,7 +172,7 @@ TEST(KernelTestSuite, TestNdiff2Short) {
 /*
  * GIVEN a buffer `buf_` of int16 and a constant threshold `const_thresh`
  * TEST THAT values in `buf_` which exceed `const_thresh` correspond to true
- *           values in a boolean buffer `crossings`.
+ *           values in a boolean buffer `crossings_`.
  */
 TEST(KernelTestSuite, FindCrossingsShort) {
   auto n_channels = 100;
@@ -181,7 +181,7 @@ TEST(KernelTestSuite, FindCrossingsShort) {
   auto const_thresh = 9.0f;
 
   short *data;
-  bool *crossings;
+  uint8_t *crossings;
   float *thresholds;
 
   cudaMallocManaged(&data, n_samples * sizeof(short));
@@ -211,11 +211,11 @@ TEST(KernelTestSuite, FindCrossingsShort) {
   // perform the thresholding
   auto n_threads = 256;
   auto n_bloacks = (n_samples + n_threads - 1) / n_threads;
-  find_crossings<<<n_bloacks, n_threads>>>(n_samples, n_channels, data,
-                                           thresholds, crossings);
+  find_crossings_<<<n_bloacks, n_threads>>>(n_samples, n_channels, data,
+                                            thresholds, crossings);
   cudaDeviceSynchronize();
 
-  // test crossings detected correctly
+  // test crossings_ detected correctly
   for (auto k = 0; k < n_samples; k++) {
     if (k < n_channels * (const_thresh + 1)) {
       EXPECT_FALSE(crossings[k]);
@@ -233,7 +233,7 @@ TEST(KernelTestSuite, FindCrossingsShort) {
 /*
 * GIVEN a buffer `buf_` of float32 and a constant threshold `const_thresh`
 * TEST THAT values in `buf_` which exceed `const_thresh` correspond to true
-*           values in a boolean buffer `crossings`.
+*           values in a boolean buffer `crossings_`.
 */
 TEST(KernelTestSuite, FindCrossingsFloat) {
   auto n_channels = 100;
@@ -242,7 +242,7 @@ TEST(KernelTestSuite, FindCrossingsFloat) {
   auto const_thresh = 9.0f;
 
   float *data;
-  bool *crossings;
+  uint8_t *crossings;
   float *thresholds;
 
   cudaMallocManaged(&data, n_samples * sizeof(float));
@@ -272,11 +272,11 @@ TEST(KernelTestSuite, FindCrossingsFloat) {
   // perform the thresholding
   auto n_threads = 256;
   auto n_bloacks = (n_samples + n_threads - 1) / n_threads;
-  find_crossings<<<n_bloacks, n_threads>>>(n_samples, n_channels, data,
-                                           thresholds, crossings);
+  find_crossings_<<<n_bloacks, n_threads>>>(n_samples, n_channels, data,
+                                            thresholds, crossings);
   cudaDeviceSynchronize();
 
-  // test crossings detected correctly
+  // test crossings_ detected correctly
   for (auto k = 0; k < n_samples; k++) {
     if (k < n_channels * (const_thresh + 1)) {
       EXPECT_FALSE(crossings[k]);

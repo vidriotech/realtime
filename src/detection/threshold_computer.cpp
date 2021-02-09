@@ -20,15 +20,14 @@ float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
   }
 
   auto med = median();
-  std::vector<double> abs_dev(data_.size());
 
   // absolute deviation from the median
   for (auto i = 0; i < data_.size(); i++) {
-    abs_dev[i] = std::abs(data_[i] - med);
+    abs_dev_.at(i) = std::abs(data_[i] - med);
   }
 
   // median absolute deviation from the median (i.e., the MAD)
-  mad = utilities::median(abs_dev, false);
+  mad = utilities::median(abs_dev_, false);
   is_cached = true;
 
   return multiplier * mad / 0.6745;
