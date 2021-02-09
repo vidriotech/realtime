@@ -41,7 +41,7 @@ TEST(FileReaderTest, AcquireFrames) {
   auto n_frames = std::min(5, (int) reader.n_frames()); // try to use 5 frames
   auto n_samples = n_frames * n_channels;
 
-  std::shared_ptr<short[]> framebuf(new short[n_samples]);
+  std::vector<short> framebuf(n_samples);
   std::shared_ptr<short[]> filebuf(new short[n_samples]);
 
   std::ifstream fp;
@@ -52,7 +52,7 @@ TEST(FileReaderTest, AcquireFrames) {
   EXPECT_EQ(n_frames, reader.AcquireFrames(framebuf, 0, n_frames));
 
   for (auto i = 0; i < n_samples; i++)
-    EXPECT_EQ(filebuf[i], framebuf[i]);
+    EXPECT_EQ(filebuf[i], framebuf.at(i));
 }
 
 /*
@@ -73,7 +73,7 @@ TEST(FileReaderTest, AcquireFramesEOF) {
   auto n_frames_expected = n_frames_desired - 1;
   auto n_samples_expected = n_frames_expected * n_channels;
 
-  std::shared_ptr<short[]> framebuf(new short[n_samples_desired]);
+  std::vector<short> framebuf(n_samples_desired);
   std::shared_ptr<short[]> filebuf(new short[n_samples_expected]);
 
   // acquire frames from the end of the file
@@ -89,5 +89,5 @@ TEST(FileReaderTest, AcquireFramesEOF) {
             reader.AcquireFrames(framebuf, frame_offset, n_frames_desired));
 
   for (auto i = 0; i < n_samples_expected; i++)
-    EXPECT_EQ(filebuf[i], framebuf[i]);
+    EXPECT_EQ(filebuf[i], framebuf.at(i));
 }

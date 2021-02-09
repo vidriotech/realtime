@@ -3,7 +3,7 @@
 
 class ThresholdParams {
  public:
-  float multiplier = 1.0;
+  float multiplier = 5.0;
 };
 
 #endif //RTS_2_THRESHOLDPARAMS_H

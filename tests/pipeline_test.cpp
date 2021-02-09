@@ -20,7 +20,7 @@ TEST(PipelineTest, InitialState) {
   Probe probe = probe_from_env();
   Pipeline<short> pipeline(params, probe);
 
-  EXPECT_EQ(nullptr, pipeline.buffer());
+  EXPECT_EQ(0, pipeline.buffer().size());
   EXPECT_EQ(0, pipeline.frame_offset());
   EXPECT_EQ(0, pipeline.n_frames_buf());
 }
@@ -39,12 +39,11 @@ TEST(PipelineTest, UpdateNullptr) {
   Pipeline<short> pipeline(params, probe);
 
   // perform the update
-  std::shared_ptr<short[]> buf;
-  uint32_t buf_size = 10191;
+  std::vector<short> buf;
   uint64_t frame_offset = 4294967296;
-  pipeline.Update(buf, buf_size, frame_offset);
+  pipeline.Update(buf, frame_offset);
 
-  EXPECT_EQ(nullptr, pipeline.buffer());
+  EXPECT_EQ(0, pipeline.buffer().size());
   EXPECT_EQ(frame_offset, pipeline.frame_offset());
   EXPECT_EQ(0, pipeline.n_frames_buf());
 }
@@ -58,9 +57,9 @@ TEST(PipelineTest, Process) {
   auto frame_offset = 0;
   auto n_frames = (uint32_t) std::ceil(probe.sample_rate());
 
-  std::shared_ptr<short[]> buffer(new short[n_frames * probe.n_total()]);
+  std::vector<short> buffer(n_frames * probe.n_total());
   reader.AcquireFrames(buffer, frame_offset, n_frames);
 
   Pipeline<short> pipeline(params, probe);
-  pipeline.Update(buffer, n_frames, frame_offset);
+  pipeline.Update(buffer, frame_offset);
 }

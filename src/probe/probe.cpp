@@ -24,10 +24,10 @@ Probe::Probe(ProbeConfig cfg)
     const ChannelGroup grp = channel_group.second;
 
     for (auto j = 0; j < grp.n_channels(); ++j) {
-      chan_idx[k] = grp.channels[j];
-      site_labels[k] = grp.site_labels[j];
-      x_coords[k] = grp.x_coords[j];
-      y_coords[k] = grp.y_coords[j];
+      chan_idx.at(k) = grp.channels.at(j);
+      site_labels.at(k) = grp.site_labels.at(j);
+      x_coords.at(k) = grp.x_coords.at(j);
+      y_coords.at(k) = grp.y_coords.at(j);
 
       chan_grps[k++] = channel_group.first;
     }
@@ -48,7 +48,7 @@ unsigned Probe::index_at(unsigned i) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return chan_idx[i];
+  return chan_idx.at(i);
 }
 
 /**
@@ -61,7 +61,7 @@ unsigned Probe::label_at(unsigned i) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return site_labels[i];
+  return site_labels.at(i);
 }
 
 /**
@@ -74,7 +74,7 @@ unsigned Probe::group_at(unsigned i) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return chan_grps[i];
+  return chan_grps.at(i);
 }
 
 /**
@@ -87,7 +87,7 @@ double Probe::x_at(unsigned i) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return x_coords[i];
+  return x_coords.at(i);
 }
 
 /**
@@ -100,7 +100,7 @@ double Probe::y_at(unsigned i) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return y_coords[i];
+  return y_coords.at(i);
 }
 
 /**
@@ -124,7 +124,7 @@ void Probe::make_distance_matrix() {
 
   for (unsigned i = 0; i < n_active(); ++i) {
     for (unsigned j = i + 1; j < n_active(); ++j) {
-      auto dx = x_coords[i] - x_coords[j], dy = y_coords[i] - y_coords[j];
+      auto dx = x_coords.at(i) - x_coords.at(j), dy = y_coords.at(i) - y_coords.at(j);
       channel_distances.set_at(i, j, (float) std::hypot(dx, dy));
     }
   }
@@ -143,11 +143,11 @@ void Probe::sort_channels() {
   // get indices that would sort chan_idx
   std::vector<unsigned> argsort(n_active());
   for (unsigned i = 0; i < n_active(); ++i) {
-    argsort[i] = i;
+    argsort.at(i) = i;
   }
 
   std::sort(argsort.begin(), argsort.end(),
-            [&](unsigned i, unsigned j) { return chan_idx[i] < chan_idx[j]; });
+            [&](unsigned i, unsigned j) { return chan_idx.at(i) < chan_idx.at(j); });
 
   if (std::is_sorted(argsort.begin(), argsort.end())) {  // nothing to do!
     return;
@@ -158,23 +158,23 @@ void Probe::sort_channels() {
 
   // reorder chan_idx, x_coords
   for (unsigned i = 0; i < argsort.size(); ++i) {
-    tmp_buf_s[i] = chan_idx[argsort[i]];
-    tmp_buf_d[i] = x_coords[argsort[i]];
+    tmp_buf_s.at(i) = chan_idx[argsort.at(i)];
+    tmp_buf_d.at(i) = x_coords[argsort.at(i)];
   }
   chan_idx.assign(tmp_buf_s.begin(), tmp_buf_s.end());
   x_coords.assign(tmp_buf_d.begin(), tmp_buf_d.end());
 
   // reorder site_labels, y_coords
   for (unsigned i = 0; i < argsort.size(); ++i) {
-    tmp_buf_s[i] = site_labels[argsort[i]];
-    tmp_buf_d[i] = y_coords[argsort[i]];
+    tmp_buf_s.at(i) = site_labels[argsort.at(i)];
+    tmp_buf_d.at(i) = y_coords[argsort.at(i)];
   }
   site_labels.assign(tmp_buf_s.begin(), tmp_buf_s.end());
   y_coords.assign(tmp_buf_d.begin(), tmp_buf_d.end());
 
   // reorder chan_grps
   for (unsigned i = 0; i < argsort.size(); ++i) {
-    tmp_buf_s[i] = chan_grps[argsort[i]];
+    tmp_buf_s.at(i) = chan_grps[argsort.at(i)];
   }
   chan_grps.assign(tmp_buf_s.begin(), tmp_buf_s.end());
 }
@@ -210,9 +210,9 @@ void Probe::find_inactive() {
     if (std::binary_search(chan_idx.begin(),
                            chan_idx.end(),
                            i)) {  // channel not found
-      is_active_[i] = true;
+      is_active_.at(i) = true;
     } else {
-      is_active_[i] = false;
+      is_active_.at(i) = false;
     }
   }
 }

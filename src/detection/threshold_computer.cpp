@@ -1,13 +1,9 @@
 #include "threshold_computer.h"
 
 template<class T>
-void ThresholdComputer<T>::UpdateBuffer(std::shared_ptr<T[]> buf,
-                                        uint32_t buf_size) {
-  if (buf_size > 0 && data_.size() != buf_size) {
-    data_.resize(buf_size);
-  }
-
-  std::memcpy(data_.data(), buf.get(), buf_size * sizeof(T));
+void ThresholdComputer<T>::UpdateBuffer(std::vector<T> buf) {
+  data_.assign(buf.begin(), buf.end());
+  abs_dev_.assign(buf.size(), 0); // fill with zeros
 
   is_sorted = false;
   is_cached = false;
@@ -23,7 +19,7 @@ float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
 
   // absolute deviation from the median
   for (auto i = 0; i < data_.size(); i++) {
-    abs_dev_.at(i) = std::abs(data_[i] - med);
+    abs_dev_.at(i) = std::abs(data_.at(i) - med);
   }
 
   // median absolute deviation from the median (i.e., the MAD)

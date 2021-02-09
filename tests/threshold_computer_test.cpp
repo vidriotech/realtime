@@ -23,15 +23,15 @@ TEST(ThresholdComputerTest, UpdateData) {
   unsigned bufsize = 100;
   ThresholdComputer<short> computer(bufsize);
 
-  std::shared_ptr<short[]> buf(new short[bufsize]);
+  std::vector<short> buf(bufsize);
   for (auto i = 0; i < bufsize; i++)
-    buf[i] = i;
+    buf.at(i) = i;
 
   // perform the update
-  computer.UpdateBuffer(buf, bufsize);
+  computer.UpdateBuffer(buf);
 
   for (auto i = 0; i < bufsize; i++)
-    EXPECT_EQ(buf[i], computer.data().at(i));
+    EXPECT_EQ(buf.at(i), computer.data().at(i));
 }
 
 /*
@@ -44,15 +44,15 @@ TEST(ThresholdComputerTest, CopyConstructor) {
   unsigned bufsize = 100;
   ThresholdComputer<short> computer(bufsize);
 
-  std::shared_ptr<short[]> buf(new short[bufsize]);
+  std::vector<short> buf(bufsize);
   for (auto i = 0; i < bufsize; i++)
-    buf[i] = i;
+    buf.at(i) = i;
 
-  computer.UpdateBuffer(buf, bufsize);
+  computer.UpdateBuffer(buf);
 
   // establish preconditions for the test
   for (auto i = 0; i < bufsize; i++)
-    EXPECT_EQ(buf[i], computer.data().at(i));
+    EXPECT_EQ(buf.at(i), computer.data().at(i));
 
   // perform the copy
   ThresholdComputer<short> computer_copy(computer);
@@ -73,11 +73,11 @@ TEST(ThresholdComputerTest, ComputeThreshold) {
   unsigned bufsize = 100;
   ThresholdComputer<short> computer(bufsize);
 
-  std::shared_ptr<short[]> buf(new short[bufsize]);
+  std::vector<short> buf(bufsize);
   for (auto i = 0; i < bufsize; i++)
-    buf[i] = i;
+    buf.at(i) = i;
 
-  computer.UpdateBuffer(buf, bufsize);
+  computer.UpdateBuffer(buf);
 
   EXPECT_FLOAT_EQ(185.32246, computer.ComputeThreshold(5));
 

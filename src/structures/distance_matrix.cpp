@@ -32,7 +32,7 @@ T DistanceMatrix<T>::at(uint32_t i, uint32_t j) const {
   }
 
   auto idx = index_at(i, j);
-  return data[idx];
+  return data.at(idx);
 }
 
 template<class T>
@@ -45,7 +45,7 @@ void DistanceMatrix<T>::set_at(uint32_t i, uint32_t j, T val) {
   }
 
   auto idx = index_at(i, j);
-  data[idx] = val;
+  data.at(idx) = val;
 }
 
 template

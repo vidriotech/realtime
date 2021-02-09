@@ -14,12 +14,11 @@ class Pipeline {
   Pipeline(Params &params, Probe &probe)
       : params_(params), probe_(probe) {};
 
-  void Update(std::shared_ptr<T[]> buf, uint32_t buf_size,
-              uint64_t frame_offset);
+  void Update(std::vector<T> buf, uint64_t frame_offset);
   void Process();
 
   // getters
-  std::shared_ptr<T[]> buffer() const { return buf_; };
+  std::vector<T> buffer() const { return buf_; };
   [[nodiscard]] uint64_t frame_offset() const { return frame_offset_; };
   [[nodiscard]] uint32_t n_frames_buf() const;
 
@@ -27,8 +26,7 @@ class Pipeline {
   Params params_;
   Probe probe_;
 
-  std::shared_ptr<T[]> buf_;
-  uint32_t buf_size_ = 0;
+  std::vector<T> buf_;
   uint64_t frame_offset_ = 0;
 };
 

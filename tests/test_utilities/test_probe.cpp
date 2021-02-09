@@ -32,10 +32,10 @@ ProbeConfig make_probe_config(unsigned n_channels,
     };
 
     for (auto j = 0; j < chans_per_group; j++) {
-      grp.site_labels[j] = k + 1;
-      grp.channels[j] = k++;
-      grp.x_coords[j] = x;
-      grp.y_coords[j] = y;
+      grp.site_labels.at(j) = k + 1;
+      grp.channels.at(j) = k++;
+      grp.x_coords.at(j) = x;
+      grp.y_coords.at(j) = y;
 
       if (j % 2 == 1) {
         x += 25.0;

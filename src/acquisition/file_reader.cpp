@@ -17,19 +17,27 @@ FileReader<T>::FileReader(std::string &filename, Probe &probe)
  */
 template<class T>
 uint32_t
-FileReader<T>::AcquireFrames(std::shared_ptr<T[]> buf,
+FileReader<T>::AcquireFrames(std::vector<T> &buf,
                              uint64_t frame_offset,
                              uint32_t n_frames) {
+  if (n_frames == 0) {
+    return 0;
+  }
+
   Open(); // no-op if already Open
   auto n_channels = this->probe_.n_total();
   auto n_samples = n_frames * n_channels;
+
+  if (buf.size() != n_samples) {
+    buf.resize(n_samples);
+  }
 
   auto nb = sizeof(T);
   auto fpos = frame_offset * n_channels * nb;
   auto n_bytes = nb * n_samples < file_size_ - fpos ? nb * n_samples : file_size_ - fpos;
 
   fp.seekg(fpos, std::ios::beg);
-  fp.read((char *) buf.get(), n_bytes);
+  fp.read((char *) buf.data(), n_bytes);
 
   return n_bytes / (nb * this->probe_.n_total());
 }

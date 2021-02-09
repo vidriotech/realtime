@@ -2,7 +2,7 @@
 
 template<class T>
 unsigned
-SocketReader<T>::AcquireFrames(T *buf, uint32_t frame_offset, int n_frames) {
+SocketReader<T>::AcquireFrames(std::vector<T> &buf, uint32_t frame_offset, int n_frames) {
   return 0;
 };
 

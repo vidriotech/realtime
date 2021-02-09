@@ -45,10 +45,10 @@ ProbeConfig make_probe_config(uint32_t n_channels,
     };
 
     for (auto j = 0; j < chans_per_group; ++j) {
-      grp.site_labels[j] = k + 1;
-      grp.channels[j] = k++;
-      grp.x_coords[j] = x;
-      grp.y_coords[j] = y;
+      grp.site_labels.at(j) = k + 1;
+      grp.channels.at(j) = k++;
+      grp.x_coords.at(j) = x;
+      grp.y_coords.at(j) = y;
 
       if (j % 2 == 1) {
         x += 25.0;
@@ -82,34 +82,33 @@ int main() {
   auto n_frames_buf = (uint64_t) std::ceil(params.acquire.n_seconds * srate_hz);
   auto n_samples_buf = n_frames_buf * n_channels;
 
-  std::shared_ptr<short[]> buf(new short[n_samples_buf]);
-  std::shared_ptr<short[]> shared_buf(new short[n_samples_buf]);
+  std::vector<short> buf(n_samples_buf);
 
   // set up thread pool
-  auto n_threads = 1;
-//  auto n_threads = std::max((uint32_t) 1,
-//                            std::thread::hardware_concurrency() / 2);
-//  PipelineThreadPool<short> pool(params, probe, n_threads);
-  Pipeline<short> pipeline(params, probe); // TODO: delete me
+//  auto n_threads = 1;
+  auto n_threads = std::max((uint32_t) 1,
+                            std::thread::hardware_concurrency() / 2);
+  PipelineThreadPool<short> pool(params, probe, n_threads);
+//  Pipeline<short> pipeline(params, probe); // TODO: delete me
 
   // start acquiring!
+  auto sleep_time_ms = (int) (params.acquire.n_seconds * 1000);
   auto tic = std::chrono::high_resolution_clock::now();
   for (uint64_t frame_offset = 0; frame_offset < reader.n_frames();
        frame_offset += n_frames_buf) {
     reader.AcquireFrames(buf, frame_offset, n_frames_buf);
-    std::memcpy(shared_buf.get(), buf.get(), n_samples_buf * sizeof(short));
 
-//    pool.BlockEnqueueData(shared_buf, n_samples_buf, frame_offset);
-    pipeline.Update(buf, n_samples_buf, frame_offset); // TODO: delete me
-    pipeline.Process();
-//    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    pool.BlockEnqueueData(buf, frame_offset);
+//    pipeline.Update(buf, frame_offset); // TODO: delete me
+//    pipeline.Process();
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
   }
 
   // finish up
-//  pool.StopWaiting();
-//  while (pool.is_working()) {
-//    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-//  }
+  pool.StopWaiting();
+  while (pool.is_working()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+  }
 
   // gather stats
   auto toc = std::chrono::high_resolution_clock::now();

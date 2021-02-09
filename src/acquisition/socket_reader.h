@@ -9,7 +9,7 @@ class SocketReader : public Reader<T> {
   explicit SocketReader(Probe &probe)
       : Reader<T>(probe) {};
   unsigned
-  AcquireFrames(T *buf, uint32_t frame_offset, int n_frames);
+  AcquireFrames(std::vector<T> &buf, uint32_t frame_offset, int n_frames);
 
  protected:
   void Open();

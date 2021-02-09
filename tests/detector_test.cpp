@@ -39,7 +39,7 @@ TEST(DetectorTest, DetectThresholds) {
   auto n_frames = detector.n_frames();
   auto n_samples = n_frames * probe.n_total();
 
-  std::shared_ptr<short[]> data(new short[n_samples]);
+  std::vector<short> data(n_samples);
   for (auto i = 0; i < n_frames; ++i) {
     for (auto j = 0; j < probe.n_total(); ++j) {
       auto k = i * probe.n_total() + j;
@@ -50,13 +50,14 @@ TEST(DetectorTest, DetectThresholds) {
        * and, since ~2/3 of the absolute deviations are j-valued, j will be
        * the MAD value.
        */
-      data[k] = (short) ((j + 1) * ((i % 3) - 1));
+      data.at(k) = (short) ((j + 1) * ((i % 3) - 1));
     }
   }
   std::vector<float> thresholds;
 
   // update buffers
-  detector.UpdateBuffer(data, n_samples);
+  detector.UpdateBuffer(data);
+  detector.UpdateThresholdComputers();
   // compute thresholds
   detector.ComputeThresholds(1.0);
 
@@ -67,5 +68,54 @@ TEST(DetectorTest, DetectThresholds) {
   for (auto i = probe.n_active(); i < probe.n_total(); ++i) {
     EXPECT_FLOAT_EQ(std::numeric_limits<float>::infinity(),
                     detector.thresholds().at(i));
+  }
+}
+
+TEST(DetectorTest, FindCrossings) {
+  Params params;
+  auto probe = probe_from_env();
+
+  Detector<short> detector(params, probe);
+
+  auto n_frames = detector.n_frames();
+  auto n_samples = n_frames * probe.n_total();
+
+  float multiplier = 1.0;
+
+  std::vector<short> data(n_samples);
+  for (auto i = 0; i < n_frames; ++i) {
+    for (auto j = 0; j < probe.n_total(); ++j) {
+      auto k = i * probe.n_total() + j;
+
+      /* Multiply each element of the sequence -1, 0, 1, -1, 0, 1, ... by
+       * j + 1. The median should be 0, so the absolute
+       * deviation from the median should go j, 0, j, j, 0, j, j, 0, j, ...
+       * and, since ~2/3 of the absolute deviations are j-valued, j will be
+       * the MAD value.
+       */
+      // set the first sample to 1 + the value of the MAD
+      if (i == 0) {
+        data.at(k) = (short) (multiplier * (float) (j + 1) / 0.6745 + 1);
+      } else {
+        data.at(k) = (short) ((j + 1) * ((i % 3) - 1));
+      }
+    }
+  }
+
+  // update buffers
+  detector.UpdateBuffer(data);
+  detector.UpdateThresholdComputers();
+  // compute thresholds
+  detector.ComputeThresholds(multiplier);
+
+  detector.FindCrossings();
+
+  // ensure sample at first
+  for (auto i = 0; i < n_samples; i++) {
+    if (i < probe.n_total() && probe.is_active(i)) {
+      EXPECT_EQ(1, detector.crossings().at(i));
+    } else {
+      EXPECT_EQ(0, detector.crossings().at(i));
+    }
   }
 }

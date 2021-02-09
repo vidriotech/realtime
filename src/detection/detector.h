@@ -22,30 +22,33 @@ class Detector {
   ~Detector();
 
   // detection sub-pipeline
-  void UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size);
+  void UpdateBuffer(std::vector<T> buf);
   void Filter();
+  void UpdateThresholdComputers();
   void ComputeThresholds(float multiplier);
   std::vector<uint8_t> FindCrossings();
 
   // getters
-  std::shared_ptr<T[]> buffer() const { return buf_; };
+  std::vector<T> buffer() const { return buf_; };
   std::vector<float> &thresholds() { return thresholds_; };
-  [[nodiscard]] unsigned n_frames() const { return buf_size_ / probe_.n_total(); };
-  [[nodiscard]] uint32_t buffer_size() const { return buf_size_; }
+  std::vector<uint8_t> &crossings() { return crossings_; };
+  [[nodiscard]] unsigned n_frames() const { return buf_.size() / probe_.n_total()
+  ; };
+  [[nodiscard]] uint32_t buffer_size() const { return buf_.size(); }
 
  private:
   Params params_;
   Probe probe_;
   std::vector<ThresholdComputer<T>> threshold_computers;
 
-  uint32_t buf_size_;
-  std::shared_ptr<T[]> buf_;
+  std::vector<T> buf_;
   std::vector<float> thresholds_;
   std::vector<uint8_t> crossings_;
 
   // CUDA buffers
-  T *cubuf_in = nullptr;
-  T *cubuf_out = nullptr;
+  T *cu_in = nullptr;
+  T *cu_out = nullptr;
+  float *cu_thresh = nullptr;
 
   void Realloc();
 };

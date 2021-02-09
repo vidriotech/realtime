@@ -14,7 +14,7 @@ class ThresholdComputer {
   explicit ThresholdComputer(unsigned buf_size)
       : data_(buf_size), abs_dev_(buf_size) {};
 
-  void UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size);
+  void UpdateBuffer(std::vector<T> buf);
   float ComputeThreshold(float multiplier);
 
   // getters

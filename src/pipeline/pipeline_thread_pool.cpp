@@ -50,26 +50,21 @@ PipelineThreadPool<T>::~PipelineThreadPool() {
 }
 
 /**
- * @brief
- * @tparam T
- * @param buf
- * @param buf_size
- * @param frame_offset
+ * @brief Enqueue incoming data in a Pipeline to be processed when a thread
+ * can pick it up.
+ * @param buf Incoming data.
+ * @param frame_offset Timestamp of first frame in `buf`.
  */
 template<class T>
-void PipelineThreadPool<T>::BlockEnqueueData(std::shared_ptr<T[]> buf,
-                                             uint32_t buf_size,
+void PipelineThreadPool<T>::BlockEnqueueData(std::vector<T> buf,
                                              uint64_t frame_offset) {
-  std::shared_ptr<T[]> buf_copy(new T[buf_size]);
-  std::memcpy(buf_copy.get(), buf.get(), buf_size * sizeof(T));
-
   // block until a position in the queue becomes available
   while (work_queue.size() >= max_queue_size) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
   Pipeline<T> pipeline(params_, probe_);
-  pipeline.Update(buf_copy, buf_size, frame_offset);
+  pipeline.Update(buf, frame_offset);
 
   work_queue.push(pipeline);
 }

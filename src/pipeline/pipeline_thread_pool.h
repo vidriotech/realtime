@@ -19,10 +19,7 @@ class PipelineThreadPool {
   explicit PipelineThreadPool(Params &params, Probe &probe, uint32_t n_threads);
   ~PipelineThreadPool();
 
-  void
-  BlockEnqueueData(std::shared_ptr<T[]> buf, uint32_t buf_size,
-                   uint64_t frame_offset);
-
+  void BlockEnqueueData(std::vector<T> buf, uint64_t frame_offset);
   void StopWaiting() { wait_for_data = false; };
 
   // getters

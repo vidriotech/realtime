@@ -6,55 +6,40 @@ Detector<T>::Detector(Params &params, Probe &probe)
       probe_(probe),
       thresholds_(probe.n_total()) {
   auto nf = (int) std::ceil(params_.acquire.n_seconds * probe_.sample_rate());
-  buf_size_ = nf * probe.n_total();
+  buf_.resize(nf);
 
   for (auto i = 0; i < probe.n_active(); i++) {
     threshold_computers.push_back(ThresholdComputer<T>(nf));
   }
 
+  cudaMalloc(&cu_thresh, probe_.n_total() * sizeof(float));
   Realloc();
 }
 
 
 template<class T>
 Detector<T>::~Detector() {
-  if (cubuf_in != nullptr) {
-    cudaFree(cubuf_in);
+  if (cu_in != nullptr) {
+    cudaFree(cu_in);
   }
 
-  if (cubuf_out != nullptr) {
-    cudaFree(cubuf_out);
+  if (cu_out != nullptr) {
+    cudaFree(cu_out);
+  }
+
+  if (cu_thresh != nullptr) {
+    cudaFree(cu_thresh);
   }
 }
 
 /**
  * @brief Update ThresholdDetector buffers.
  * @param buf Incoming data, n_total x n_frames_buf, column-major.
- * @param n The *total* number of samples (n_total * n_frames_buf) in `buf_`.
  */
 template<class T>
-void Detector<T>::UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size) {
-  auto do_realloc = buf_size != buf_size_;
-
+void Detector<T>::UpdateBuffer(std::vector<T> buf) {
+  auto do_realloc = buf.size() != buf_.size();
   buf_ = buf;
-  buf_size_ = buf_ == nullptr ? 0 : buf_size;
-
-  std::shared_ptr<T[]> threshold_buffer(new T[n_frames()]);
-
-  auto site_idx = 0;
-  for (auto j = 0; j < probe_.n_total(); ++j) {
-    if (!probe_.is_active(j)) {
-      continue;
-    }
-
-    for (auto i = 0; i < n_frames(); ++i) {
-      threshold_buffer[i] = buf_[j + i * probe_.n_total()];
-    }
-
-    std::vector<T> vec_buf(n_frames());
-    std::memcpy(vec_buf.data(), threshold_buffer.get(), n_frames() * sizeof(T));
-    threshold_computers[site_idx++].UpdateBuffer(threshold_buffer, n_frames());
-  }
 
   // (re)allocate memory on GPU
   if (do_realloc) {
@@ -62,7 +47,7 @@ void Detector<T>::UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size) {
   }
 
   // copy buffer over
-  cudaMemcpy(cubuf_in, buf_.get(), buf_size_ * sizeof(T),
+  cudaMemcpy(cu_in, buf_.data(), buf_.size() * sizeof(T),
              cudaMemcpyHostToDevice);
 }
 
@@ -71,19 +56,22 @@ void Detector<T>::UpdateBuffer(std::shared_ptr<T[]> buf, uint32_t buf_size) {
  */
 template<class T>
 void Detector<T>::Filter() {
-  if (cubuf_in == nullptr || cubuf_out == nullptr) {
+  if (cu_in == nullptr || cu_out == nullptr) {
     return;
   }
 
-  auto n_blocks = params_.device.n_blocks(buf_size_);
+  auto n_blocks = params_.device.n_blocks(buf_.size());
   auto n_threads = params_.device.n_threads;
-  ndiff2<T>(buf_size_, probe_.n_total(), cubuf_in, cubuf_out, n_blocks,
+  ndiff2<T>(buf_.size(), probe_.n_total(), cu_in, cu_out, n_blocks,
             n_threads);
 
-  cudaMemcpy(buf_.get(), cubuf_out, buf_size_ * sizeof(T), cudaMemcpyDeviceToHost);
+  cudaMemcpy(buf_.data(), cu_out, buf_.size() * sizeof(T),
+             cudaMemcpyDeviceToHost);
 
-  cudaMemcpy(cubuf_in, cubuf_out, buf_size_ * sizeof(T),
+  cudaMemcpy(cu_in, cu_out, buf_.size() * sizeof(T),
              cudaMemcpyDeviceToDevice);
+
+  UpdateThresholdComputers();
 }
 
 /**
@@ -95,9 +83,9 @@ void Detector<T>::ComputeThresholds(float multiplier) {
   auto site_idx = 0;
   for (auto i = 0; i < probe_.n_total(); i++) {
     if (!probe_.is_active(i)) {
-      thresholds_[i] = std::numeric_limits<float>::infinity();
+      thresholds_.at(i) = std::numeric_limits<float>::infinity();
     } else {
-      thresholds_[i] =
+      thresholds_.at(i) =
           threshold_computers[site_idx++].ComputeThreshold(multiplier);
     }
   }
@@ -109,11 +97,26 @@ void Detector<T>::ComputeThresholds(float multiplier) {
  */
 template<class T>
 std::vector<uint8_t> Detector<T>::FindCrossings() {
-  auto n_blocks = params_.device.n_blocks(buf_size_);
+  auto n_blocks = params_.device.n_blocks(buf_.size());
   auto n_threads = params_.device.n_threads;
-  find_crossings(buf_size_, probe_.n_total(), cubuf_in, thresholds_.data(),
-                  (unsigned char *) cubuf_out, n_blocks, n_threads);
-  cudaMemcpy(crossings_.data(), cubuf_out, buf_size_ * sizeof(char),
+
+  cudaMemcpy(cu_thresh, thresholds_.data(),
+             probe_.n_total() * sizeof (float), cudaMemcpyHostToDevice);
+
+  unsigned char *cu_crossings;
+  cudaMalloc(&cu_crossings, buf_.size() * sizeof(char));
+
+  std::vector<T> vec_buf(buf_.size());
+  cudaMemcpy(vec_buf.data(), cu_in, buf_.size() * sizeof(T),
+             cudaMemcpyDeviceToHost);
+
+  std::vector<T> vec_buf_out(buf_.size());
+  cudaMemcpy(vec_buf_out.data(), cu_out, buf_.size() * sizeof(T),
+             cudaMemcpyDeviceToHost);
+
+  find_crossings(buf_.size(), probe_.n_total(), cu_in, cu_thresh,
+                 (unsigned char *) cu_out, n_blocks, n_threads);
+  cudaMemcpy(crossings_.data(), cu_out, buf_.size() * sizeof(char),
              cudaMemcpyDeviceToHost);
 
   return crossings_;
@@ -124,23 +127,43 @@ std::vector<uint8_t> Detector<T>::FindCrossings() {
  */
 template<class T>
 void Detector<T>::Realloc() {
-  if (cubuf_in != nullptr) {
-    cudaFree(cubuf_in);
-    cubuf_in = nullptr;
+  if (cu_in != nullptr) {
+    cudaFree(cu_in);
+    cu_in = nullptr;
   }
-  if (cubuf_out != nullptr) {
-    cudaFree(cubuf_out);
-    cubuf_out = nullptr;
+  if (cu_out != nullptr) {
+    cudaFree(cu_out);
+    cu_out = nullptr;
   }
 
-  crossings_.resize(buf_size_);
+  crossings_.resize(buf_.size());
 
-  if (buf_size_ == 0) {
+  if (buf_.empty()) {
     return;
   }
 
-  cudaMalloc(&cubuf_in, buf_size_ * sizeof(T));
-  cudaMalloc(&cubuf_out, buf_size_ * sizeof(T));
+  cudaMalloc(&cu_in, buf_.size() * sizeof(T));
+  cudaMalloc(&cu_out, buf_.size() * sizeof(T));
+}
+
+/**
+ * @brief Update channel-wise buffers for each ThresholdComputer.
+ */
+template<class T>
+void Detector<T>::UpdateThresholdComputers() {
+  std::vector<T> threshold_buffer(n_frames());
+  auto site_idx = 0;
+  for (auto j = 0; j < probe_.n_total(); ++j) {
+    if (!probe_.is_active(j)) {
+      continue;
+    }
+
+    for (auto i = 0; i < n_frames(); ++i) {
+      threshold_buffer.at(i) = buf_.at(j + i * probe_.n_total());
+    }
+
+    threshold_computers[site_idx++].UpdateBuffer(threshold_buffer);
+  }
 }
 
 template

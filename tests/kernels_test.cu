@@ -174,6 +174,126 @@ TEST(KernelTestSuite, TestNdiff2Short) {
  * TEST THAT values in `buf_` which exceed `const_thresh` correspond to true
  *           values in a boolean buffer `crossings_`.
  */
+TEST(KernelTestSuite, FindCrossingsKernelShort) {
+  auto n_channels = 100;
+  auto n_frames = 100;
+  auto n_samples = n_channels * n_frames;
+  auto const_thresh = 9.0f;
+
+  short *data;
+  uint8_t *crossings;
+  float *thresholds;
+
+  cudaMallocManaged(&data, n_samples * sizeof(short));
+  cudaMallocManaged(&crossings, n_samples * sizeof(bool));
+  cudaMallocManaged(&thresholds, n_channels * sizeof(float));
+
+  for (auto i = 0; i < n_channels; ++i) {
+    thresholds[i] = const_thresh;
+  }
+
+  // column j gets all j's
+  for (auto k = 0; k < n_samples; ++k) {
+    data[k] = (short) (k / n_channels);
+  }
+
+  // establish preconditions for the test
+  for (auto k = 0; k < n_samples; k++) {
+    EXPECT_FALSE(crossings[k]);
+
+    if (k < n_channels * (const_thresh + 1)) {
+      EXPECT_FALSE(data[k] > const_thresh);
+    } else {
+      EXPECT_TRUE(data[k] > const_thresh);
+    }
+  }
+
+  // perform the thresholding
+  auto n_threads = 256;
+  auto n_blocks = (n_samples + n_threads - 1) / n_threads;
+  find_crossings_<<<n_blocks, n_threads>>>(n_samples, n_channels, data,
+                                           thresholds, crossings);
+  cudaDeviceSynchronize();
+
+  // test crossings_ detected correctly
+  for (auto k = 0; k < n_samples; k++) {
+    if (k < n_channels * (const_thresh + 1)) {
+      EXPECT_FALSE(crossings[k]);
+    } else {
+      EXPECT_TRUE(crossings[k]);
+    }
+  }
+
+  // clean up
+  cudaFree(data);
+  cudaFree(crossings);
+  cudaFree(thresholds);
+}
+
+/*
+* GIVEN a buffer `buf_` of float32 and a constant threshold `const_thresh`
+* TEST THAT values in `buf_` which exceed `const_thresh` correspond to true
+*           values in a boolean buffer `crossings_`.
+*/
+TEST(KernelTestSuite, FindCrossingsKernelFloat) {
+  auto n_channels = 100;
+  auto n_frames = 100;
+  auto n_samples = n_channels * n_frames;
+  auto const_thresh = 9.0f;
+
+  float *data;
+  uint8_t *crossings;
+  float *thresholds;
+
+  cudaMallocManaged(&data, n_samples * sizeof(float));
+  cudaMallocManaged(&crossings, n_samples * sizeof(bool));
+  cudaMallocManaged(&thresholds, n_channels * sizeof(float));
+
+  for (auto i = 0; i < n_channels; ++i) {
+    thresholds[i] = const_thresh;
+  }
+
+  // column j gets all j's
+  for (auto k = 0; k < n_samples; ++k) {
+    data[k] = (float) (k / n_channels); // NOLINT(bugprone-integer-division)
+  }
+
+  // establish preconditions for the test
+  for (auto k = 0; k < n_samples; k++) {
+    EXPECT_FALSE(crossings[k]);
+
+    if (k < n_channels * (const_thresh + 1)) {
+      EXPECT_FALSE(data[k] > const_thresh);
+    } else {
+      EXPECT_TRUE(data[k] > const_thresh);
+    }
+  }
+
+  // perform the thresholding
+  auto n_threads = 256;
+  auto n_blocks = (n_samples + n_threads - 1) / n_threads;
+  find_crossings_<<<n_blocks, n_threads>>>(n_samples, n_channels, data,
+                                           thresholds, crossings);
+  cudaDeviceSynchronize();
+
+  // test crossings_ detected correctly
+  for (auto k = 0; k < n_samples; k++) {
+    if (k < n_channels * (const_thresh + 1)) {
+      EXPECT_FALSE(crossings[k]);
+    } else {
+      EXPECT_TRUE(crossings[k]);
+    }
+  }
+
+  // clean up
+  cudaFree(data);
+  cudaFree(crossings);
+  cudaFree(thresholds);
+}
+
+/*
+ *
+ */
 TEST(KernelTestSuite, FindCrossingsShort) {
   auto n_channels = 100;
   auto n_frames = 100;
@@ -210,71 +330,9 @@ TEST(KernelTestSuite, FindCrossingsShort) {
 
   // perform the thresholding
   auto n_threads = 256;
-  auto n_bloacks = (n_samples + n_threads - 1) / n_threads;
-  find_crossings_<<<n_bloacks, n_threads>>>(n_samples, n_channels, data,
-                                            thresholds, crossings);
-  cudaDeviceSynchronize();
-
-  // test crossings_ detected correctly
-  for (auto k = 0; k < n_samples; k++) {
-    if (k < n_channels * (const_thresh + 1)) {
-      EXPECT_FALSE(crossings[k]);
-    } else {
-      EXPECT_TRUE(crossings[k]);
-    }
-  }
-
-  // clean up
-  cudaFree(data);
-  cudaFree(crossings);
-  cudaFree(thresholds);
-}
-
-/*
-* GIVEN a buffer `buf_` of float32 and a constant threshold `const_thresh`
-* TEST THAT values in `buf_` which exceed `const_thresh` correspond to true
-*           values in a boolean buffer `crossings_`.
-*/
-TEST(KernelTestSuite, FindCrossingsFloat) {
-  auto n_channels = 100;
-  auto n_frames = 100;
-  auto n_samples = n_channels * n_frames;
-  auto const_thresh = 9.0f;
-
-  float *data;
-  uint8_t *crossings;
-  float *thresholds;
-
-  cudaMallocManaged(&data, n_samples * sizeof(float));
-  cudaMallocManaged(&crossings, n_samples * sizeof(bool));
-  cudaMallocManaged(&thresholds, n_channels * sizeof(float));
-
-  for (auto i = 0; i < n_channels; ++i) {
-    thresholds[i] = const_thresh;
-  }
-
-  // column j gets all j's
-  for (auto k = 0; k < n_samples; ++k) {
-    data[k] = (float) (k / n_channels); // NOLINT(bugprone-integer-division)
-  }
-
-  // establish preconditions for the test
-  for (auto k = 0; k < n_samples; k++) {
-    EXPECT_FALSE(crossings[k]);
-
-    if (k < n_channels * (const_thresh + 1)) {
-      EXPECT_FALSE(data[k] > const_thresh);
-    } else {
-      EXPECT_TRUE(data[k] > const_thresh);
-    }
-  }
-
-  // perform the thresholding
-  auto n_threads = 256;
-  auto n_bloacks = (n_samples + n_threads - 1) / n_threads;
-  find_crossings_<<<n_bloacks, n_threads>>>(n_samples, n_channels, data,
-                                            thresholds, crossings);
-  cudaDeviceSynchronize();
+  auto n_blocks = (n_samples + n_threads - 1) / n_threads;
+  find_crossings(n_samples, n_channels, data, thresholds, crossings,
+                 n_blocks, n_threads);
 
   // test crossings_ detected correctly
   for (auto k = 0; k < n_samples; k++) {

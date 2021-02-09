@@ -25,7 +25,7 @@ class FileReader : public Reader<T> {
   ~FileReader() { Close(); };
 
   uint32_t
-  AcquireFrames(std::shared_ptr<T[]> buf, uint64_t frame_offset,
+  AcquireFrames(std::vector<T> &buf, uint64_t frame_offset,
                 uint32_t n_frames);
 
   // getters
