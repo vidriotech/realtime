@@ -16,7 +16,6 @@ Detector<T>::Detector(Params &params, Probe &probe)
   Realloc();
 }
 
-
 template<class T>
 Detector<T>::~Detector() {
   if (cu_in != nullptr) {
@@ -112,8 +111,7 @@ void Detector<T>::ComputeThresholds(float multiplier) {
 }
 
 /**
- * @brief Find detect crossings_.
- * @return A vector of detect crossings_.
+ * @brief Find threshold crossings in the filtered data.
  */
 template<class T>
 void Detector<T>::FindCrossings() {
@@ -121,7 +119,7 @@ void Detector<T>::FindCrossings() {
   auto n_threads = params_.device.n_threads;
 
   cudaMemcpy(cu_thresh, thresholds_.data(),
-             probe_.n_total() * sizeof (float), cudaMemcpyHostToDevice);
+             probe_.n_total() * sizeof(float), cudaMemcpyHostToDevice);
 
   unsigned char *cu_crossings;
   cudaMalloc(&cu_crossings, buf_.size() * sizeof(char));
@@ -158,8 +156,13 @@ void Detector<T>::DedupePeaksTime() {
   std::vector<uint64_t> chan_crossings;
   std::vector<uint64_t> chan_offsets;
 
-  auto thresh = (uint64_t) (params_.detect.dedupe_ms * probe_.sample_rate() / 1000);
+  auto thresh =
+      (uint64_t) (params_.detect.dedupe_ms * probe_.sample_rate() / 1000);
   for (auto i = 0; i < probe_.n_total(); ++i) {
+    if (!probe_.is_active(i)) {
+      continue;
+    }
+
     chan_crossings.clear();
     chan_offsets.clear();
 
@@ -179,12 +182,12 @@ void Detector<T>::DedupePeaksTime() {
     // partition crossings into neighborhoods and take the one with the
     // largest absolute value
     auto groups = utilities::part_nearby(chan_crossings, thresh);
-    for (auto & group : groups) {
+    for (auto &group : groups) {
       if (group.size() == 1) {
         chan_offsets.push_back(group.at(0));
       } else {
         std::vector<uint64_t> cross_values;
-        for (auto & idx : group) {
+        for (auto &idx : group) {
           auto val = buf_.at(idx * probe_.n_total() + i);
           cross_values.push_back(std::abs(val));
         }
@@ -195,7 +198,7 @@ void Detector<T>::DedupePeaksTime() {
     }
 
     // replace crossings *only* at peak sites
-    for (auto & j : chan_offsets) {
+    for (auto &j : chan_offsets) {
       auto k = i + probe_.n_total() * j;
       crossings_.at(k) = 1;
     }
@@ -208,7 +211,73 @@ void Detector<T>::DedupePeaksTime() {
  */
 template<class T>
 void Detector<T>::DedupePeaksSpace() {
+  std::vector<uint64_t> peaks;
 
+  auto time_thresh =
+      (uint64_t) (params_.detect.dedupe_ms * probe_.sample_rate() / 1000);
+  auto space_thresh = params_.detect.dedupe_um;
+
+  for (auto chan = 0; chan < probe_.n_total(); ++chan) {
+    if (!probe_.is_active(chan)) {
+      continue;
+    }
+
+    peaks.clear();
+
+    // get indices of channel crossings
+    for (auto frame = 0; frame < n_frames(); ++frame) {
+      auto k = frame * probe_.n_total() + chan;
+
+      if (crossings_.at(k)) {
+        peaks.push_back(frame);
+      }
+    }
+
+    if (peaks.empty()) {
+      continue;
+    }
+
+    auto site_idx = probe_.site_index(chan);
+    auto nearest_neighbors = probe_.NearestNeighbors(site_idx, 5);
+    for (auto &site2 : nearest_neighbors) {
+      if (peaks.empty()) {
+        break;
+      }
+
+      auto chan2 = probe_.chan_index(site2);
+
+      if (chan2 <= chan ||
+          probe_.dist_between(site_idx, site2) > space_thresh) {
+        continue;
+      }
+
+      /* for each peak on the current channel, check if there are any peaks
+       * on neighboring channels which are also nearby in time.
+       * Peaks which are larger in magnitude are preferred.
+       */
+      for (auto &peak : peaks) {
+        auto k = chan + peak * probe_.n_total();
+        auto peak_val = std::abs(buf_.at(k));
+
+        for (auto frame = peak - std::min(peak, time_thresh);
+             frame < std::min((uint64_t) n_frames(), peak + time_thresh);
+             ++frame) {
+          auto k2 = chan2 + frame * probe_.n_total();
+          if (!crossings_.at(k2)) {
+            continue;
+          }
+
+          auto peak_val2 = std::abs(buf_.at(k2));
+          if (peak_val >= peak_val2) {
+            crossings_.at(k2) = 0;
+          } else {
+            crossings_.at(k) = 0;
+            break;
+          }
+        }
+      }
+    }
+  }
 }
 
 /**

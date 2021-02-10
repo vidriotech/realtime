@@ -62,7 +62,7 @@ class Probe {
    * @brief Get the number of *active* channels on the probe_.
    * @return The number of active channels on the probe_.
    */
-  [[nodiscard]] unsigned n_active() const { return chan_idx.size(); };
+  [[nodiscard]] unsigned n_active() const { return chan_indices_.size(); };
   /**
    * @brief Get the sample rate, in Hz.
    * @return The sample rate, in Hz.
@@ -71,7 +71,8 @@ class Probe {
 
   // indexed getters
   [[nodiscard]] bool is_active(uint32_t i) const;
-  [[nodiscard]] unsigned index_at(uint32_t i) const;
+  [[nodiscard]] unsigned chan_index(uint32_t site_idx) const;
+  [[nodiscard]] unsigned site_index(uint32_t chan_idx) const;
   [[nodiscard]] unsigned label_at(uint32_t i) const;
   [[nodiscard]] unsigned group_at(uint32_t i) const;
   [[nodiscard]] double x_at(uint32_t i) const;
@@ -87,7 +88,7 @@ class Probe {
   double srate_hz_ = 0.0;
 
   // row indices of active sites in the data matrix
-  std::vector<unsigned> chan_idx;
+  std::vector<unsigned> chan_indices_;
   // (unique) label of each site in the probe mapping
   std::vector<unsigned> site_labels;
   // channel group ID of each active site
@@ -106,11 +107,11 @@ class Probe {
   DistanceMatrix<float> site_dists;
 
   // rearrange site labels, x_coords/y_coords in order of channels
-  void sort_channels();
+  void SortChannels();
   // ensure channel indices/site labels are unique
-  void ensure_unique();
+  void EnsureUnique();
   // find inactive channels, populate is_active_
-  void find_inactive();
+  void FindInactive();
 };
 
 #endif //RTS_2_PROBE_H

@@ -1,7 +1,7 @@
 #include "probe.h"
 
 Probe::Probe(ProbeConfig cfg)
-    : chan_idx(cfg.n_active()),
+    : chan_indices_(cfg.n_active()),
       site_labels(cfg.n_active()),
       chan_grps(cfg.n_active()),
       x_coords(cfg.n_active()),
@@ -24,7 +24,7 @@ Probe::Probe(ProbeConfig cfg)
     const ChannelGroup grp = channel_group.second;
 
     for (auto j = 0; j < grp.n_channels(); ++j) {
-      chan_idx.at(k) = grp.channels.at(j);
+      chan_indices_.at(k) = grp.channels.at(j);
       site_labels.at(k) = grp.site_labels.at(j);
       x_coords.at(k) = grp.x_coords.at(j);
       y_coords.at(k) = grp.y_coords.at(j);
@@ -33,9 +33,9 @@ Probe::Probe(ProbeConfig cfg)
     }
   }
 
-  sort_channels();
-  ensure_unique();
-  find_inactive();
+  SortChannels();
+  EnsureUnique();
+  FindInactive();
 }
 
 /**
@@ -47,7 +47,8 @@ void Probe::MakeDistanceMatrix() {
 
   for (unsigned i = 0; i < n_active(); ++i) {
     for (unsigned j = i + 1; j < n_active(); ++j) {
-      auto dx = x_coords.at(i) - x_coords.at(j), dy = y_coords.at(i) - y_coords.at(j);
+      auto dx = x_coords.at(i) - x_coords.at(j),
+          dy = y_coords.at(i) - y_coords.at(j);
       site_dists.set_at(i, j, (float) std::hypot(dx, dy));
     }
   }
@@ -68,17 +69,31 @@ std::vector<uint32_t> Probe::NearestNeighbors(uint32_t site_idx,
   return site_dists.closest(site_idx, n_neighbors);
 }
 
- /**
-  * @brief Get the channel index value of the ith site.
-  * @param i Index of the site.
-  * @return The channel index value of the ith site.
-  */
-unsigned Probe::index_at(unsigned i) const {
-  if (i > n_active()) {
+/**
+ * @brief Get the channel index value of the site at `site_idx`.
+ * @param site_idx Index of the site.
+ * @return The channel index value of the site at `site_idx`.
+ */
+unsigned Probe::chan_index(unsigned site_idx) const {
+  if (site_idx > n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return chan_idx.at(i);
+  return chan_indices_.at(site_idx);
+}
+
+/**
+  * @brief Get the site index value of the channel at `chan_idx`.
+  * @param chan_idx Index of the channel.
+  * @return The site index value of the channel at `chan_idx`.
+  */
+unsigned Probe::site_index(uint32_t chan_idx) const {
+  auto idx = 0;
+  for (auto it = is_active_.begin(); it < is_active_.begin() + chan_idx; ++it) {
+    idx += *it;
+  }
+
+  return idx;
 }
 
 /**
@@ -152,48 +167,40 @@ float Probe::dist_between(uint32_t i, uint32_t j) {
 }
 
 /**
- * @brief Sort channel-indexed values (channel indices, site labels, channel
- * group ID, x/y coords) by channel in ascending order.
+ * @brief Sort site-indexed values by corresponding channel in ascending order.
  */
-void Probe::sort_channels() {
+void Probe::SortChannels() {
   if (n_active() == 0)
     return;
 
-  // get indices that would sort chan_idx
-  std::vector<unsigned> argsort(n_active());
-  for (unsigned i = 0; i < n_active(); ++i) {
-    argsort.at(i) = i;
-  }
-
-  std::sort(argsort.begin(), argsort.end(),
-            [&](unsigned i, unsigned j) { return chan_idx.at(i) < chan_idx.at(j); });
-
-  if (std::is_sorted(argsort.begin(), argsort.end())) {  // nothing to do!
+  // get indices that would sort chan_indices_
+  auto as = utilities::argsort(chan_indices_);
+  if (std::is_sorted(as.begin(), as.end())) {  // nothing to do!
     return;
   }
 
   std::vector<unsigned> tmp_buf_s(n_active());
   std::vector<double> tmp_buf_d(n_active());
 
-  // reorder chan_idx, x_coords
-  for (unsigned i = 0; i < argsort.size(); ++i) {
-    tmp_buf_s.at(i) = chan_idx[argsort.at(i)];
-    tmp_buf_d.at(i) = x_coords[argsort.at(i)];
+  // reorder chan_indices_, x_coords
+  for (auto i = 0; i < as.size(); ++i) {
+    tmp_buf_s.at(i) = chan_indices_.at(as.at(i));
+    tmp_buf_d.at(i) = x_coords.at(as.at(i));
   }
-  chan_idx.assign(tmp_buf_s.begin(), tmp_buf_s.end());
+  chan_indices_.assign(tmp_buf_s.begin(), tmp_buf_s.end());
   x_coords.assign(tmp_buf_d.begin(), tmp_buf_d.end());
 
   // reorder site_labels, y_coords
-  for (unsigned i = 0; i < argsort.size(); ++i) {
-    tmp_buf_s.at(i) = site_labels[argsort.at(i)];
-    tmp_buf_d.at(i) = y_coords[argsort.at(i)];
+  for (auto i = 0; i < as.size(); ++i) {
+    tmp_buf_s.at(i) = site_labels[as.at(i)];
+    tmp_buf_d.at(i) = y_coords[as.at(i)];
   }
   site_labels.assign(tmp_buf_s.begin(), tmp_buf_s.end());
   y_coords.assign(tmp_buf_d.begin(), tmp_buf_d.end());
 
   // reorder chan_grps
-  for (unsigned i = 0; i < argsort.size(); ++i) {
-    tmp_buf_s.at(i) = chan_grps[argsort.at(i)];
+  for (auto i = 0; i < as.size(); ++i) {
+    tmp_buf_s.at(i) = chan_grps[as.at(i)];
   }
   chan_grps.assign(tmp_buf_s.begin(), tmp_buf_s.end());
 }
@@ -202,11 +209,11 @@ void Probe::sort_channels() {
 * @brief Check that channel indices and site labels are unique, throwing an
  * error if this is not the case.
 */
-void Probe::ensure_unique() {
+void Probe::EnsureUnique() {
   // ensure all channel indices are unique
   unsigned ct;
-  for (auto it = chan_idx.begin(); it != chan_idx.end(); ++it) {
-    ct = std::count(it, chan_idx.end(), *(it));
+  for (auto it = chan_indices_.begin(); it != chan_indices_.end(); ++it) {
+    ct = std::count(it, chan_indices_.end(), *(it));
     if (ct > 1) {
       throw std::domain_error("Channel indices are not unique.");
     }
@@ -223,19 +230,15 @@ void Probe::ensure_unique() {
 /**
 * @brief Find inactive channels and set their bits to 0 in is_active_.
 *
-* Assumes that chan_idx is sorted.
+* Assumes that chan_indices_ is sorted.
 */
-void Probe::find_inactive() {
-  for (unsigned i = 0; i < n_total_; ++i) {
-    if (std::binary_search(chan_idx.begin(),
-                           chan_idx.end(),
-                           i)) {  // channel not found
-      is_active_.at(i) = true;
-    } else {
-      is_active_.at(i) = false;
-    }
+void Probe::FindInactive() {
+  for (auto i = 0; i < n_total_; ++i) {
+    is_active_.at(i) = std::binary_search(chan_indices_.begin(),
+                                          chan_indices_.end(), i);
   }
 }
+
 /**
  * @brief Determine whether a channel represents an active site.
  * @param i Channel index.

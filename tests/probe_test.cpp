@@ -100,3 +100,17 @@ TEST(ProbeTestSuite, NearestNeighbors) {
     }
   }
 }
+
+/*
+ *
+ */
+TEST(ProbeTestSuite, SiteIndex) {
+  auto probe = probe_from_env();
+
+  auto site_idx = 0;
+  for (auto chan = 0; chan < probe.n_total(); ++chan) {
+    if (probe.is_active(chan)) {
+      EXPECT_EQ(site_idx++, probe.site_index(chan));
+    }
+  }
+}
