@@ -104,7 +104,8 @@ double Probe::y_at(unsigned i) {
 }
 
 /**
- * Returns the Euclidean distance between the ith channel and the jth channel.
+ * @brief Returns the Euclidean distance between the ith channel and the jth
+ * channel.
  */
 float Probe::dist_between(unsigned i, unsigned j) {
   if (i > n_active()) {
@@ -118,6 +119,9 @@ float Probe::dist_between(unsigned i, unsigned j) {
   return channel_distances.at(i, j);
 }
 
+/**
+ * @brief Create the matrix of distances between channels on the probe.
+ */
 void Probe::make_distance_matrix() {
   if (dist_mat_complete || channel_distances.n_cols() != n_active())
     return;
@@ -133,8 +137,8 @@ void Probe::make_distance_matrix() {
 }
 
 /**
- * Sort channel-indexed values (channel indices, site labels, channel group ID, x/y coords) by channel,
- * ascending.
+ * @brief Sort channel-indexed values (channel indices, site labels, channel
+ * group ID, x/y coords) by channel in ascending order.
  */
 void Probe::sort_channels() {
   if (n_active() == 0)
@@ -180,7 +184,8 @@ void Probe::sort_channels() {
 }
 
 /**
-* Check that channel indices and site labels are unique, throwing an error if this is not the case.
+* @brief Check that channel indices and site labels are unique, throwing an
+ * error if this is not the case.
 */
 void Probe::ensure_unique() {
   // ensure all channel indices are unique

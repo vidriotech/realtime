@@ -34,15 +34,22 @@ void Pipeline<T>::Process() {
   Detector<T> detector(params_, probe_);
   detector.UpdateBuffer(buf_);
   detector.Filter();
-  detector.ComputeThresholds(params_.threshold.multiplier);
-  auto crossings = detector.FindCrossings();
+  detector.ComputeThresholds(params_.detect.thresh_multiplier);
+  detector.FindCrossings();
 
   uint32_t n_crossings = 0;
   for (auto i = 0; i < buf_.size(); ++i) {
-    if (crossings.at(i)) n_crossings++;
+    if (detector.crossings().at(i)) n_crossings++;
   }
+  std::cout << n_crossings << "/" << buf_.size() << " found before; ";
 
-  std::cout << n_crossings << "/" << buf_.size() << " found" << std::endl;
+  detector.DedupePeaks();
+
+  n_crossings = 0;
+  for (auto i = 0; i < buf_.size(); ++i) {
+    if (detector.crossings().at(i)) n_crossings++;
+  }
+  std::cout << n_crossings << "/" << buf_.size() << " after" << std::endl;
 
 //  Extractor<T> extractor(params_, probe_);
 //  extractor.Update(detector.buffer(), n_samples);

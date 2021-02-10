@@ -10,7 +10,7 @@ set(HEADER_FILES src/utilities.h
         src/structures/median_tree_node.h src/structures/median_tree.h src/structures/distance_matrix.h
         src/pipeline/pipeline_thread_pool.h
         src/probe/probe.h src/probe/probe_reader.h
-        src/params/acquire_params.h src/params/threshold_params.h
+        src/params/acquire_params.h src/params/detect_params.h
         src/acquisition/reader.h src/acquisition/file_reader.h src/acquisition/socket_reader.h
         src/detection/threshold_computer.h src/detection/detector.h
         src/extraction/Snippet.h src/extraction/SnippetExtractor.h

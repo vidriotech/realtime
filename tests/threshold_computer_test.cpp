@@ -63,10 +63,10 @@ TEST(ThresholdComputerTest, CopyConstructor) {
 }
 
 /*
- * GIVEN a ThresholdComputer `computer` with underlying data and a multiplier
- *       `multiplier`
- * DO compute the threshold associated with the data and multiplier AND
- * TEST THAT the threshold as computed is as expected; AND
+ * GIVEN a ThresholdComputer `computer` with underlying data and a thresh_multiplier
+ *       `thresh_multiplier`
+ * DO compute the detect associated with the data and thresh_multiplier AND
+ * TEST THAT the detect as computed is as expected; AND
  *           the cached value is also as expected.
  */
 TEST(ThresholdComputerTest, ComputeThreshold) {

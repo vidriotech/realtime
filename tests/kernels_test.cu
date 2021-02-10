@@ -170,7 +170,7 @@ TEST(KernelTestSuite, TestNdiff2Short) {
 }
 
 /*
- * GIVEN a buffer `buf_` of int16 and a constant threshold `const_thresh`
+ * GIVEN a buffer `buf_` of int16 and a constant detect `const_thresh`
  * TEST THAT values in `buf_` which exceed `const_thresh` correspond to true
  *           values in a boolean buffer `crossings_`.
  */
@@ -231,7 +231,7 @@ TEST(KernelTestSuite, FindCrossingsKernelShort) {
 }
 
 /*
-* GIVEN a buffer `buf_` of float32 and a constant threshold `const_thresh`
+* GIVEN a buffer `buf_` of float32 and a constant detect `const_thresh`
 * TEST THAT values in `buf_` which exceed `const_thresh` correspond to true
 *           values in a boolean buffer `crossings_`.
 */

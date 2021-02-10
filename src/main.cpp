@@ -85,9 +85,8 @@ int main() {
   std::vector<short> buf(n_samples_buf);
 
   // set up thread pool
-//  auto n_threads = 1;
   auto n_threads = std::max((uint32_t) 1,
-                            std::thread::hardware_concurrency() / 2);
+                            std::thread::hardware_concurrency() / 3);
   PipelineThreadPool<short> pool(params, probe, n_threads);
 //  Pipeline<short> pipeline(params, probe); // TODO: delete me
 
@@ -100,7 +99,7 @@ int main() {
 
     pool.BlockEnqueueData(buf, frame_offset);
 //    pipeline.Update(buf, frame_offset); // TODO: delete me
-//    pipeline.Process();
+//    pipeline.Process(); // TODO: delete me
     std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
   }
 

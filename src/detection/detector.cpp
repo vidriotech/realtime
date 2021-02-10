@@ -75,8 +75,28 @@ void Detector<T>::Filter() {
 }
 
 /**
+ * @brief Update channel-wise buffers for each ThresholdComputer.
+ */
+template<class T>
+void Detector<T>::UpdateThresholdComputers() {
+  std::vector<T> threshold_buffer(n_frames());
+  auto site_idx = 0;
+  for (auto j = 0; j < probe_.n_total(); ++j) {
+    if (!probe_.is_active(j)) {
+      continue;
+    }
+
+    for (auto i = 0; i < n_frames(); ++i) {
+      threshold_buffer.at(i) = buf_.at(j + i * probe_.n_total());
+    }
+
+    threshold_computers[site_idx++].UpdateBuffer(threshold_buffer);
+  }
+}
+
+/**
  * @brief Compute thresholds for each active site.
- * @param multiplier Multiple of MAD to serve as threshold.
+ * @param multiplier Multiple of MAD to serve as detect.
  */
 template<class T>
 void Detector<T>::ComputeThresholds(float multiplier) {
@@ -92,11 +112,11 @@ void Detector<T>::ComputeThresholds(float multiplier) {
 }
 
 /**
- * @brief Find threshold crossings_.
- * @return A vector of threshold crossings_.
+ * @brief Find detect crossings_.
+ * @return A vector of detect crossings_.
  */
 template<class T>
-std::vector<uint8_t> Detector<T>::FindCrossings() {
+void Detector<T>::FindCrossings() {
   auto n_blocks = params_.device.n_blocks(buf_.size());
   auto n_threads = params_.device.n_threads;
 
@@ -118,8 +138,77 @@ std::vector<uint8_t> Detector<T>::FindCrossings() {
                  (unsigned char *) cu_out, n_blocks, n_threads);
   cudaMemcpy(crossings_.data(), cu_out, buf_.size() * sizeof(char),
              cudaMemcpyDeviceToHost);
+}
 
-  return crossings_;
+/**
+ * @brief Detect and remove duplicate crossings.
+ */
+template<class T>
+void Detector<T>::DedupePeaks() {
+  DedupePeaksTime();
+  DedupePeaksSpace();
+}
+
+/**
+ * @brief Remove duplicate threshold crossings in time to find temporally
+ * local peaks.
+ */
+template<class T>
+void Detector<T>::DedupePeaksTime() {
+  std::vector<uint64_t> chan_crossings;
+  std::vector<uint64_t> chan_offsets;
+
+  auto thresh = (uint64_t) (params_.detect.dedupe_ms * probe_.sample_rate() / 1000);
+  for (auto i = 0; i < probe_.n_total(); ++i) {
+    chan_crossings.clear();
+    chan_offsets.clear();
+
+    for (auto j = 0; j < n_frames(); ++j) {
+      auto k = j * probe_.n_total() + i;
+
+      if (crossings_.at(k)) {
+        chan_crossings.push_back(j);
+        crossings_.at(k) = 0; // clear out the crossing at this point
+      }
+    }
+
+    if (chan_crossings.empty()) {
+      continue;
+    }
+
+    // partition crossings into neighborhoods and take the one with the
+    // largest absolute value
+    auto groups = utilities::part_nearby(chan_crossings, thresh);
+    for (auto & group : groups) {
+      if (group.size() == 1) {
+        chan_offsets.push_back(group.at(0));
+      } else {
+        std::vector<uint64_t> cross_values;
+        for (auto & idx : group) {
+          auto val = buf_.at(idx * probe_.n_total() + i);
+          cross_values.push_back(std::abs(val));
+        }
+
+        auto best_idx = utilities::argmax(cross_values);
+        chan_offsets.push_back(group.at(best_idx));
+      }
+    }
+
+    // replace crossings *only* at peak sites
+    for (auto & j : chan_offsets) {
+      auto k = i + probe_.n_total() * j;
+      crossings_.at(k) = 1;
+    }
+  }
+}
+
+/**
+ * @brief Remove duplicate threshold crossings in time to find spatially
+ * local peaks.
+ */
+template<class T>
+void Detector<T>::DedupePeaksSpace() {
+
 }
 
 /**
@@ -146,24 +235,9 @@ void Detector<T>::Realloc() {
   cudaMalloc(&cu_out, buf_.size() * sizeof(T));
 }
 
-/**
- * @brief Update channel-wise buffers for each ThresholdComputer.
- */
 template<class T>
-void Detector<T>::UpdateThresholdComputers() {
-  std::vector<T> threshold_buffer(n_frames());
-  auto site_idx = 0;
-  for (auto j = 0; j < probe_.n_total(); ++j) {
-    if (!probe_.is_active(j)) {
-      continue;
-    }
-
-    for (auto i = 0; i < n_frames(); ++i) {
-      threshold_buffer.at(i) = buf_.at(j + i * probe_.n_total());
-    }
-
-    threshold_computers[site_idx++].UpdateBuffer(threshold_buffer);
-  }
+unsigned Detector<T>::n_frames() const {
+  return buf_.size() / probe_.n_total();
 }
 
 template

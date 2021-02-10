@@ -6,28 +6,34 @@
 #include <stdexcept>
 #include <vector>
 
-// T: the type of value being stored
-// n_observations_: the number of elements whose distances are being stored
 template<class T>
 class DistanceMatrix {
  public:
-  explicit DistanceMatrix(uint32_t n_observations);
-
-  uint32_t n_cols();  // column count (also row count)
+  /**
+   * @brief Matrix of distances between observations.
+   * @param n_observations The number of elements whose distances are being
+   * stored.
+   */
+  explicit DistanceMatrix(uint32_t n_observations)
+      : data(n_observations * (n_observations - 1) / 2),
+        n_observations_(n_observations) {};
 
   // getters
   T at(uint32_t i, uint32_t j) const;  // get the element at the (i,j) index
+  /**
+   * @brief Get the number of columns/rows in the distance matrix.
+   * @return The number of columns/rows in the distance matrix.
+   */
+  [[nodiscard]] uint32_t n_cols() const { return n_observations_; };
 
   // setters
-  void set_at(uint32_t i,
-              uint32_t j,
-              T val);  // set the element at the (i,j) index
+  void set_at(uint32_t i, uint32_t j, T val);
 
  private:
-  uint32_t n_observations_{};
-  std::vector<T> data;
+  uint32_t n_observations_; /*!< Number of observations/rows/columns. */
+  std::vector<T> data; /*!< Compressed form of distance matrix. */
 
-  uint32_t index_at(uint32_t i, uint32_t j) const;
+  [[nodiscard]] uint32_t index_at(uint32_t i, uint32_t j) const;
 };
 
 #endif //RTS_2_DISTANCEMATRIX_H
