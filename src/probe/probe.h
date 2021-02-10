@@ -48,7 +48,9 @@ class Probe {
  public:
   explicit Probe(ProbeConfig cfg);
 
-  void make_distance_matrix();
+  void MakeDistanceMatrix();
+  std::vector<uint32_t>
+  NearestNeighbors(uint32_t site_idx, uint32_t n_neighbors);
 
   // unindexed getters
   /**
@@ -68,15 +70,14 @@ class Probe {
   [[nodiscard]] double sample_rate() const { return srate_hz_; };
 
   // indexed getters
-  [[nodiscard]] bool is_active(unsigned i) const;
+  [[nodiscard]] bool is_active(uint32_t i) const;
+  [[nodiscard]] unsigned index_at(uint32_t i) const;
+  [[nodiscard]] unsigned label_at(uint32_t i) const;
+  [[nodiscard]] unsigned group_at(uint32_t i) const;
+  [[nodiscard]] double x_at(uint32_t i) const;
+  [[nodiscard]] double y_at(uint32_t j) const;
 
-  unsigned index_at(unsigned i);
-  unsigned label_at(unsigned i);
-  unsigned group_at(unsigned i);
-  double x_at(unsigned i);
-  double y_at(unsigned j);
-
-  float dist_between(unsigned i, unsigned j);
+  float dist_between(uint32_t i, uint32_t j);
 
  private:
   unsigned n_total_ = 0;  // the TOTAL number of channels on the probe_
@@ -85,15 +86,15 @@ class Probe {
   // the number of samples taken per channel per second
   double srate_hz_ = 0.0;
 
-  // row indices of active sites in the data_ matrix
+  // row indices of active sites in the data matrix
   std::vector<unsigned> chan_idx;
-  // (unique) label of each site in the probe_ mapping
+  // (unique) label of each site in the probe mapping
   std::vector<unsigned> site_labels;
   // channel group ID of each active site
   std::vector<unsigned> chan_grps;
-  // x coordinates of sites on the probe_, in microns
+  // x coordinates of sites on the probe, in microns
   std::vector<double> x_coords;
-  // y coordinates of sites on the probe_, in microns
+  // y coordinates of sites on the probe, in microns
   std::vector<double> y_coords;
 
   // entries are true if the channel is active (size: n_total_)
@@ -102,7 +103,7 @@ class Probe {
   // true iff the distance matrix has been built
   bool dist_mat_complete = false;
   // distances between channels, in microns
-  DistanceMatrix<float> channel_distances;
+  DistanceMatrix<float> site_dists;
 
   // rearrange site labels, x_coords/y_coords in order of channels
   void sort_channels();

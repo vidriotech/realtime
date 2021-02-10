@@ -7,7 +7,7 @@ Probe::Probe(ProbeConfig cfg)
       x_coords(cfg.n_active()),
       y_coords(cfg.n_active()),
       is_active_(cfg.n_total),
-      channel_distances(cfg.n_active()) {
+      site_dists(cfg.n_active()) {
   n_total_ = cfg.n_total;
   if (n_total_ < cfg.n_active()) {
     throw std::domain_error(
@@ -38,12 +38,42 @@ Probe::Probe(ProbeConfig cfg)
   find_inactive();
 }
 
+/**
+ * @brief Create the matrix of distances between channels on the probe.
+ */
+void Probe::MakeDistanceMatrix() {
+  if (dist_mat_complete || site_dists.n_cols() != n_active())
+    return;
+
+  for (unsigned i = 0; i < n_active(); ++i) {
+    for (unsigned j = i + 1; j < n_active(); ++j) {
+      auto dx = x_coords.at(i) - x_coords.at(j), dy = y_coords.at(i) - y_coords.at(j);
+      site_dists.set_at(i, j, (float) std::hypot(dx, dy));
+    }
+  }
+
+  dist_mat_complete = true;
+}
+
+/**
+ * @brief
+ * @param site_idx
+ * @param n_neighbors
+ * @return Site indices of nearest neighbors to `site_idx` (including
+ * `site_idx`).
+ */
+std::vector<uint32_t> Probe::NearestNeighbors(uint32_t site_idx,
+                                              uint32_t n_neighbors) {
+  MakeDistanceMatrix();
+  return site_dists.closest(site_idx, n_neighbors);
+}
+
  /**
   * @brief Get the channel index value of the ith site.
   * @param i Index of the site.
   * @return The channel index value of the ith site.
   */
-unsigned Probe::index_at(unsigned i) {
+unsigned Probe::index_at(unsigned i) const {
   if (i > n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
@@ -56,7 +86,7 @@ unsigned Probe::index_at(unsigned i) {
  * @param i Index of the site.
  * @return The ith site label.
  */
-unsigned Probe::label_at(unsigned i) {
+unsigned Probe::label_at(unsigned i) const {
   if (i > n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
@@ -69,7 +99,7 @@ unsigned Probe::label_at(unsigned i) {
  * @param i Index of the site.
  * @return The channel group label of the ith site.
  */
-unsigned Probe::group_at(unsigned i) {
+unsigned Probe::group_at(unsigned i) const {
   if (i > n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
@@ -82,7 +112,7 @@ unsigned Probe::group_at(unsigned i) {
  * @param i Index of the site.
  * @return The x coordinate of the ith site.
  */
-double Probe::x_at(unsigned i) {
+double Probe::x_at(unsigned i) const {
   if (i > n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
@@ -95,7 +125,7 @@ double Probe::x_at(unsigned i) {
  * @param i Index of the site.
  * @return The y coordinate of the ith site.
  */
-double Probe::y_at(unsigned i) {
+double Probe::y_at(unsigned i) const {
   if (i > n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
@@ -104,36 +134,21 @@ double Probe::y_at(unsigned i) {
 }
 
 /**
- * @brief Returns the Euclidean distance between the ith channel and the jth
- * channel.
+ * @brief Get the distance between the ith and jth sites.
+ * @param i Site label.
+ * @param j Site label.
+ * @return Distance between site i and site j.
  */
-float Probe::dist_between(unsigned i, unsigned j) {
+float Probe::dist_between(uint32_t i, uint32_t j) {
   if (i > n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
   if (!dist_mat_complete) {
-    make_distance_matrix();
+    MakeDistanceMatrix();
   }
 
-  return channel_distances.at(i, j);
-}
-
-/**
- * @brief Create the matrix of distances between channels on the probe.
- */
-void Probe::make_distance_matrix() {
-  if (dist_mat_complete || channel_distances.n_cols() != n_active())
-    return;
-
-  for (unsigned i = 0; i < n_active(); ++i) {
-    for (unsigned j = i + 1; j < n_active(); ++j) {
-      auto dx = x_coords.at(i) - x_coords.at(j), dy = y_coords.at(i) - y_coords.at(j);
-      channel_distances.set_at(i, j, (float) std::hypot(dx, dy));
-    }
-  }
-
-  dist_mat_complete = true;
+  return site_dists.at(i, j);
 }
 
 /**

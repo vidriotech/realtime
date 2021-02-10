@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "../utilities.h"
+
 template<class T>
 class DistanceMatrix {
  public:
@@ -25,6 +27,7 @@ class DistanceMatrix {
    * @return The number of columns/rows in the distance matrix.
    */
   [[nodiscard]] uint32_t n_cols() const { return n_observations_; };
+  std::vector<uint32_t> closest(uint32_t i, uint32_t n);
 
   // setters
   void set_at(uint32_t i, uint32_t j, T val);

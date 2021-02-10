@@ -20,6 +20,28 @@ T DistanceMatrix<T>::at(uint32_t i, uint32_t j) const {
 }
 
 /**
+ * @brief Get indices of the `n` values closest to observation `i`.
+ * @param i The index of the observation.
+ * @param n The number of observations to take.
+ * @return The indices of the `n` values closest to observation `i`.
+ */
+template<class T>
+std::vector<uint32_t> DistanceMatrix<T>::closest(uint32_t i, uint32_t n) {
+  n = std::min(n, n_cols());
+  std::vector<uint32_t> indices(n);
+
+  std::vector<uint32_t> dists(n_cols());
+  for (auto j = 0; j < n_cols(); ++j) {
+    dists.at(j) = at(i, j);
+  }
+
+  auto as = utilities::argsort(dists);
+  indices.assign(as.begin(), as.begin() + n);
+
+  return indices;
+}
+
+/**
  * @brief Set the value at the (`i`, `j`) coordinate to `val`.
  * @param i The row in the distance matrix.
  * @param j The column in the distance matrix.
