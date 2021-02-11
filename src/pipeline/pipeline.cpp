@@ -2,8 +2,8 @@
 #include "pipeline.h"
 
 /**
- * @brief Get the number of frames in the buffer.
- * @return The number of frames in the buffer.
+ * @brief Get the number of frames in the data.
+ * @return The number of frames in the data.
  */
 template<class T>
 uint32_t Pipeline<T>::n_frames_buf() const {
@@ -11,9 +11,9 @@ uint32_t Pipeline<T>::n_frames_buf() const {
 }
 
 /**
- * @brief Update the data buffer, buffer size, and frame offset.
- * @param buf The new data buffer.
- * @param frame_offset Timestep at the beginning of the new data buffer.
+ * @brief Update the data buffer, data size, and frame offset.
+ * @param buf The new data data.
+ * @param frame_offset Timestep at the beginning of the new data data.
  */
 template<class T>
 void Pipeline<T>::Update(std::vector<T> buf, uint64_t frame_offset) {
@@ -22,7 +22,7 @@ void Pipeline<T>::Update(std::vector<T> buf, uint64_t frame_offset) {
 }
 
 /**
- * @brief Process the data in the buffer.
+ * @brief Process the data in the data.
  */
 template<class T>
 void Pipeline<T>::Process() {
@@ -51,9 +51,10 @@ void Pipeline<T>::Process() {
   }
   std::cout << n_crossings << "/" << buf_.size() << " after" << std::endl;
 
-//  Extractor<T> extractor(params_, probe_);
-//  extractor.Update(detector.buffer(), n_samples);
-//  extractor.MakeSnippets();
+  Extractor<T> extractor(params_, probe_);
+  extractor.Update(detector.data(), detector.crossings(), frame_offset_);
+  extractor.MakeSnippets();
+  auto x = 1 + 1;
 //  auto features = extractor.ExtractFeatures();
 }
 

@@ -73,12 +73,12 @@ class Probe {
   [[nodiscard]] bool is_active(uint32_t i) const;
   [[nodiscard]] unsigned chan_index(uint32_t site_idx) const;
   [[nodiscard]] unsigned site_index(uint32_t chan_idx) const;
-  [[nodiscard]] unsigned label_at(uint32_t i) const;
-  [[nodiscard]] unsigned group_at(uint32_t i) const;
-  [[nodiscard]] double x_at(uint32_t i) const;
-  [[nodiscard]] double y_at(uint32_t j) const;
+  [[nodiscard]] unsigned label_at(uint32_t site_idx) const;
+  [[nodiscard]] unsigned group_at(uint32_t site_idx) const;
+  [[nodiscard]] double x_at(uint32_t site_idx) const;
+  [[nodiscard]] double y_at(uint32_t site_idx) const;
 
-  float dist_between(uint32_t i, uint32_t j);
+  float dist_between(uint32_t left, uint32_t right);
 
  private:
   unsigned n_total_ = 0;  // the TOTAL number of channels on the probe_

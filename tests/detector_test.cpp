@@ -25,8 +25,8 @@ TEST(DetectorTest, InitialState) {
 }
 
 /*
- * GIVEN a ThresholdDetector `detector` and test data buffer `buf_`
- * DO update `detector`'s buffers with `buf_` AND
+ * GIVEN a ThresholdDetector `detector` and test data data `data_`
+ * DO update `detector`'s buffers with `data_` AND
  *    compute the thresholds of each channel AND
  * TEST THAT each detect is as expected.
  */

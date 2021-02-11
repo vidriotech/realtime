@@ -2,13 +2,13 @@
 
 ## Environment variables
 
-Some tests require a test data_ file and source the pertinent information from
+Some tests require a test samples_ file and source the pertinent information from
 environment variables.
 When running tests you should have, at a minimum, the following environment
 variables defined:
 
-- `TEST_FILE`: Path (we recommend a full path on principle) to the test data_
-  file containing the raw data_ from your recording.
+- `TEST_FILE`: Path (we recommend a full path on principle) to the test samples_
+  file containing the raw samples_ from your recording.
 - `TEST_NCHANNELS`: The *total* number of channels in the recording living in
   `TEST_FILE`.
 - `TEST_NACTIVE`: The number of *active* channels in the recording living in
@@ -25,7 +25,7 @@ variables defined:
 
 ## Test file format
 
-Right now the data_ is expected to be short int (16-bit signed integer), laid
+Right now the samples_ is expected to be short int (16-bit signed integer), laid
 out in column-major order, as it would be in acquisition, i.e., a sample per
 channel for each consecutive timestep.
 This is the format followed by, e.g., SpikeGLX.

@@ -5,10 +5,10 @@
 #include "../src/extraction/snippet.h"
 
 /*
- * GIVEN a buffer `buf`, a channel count `n_chans_` and a frame count `n_frames_`
+ * GIVEN a data `buf`, a channel count `n_sites` and a frame count `n_frames`
  * DO construct a Snippet `snippet` AND
  * TEST THAT the channel count and frame count are as expected; AND
- *           each value is indexed in column-major order.
+ *           each value is indexed in row-major order.
  */
 TEST(SnippetTest, InitialState) {
   auto n_chans = 5, n_frames = 53;
@@ -23,9 +23,9 @@ TEST(SnippetTest, InitialState) {
   EXPECT_EQ(n_chans, snippet.n_chans());
   EXPECT_EQ(n_frames, snippet.n_frames());
 
-  for (auto frame = 0; frame < n_frames; ++frame) {
-    for (auto chan = 0; chan < n_chans; ++chan) {
-      auto k = frame * n_chans + chan;
+  for (auto chan = 0; chan < n_chans; ++chan) {
+    for (auto frame = 0; frame < n_frames; ++frame) {
+      auto k = chan * n_frames + frame;
       EXPECT_EQ(buf.at(k), snippet.at(chan, frame));
     }
   }
@@ -45,7 +45,7 @@ TEST(SnippetTest, SelfSqDist) {
   }
   Snippet<short> snippet(buf, n_chans, n_frames);
 
-  EXPECT_EQ(0, snippet.SqDist(snippet));
+  EXPECT_DOUBLE_EQ(0, snippet.SqDist(snippet));
 }
 
 /*
@@ -69,7 +69,7 @@ TEST(SnippetTest, ZeroSqDist) {
   std::vector<short> buf0(buf.size(), 0);
   Snippet<short> zero(buf0, n_chans, n_frames);
 
-  EXPECT_EQ(expected_dist, snippet.SqDist(zero));
+  EXPECT_DOUBLE_EQ(expected_dist, snippet.SqDist(zero));
 }
 
 /*
@@ -93,4 +93,29 @@ TEST(SnippetTest, MismatchSqDist) {
 
   EXPECT_DOUBLE_EQ(std::numeric_limits<double>::infinity(),
                    snippet.SqDist(mismatch));
+}
+
+/*
+ * GIVEN a Snippet `snippet` and a Snippet `negative` with each element equal
+ *       to the negative of the corresponding element in `snippet`
+ * DO compute the squared Euclidean distance between `snippet` and `negative`
+ * AND TEST THAT the distance is 4 times the sum of the squares of the
+ *               elements of `snippet`.
+ */
+TEST(SnippetTest, SqDist) {
+  auto n_chans = 5, n_frames = 53;
+
+  std::vector<short> buf(n_chans * n_frames);
+  std::vector<short> neg_buf(n_chans * n_frames);
+
+  double expected_dist = 0.0;
+  for (auto i = 0; i < buf.size(); ++i) {
+    buf.at(i) = i;
+    neg_buf.at(i) = -i;
+    expected_dist += 4 * i * i;
+  }
+  Snippet<short> snippet(buf, n_chans, n_frames);
+  Snippet<short> negative(neg_buf, n_chans, n_frames);
+
+  EXPECT_DOUBLE_EQ(expected_dist, snippet.SqDist(negative));
 }

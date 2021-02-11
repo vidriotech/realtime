@@ -9,8 +9,8 @@
 #include "reader.h"
 
 /**
- * @brief A class for reading data_ from a flat binary file.
- * @tparam T The type of data_ stored in the underlying file.
+ * @brief A class for reading samples_ from a flat binary file.
+ * @tparam T The type of samples_ stored in the underlying file.
  */
 template<class T>
 class FileReader : public Reader<T> {

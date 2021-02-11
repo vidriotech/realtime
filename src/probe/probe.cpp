@@ -75,7 +75,7 @@ std::vector<uint32_t> Probe::NearestNeighbors(uint32_t site_idx,
  * @return The channel index value of the site at `site_idx`.
  */
 unsigned Probe::chan_index(unsigned site_idx) const {
-  if (site_idx > n_active()) {
+  if (site_idx >= n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
@@ -98,72 +98,65 @@ unsigned Probe::site_index(uint32_t chan_idx) const {
 
 /**
  * @brief Get the label of the ith site.
- * @param i Index of the site.
+ * @param site_idx Index of the site.
  * @return The ith site label.
  */
-unsigned Probe::label_at(unsigned i) const {
-  if (i > n_active()) {
+unsigned Probe::label_at(unsigned site_idx) const {
+  if (site_idx >= n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return site_labels.at(i);
+  return site_labels.at(site_idx);
 }
 
 /**
  * @brief Get the channel group label of the ith site.
- * @param i Index of the site.
+ * @param site_idx Index of the site.
  * @return The channel group label of the ith site.
  */
-unsigned Probe::group_at(unsigned i) const {
-  if (i > n_active()) {
+unsigned Probe::group_at(unsigned site_idx) const {
+  if (site_idx >= n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return chan_grps.at(i);
+  return chan_grps.at(site_idx);
 }
 
 /**
  * @brief Returns the x coordinate of the ith site.
- * @param i Index of the site.
+ * @param site_idx Index of the site.
  * @return The x coordinate of the ith site.
  */
-double Probe::x_at(unsigned i) const {
-  if (i > n_active()) {
+double Probe::x_at(unsigned site_idx) const {
+  if (site_idx > n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return x_coords.at(i);
+  return x_coords.at(site_idx);
 }
 
 /**
  * @brief Returns the y coordinate of the ith site.
- * @param i Index of the site.
+ * @param site_idx Index of the site.
  * @return The y coordinate of the ith site.
  */
-double Probe::y_at(unsigned i) const {
-  if (i > n_active()) {
+double Probe::y_at(unsigned site_idx) const {
+  if (site_idx > n_active()) {
     throw std::length_error("Index exceeds array dimensions.");
   }
 
-  return y_coords.at(i);
+  return y_coords.at(site_idx);
 }
 
 /**
  * @brief Get the distance between the ith and jth sites.
- * @param i Site label.
- * @param j Site label.
- * @return Distance between site i and site j.
+ * @param left Site index.
+ * @param right Site index.
+ * @return Distance between left and right.
  */
-float Probe::dist_between(uint32_t i, uint32_t j) {
-  if (i > n_active()) {
-    throw std::length_error("Index exceeds array dimensions.");
-  }
-
-  if (!dist_mat_complete) {
-    MakeDistanceMatrix();
-  }
-
-  return site_dists.at(i, j);
+float Probe::dist_between(uint32_t left, uint32_t right) {
+  MakeDistanceMatrix();
+  return site_dists.at(left, right);
 }
 
 /**

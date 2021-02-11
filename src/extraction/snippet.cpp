@@ -4,7 +4,7 @@
 template<class T>
 Snippet<T>::Snippet(std::vector<T> buf, uint32_t n_chans, uint32_t n_frames)
     : data(buf), n_chans_(n_chans), n_frames_(n_frames) {
-  // resize data buffer to match up with our expectations of size
+  // resize data data to match up with our expectations of size
   if (data.size() != n_chans * n_frames) {
     data.resize(n_chans * n_frames);
   }
@@ -44,7 +44,20 @@ double Snippet<T>::SqDist(const Snippet<T> &other) {
  */
 template<class T>
 T Snippet<T>::at(uint32_t chan, uint32_t frame) const {
-  return data.at(frame * n_chans_ + chan);
+  return data.at(chan * n_frames_ + frame);
+}
+
+/**
+ * @brief Set the channel ids of this snippet.
+ * @param ids Vector of channel ids.
+ */
+template<class T>
+void Snippet<T>::set_channel_ids(std::vector<uint32_t> &ids) {
+  if (ids.size() != n_chans_) {
+    return;
+  }
+
+  channel_ids_.assign(ids.begin(), ids.end());
 }
 
 template

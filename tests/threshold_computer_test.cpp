@@ -3,7 +3,7 @@
 #include "../src/detection/threshold_computer.h"
 
 /*
- * GIVEN a buffer size `bufsize`
+ * GIVEN a data size `bufsize`
  * DO construct a ThresholdComputer `computer` AND
  * TEST THAT buffer_size is equal to `bufsize`.
  */
@@ -15,9 +15,9 @@ TEST(ThresholdComputerTest, InitialState) {
 }
 
 /*
- * GIVEN a ThresholdComputer `computer` and a buffer `buf_`
- * DO update buffer underlying `computer` with the data_ from `buf_` AND
- * TEST THAT the data_ in the `computer` buffer matches that in `buf_`.
+ * GIVEN a ThresholdComputer `computer` and a buffer `data_`
+ * DO update buffer underlying `computer` with the samples_ from `data_` AND
+ * TEST THAT the samples_ in the `computer` data matches that in `data_`.
  */
 TEST(ThresholdComputerTest, UpdateData) {
   unsigned bufsize = 100;
@@ -38,7 +38,7 @@ TEST(ThresholdComputerTest, UpdateData) {
  * GIVEN a ThresholdComputer `computer`
  * DO construct a copy `computer_copy` AND
  * TEST THAT buffer_size()s match; AND
- *           data_ is equal between the underlying buffers.
+ *           samples_ is equal between the underlying buffers.
  */
 TEST(ThresholdComputerTest, CopyConstructor) {
   unsigned bufsize = 100;

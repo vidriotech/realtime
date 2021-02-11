@@ -74,7 +74,7 @@ uint32_t DistanceMatrix<T>::index_at(uint32_t i, uint32_t j) const {
     return index_at(j, i);
   }
 
-  // the index in the data_ array of the (i, j) element
+  // the index in the samples_ array of the (i, j) element
   return i * n_observations_ - (i + 1) * (i + 2) / 2 + j;
 }
 

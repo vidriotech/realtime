@@ -11,7 +11,7 @@
  * GIVEN a Params `params` and a Probe `probe`
  * DO construct a Pipeline `pipeline` of FileReader AND
  * TEST THAT the frame offset is 0; AND
- *           the number of samples in the buffer of `pipeline` is reported as
+ *           the number of samples in the data of `pipeline` is reported as
  *           equal to the the ceiling of the number of seconds as specified in
  *           `params` times the number of frames per second (the sample rate).
  */
@@ -27,11 +27,11 @@ TEST(PipelineTest, InitialState) {
 
 /*
  * GIVEN a Pipeline `pipeline`, a buffer size `buffer_size`, and a frame offset
- *           `frame_offset`
+ *           `frame_offset_`
  * DO update the pipeline with an uninitialized shared_ptr AND
  * TEST THAT the buffer returned is a nullptr; AND
  *           the frame offset is reported correctly; AND
- *           the buffer size is reported as 0.
+ *           the data size is reported as 0.
  */
 TEST(PipelineTest, UpdateNullptr) {
   Params params;

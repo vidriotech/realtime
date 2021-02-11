@@ -1,5 +1,5 @@
-#ifndef RTS_2_DETECTPARAMS_H
-#define RTS_2_DETECTPARAMS_H
+#ifndef RTS_2_SRC_PARAMS_DETECT_PARAMS_H
+#define RTS_2_SRC_PARAMS_DETECT_PARAMS_H
 
 class DetectParams {
  public:
@@ -8,4 +8,4 @@ class DetectParams {
   float dedupe_um = 50.0; /*!< space partition around potential peaks */
 };
 
-#endif //RTS_2_DETECTPARAMS_H
+#endif //RTS_2_SRC_PARAMS_DETECT_PARAMS_H

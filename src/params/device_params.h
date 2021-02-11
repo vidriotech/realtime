@@ -1,6 +1,8 @@
 #ifndef RTS_2_SRC_PARAMS_DEVICE_PARAMS_H_
 #define RTS_2_SRC_PARAMS_DEVICE_PARAMS_H_
 
+#include <cstdint>
+
 class DeviceParams {
  public:
   bool gpu_enabled = true;

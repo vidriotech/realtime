@@ -17,14 +17,22 @@ class Snippet {
   T at(uint32_t chan, uint32_t frame) const;
 
   // unindexed getters
+
   [[nodiscard]] uint32_t n_chans() const { return n_chans_; };
   [[nodiscard]] uint32_t n_frames() const { return n_frames_; };
+
+  // setters
+  void set_frame_offset(uint64_t offset) { frame_offset_ = offset; };
+  void set_channel_ids(std::vector<uint32_t> &ids);
 
  private:
   uint32_t n_chans_; /*!< number of channels in the snippet */
   uint32_t n_frames_; /*!< number of frames in the snippet */
 
-  std::vector<T> data; /*!< data buffer, stored in column major order */
+  uint64_t frame_offset_ = 0; /*!< global offset of first sample in snippet */
+  std::vector<uint32_t> channel_ids_; /*!< ids of channels in snippets */
+
+  std::vector<T> data; /*!< data data, stored in row major order */
 };
 
 #endif //RTS_2_SNIPPET_H

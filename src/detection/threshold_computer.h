@@ -19,13 +19,13 @@ class ThresholdComputer {
 
   // getters
   /**
-   * @brief Get the size of the buffer.
-   * @return The size of the buffer.
+   * @brief Get the size of the data.
+   * @return The size of the data.
    */
   [[nodiscard]] uint32_t buffer_size() const { return data_.size(); };
   /**
-   * @brief Get the underlying data buffer.
-   * @return The underlying data buffer.
+   * @brief Get the underlying data data.
+   * @return The underlying data data.
    */
   const std::vector<T>& data() { return data_; };
   double median();

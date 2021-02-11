@@ -14,7 +14,7 @@ set(HEADER_FILES src/utilities.h
         src/acquisition/reader.h src/acquisition/file_reader.h src/acquisition/socket_reader.h
         src/detection/threshold_computer.h src/detection/detector.h
         src/extraction/snippet.h src/extraction/snippet_extractor.h
-        src/pipeline/pipeline.h)
+        src/pipeline/pipeline.h src/params/extract_params.h)
 set(SOURCE_FILES src/main.cpp
         src/structures/median_tree_node.cpp src/structures/median_tree.cpp src/structures/distance_matrix.cpp
         src/pipeline/pipeline_thread_pool.cpp
@@ -22,7 +22,7 @@ set(SOURCE_FILES src/main.cpp
         src/acquisition/reader.cpp src/acquisition/file_reader.cpp src/acquisition/socket_reader.cpp
         src/detection/detector.cpp src/detection/threshold_computer.cpp
         src/extraction/snippet.cpp src/extraction/snippet_extractor.cpp src/params/params.h
-        src/pipeline/pipeline.cpp src/params/device_params.h)
+        src/pipeline/pipeline.cpp src/params/device_params.h src/extraction/extractor.h src/extraction/extractor.cpp)
 
 add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
 

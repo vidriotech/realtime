@@ -31,7 +31,7 @@ class Detector {
   void DedupePeaks();
 
   // getters
-  std::vector<T> buffer() const { return buf_; };
+  std::vector<T> &data() { return data_; };
   std::vector<float> &thresholds() { return thresholds_; };
   std::vector<uint8_t> &crossings() { return crossings_; };
   [[nodiscard]] unsigned n_frames() const;
@@ -41,14 +41,14 @@ class Detector {
   Probe probe_;
   std::vector<ThresholdComputer<T>> threshold_computers;
 
-  std::vector<T> buf_;
+  std::vector<T> data_;
   std::vector<float> thresholds_;
   std::vector<uint8_t> crossings_;
 
   // CUDA buffers
-  T *cu_in = nullptr; /*<! GPU input buffer */
-  T *cu_out = nullptr; /*<! GPU output buffer */
-  float *cu_thresh = nullptr; /*<! GPU detect buffer */
+  T *cu_in = nullptr; /*<! GPU input data */
+  T *cu_out = nullptr; /*<! GPU output data */
+  float *cu_thresh = nullptr; /*<! GPU detect data */
 
   void DedupePeaksTime();
   void DedupePeaksSpace();

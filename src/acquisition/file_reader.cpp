@@ -8,11 +8,11 @@ FileReader<T>::FileReader(std::string &filename, Probe &probe)
 }
 
 /**
- * @brief Acquire data_ from the file, so many frames at a time.
- * @tparam T The type of data_ stored in the underlying file.
+ * @brief Acquire samples_ from the file, so many frames at a time.
+ * @tparam T The type of samples_ stored in the underlying file.
  * @param frame_offset Number of frames after the beginning to start acquiring.
  * @param n_frames Number of frames to acquire.
- * @param buf Buffer where the acquired data_ will be stored.
+ * @param buf Buffer where the acquired samples_ will be stored.
  * @return The number of frames read.
  */
 template<class T>
@@ -44,7 +44,7 @@ FileReader<T>::AcquireFrames(std::vector<T> &buf,
 
 /**
  * @brief Open the underlying file for reading.
- * @tparam T The type of data_ stored in the underlying file.
+ * @tparam T The type of samples_ stored in the underlying file.
  */
 template<class T>
 void FileReader<T>::Open() {
@@ -54,7 +54,7 @@ void FileReader<T>::Open() {
 
 /**
  * @brief Close the underlying file.
- * @tparam T The type of data_ stored in the underlying file.
+ * @tparam T The type of samples_ stored in the underlying file.
  */
 template<class T>
 void FileReader<T>::Close() {

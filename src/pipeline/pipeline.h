@@ -7,6 +7,7 @@
 
 #include "../params/params.h"
 #include "../detection/detector.h"
+#include "../extraction/extractor.h"
 
 template<class T>
 class Pipeline {

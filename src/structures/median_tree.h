@@ -101,7 +101,7 @@ MedianTree<T>::MedianTree(T a, T b) {
 
 /**
  * @brief Insert a value into this tree.
- * @tparam T The type of data_ stored in the nodes of this tree.
+ * @tparam T The type of samples_ stored in the nodes of this tree.
  * @param val The value to insert.
  */
 template<class T>
@@ -137,7 +137,7 @@ void MedianTree<T>::Insert(T val, bool balance, bool rotate) {
 
 /**
  * @brief Remove a value from this tree.
- * @tparam T The type of the data_ stored in the nodes of this tree.
+ * @tparam T The type of the samples_ stored in the nodes of this tree.
  * @param val The value to remove from this tree.
  * @param subtree Force remove from left subtree if 1, right subtree if -1,
  *                or detect if 0.
@@ -199,7 +199,7 @@ void MedianTree<T>::RotateSubtrees(bool recursive) {
 /**
  * @brief Shift elements between subtrees to maintain a difference of no more
  *        than a single element.
- * @tparam T The type of data_ stored in the nodes of this tree.
+ * @tparam T The type of samples_ stored in the nodes of this tree.
  */
 template<class T>
 void MedianTree<T>::BalanceElements() {
@@ -218,7 +218,7 @@ void MedianTree<T>::BalanceElements() {
 
 /**
  * @brief Compute and return the height of this tree.
- * @tparam T The type of data_ stored in the nodes of this tree.
+ * @tparam T The type of samples_ stored in the nodes of this tree.
  * @return The height of this tree.
  */
 template<class T>
@@ -239,7 +239,7 @@ unsigned short MedianTree<T>::height() {
  * "Right-heavy" is analogously defined. In AVL trees, a tree's balance,
  * together with that of its subtrees, is used to determine when to rotate.
  *
- * @tparam T The type of data_ stored in the nodes of this tree.
+ * @tparam T The type of samples_ stored in the nodes of this tree.
  * @return The balance factor.
  */
 template<class T>
@@ -252,7 +252,7 @@ short MedianTree<T>::balance() {
 
 /**
  * @brief Compute the balance between the counts of the left and right subtrees.
- * @tparam T The type of data_ stored in the nodes of this tree.
+ * @tparam T The type of samples_ stored in the nodes of this tree.
  * @return The difference between the left tree's count and the right tree's
  * count.
  */
@@ -266,7 +266,7 @@ short MedianTree<T>::el_balance() {
 
 /**
  * @brief Compute and return the median of all values in this tree.
- * @tparam T The type of data_ stored in the nodes of this tree.
+ * @tparam T The type of samples_ stored in the nodes of this tree.
  * @return The median of all values.
  */
 template<class T>
@@ -290,7 +290,7 @@ float MedianTree<T>::median() const {
  * Only the root node is removed. Subtrees of `root` will be reinserted back
  * into
  *
- * @tparam T The type of data_ stored in the nodes of this tree.
+ * @tparam T The type of samples_ stored in the nodes of this tree.
  * @param root The node to remove.
  */
 template<class T>
@@ -314,7 +314,7 @@ MedianTree<T>::RemoveRoot(std::shared_ptr<MedianTreeNode<T>> root) {
 
 /**
  * @brief Perform an LL, LR, RL, or RR rotation on a subtree if it needs one.
- * @tparam T The type of data_ stored in the subtree.
+ * @tparam T The type of samples_ stored in the subtree.
  * @param subtree Pointer to the subtree to rotate.
  * @return Root of the new subtree to be inserted into the old subtree's place.
  */
@@ -357,7 +357,7 @@ MedianTree<T>::RotateSubtree(std::shared_ptr<MedianTreeNode<T>> subtree) {
 
 /**
  * @brief Shift the largest value in the left subtree to the right subtree.
- * @tparam T The type of data_ stored in the nodes of this tree.
+ * @tparam T The type of samples_ stored in the nodes of this tree.
  */
 template<class T>
 void MedianTree<T>::ShiftLTR() {
@@ -377,7 +377,7 @@ void MedianTree<T>::ShiftLTR() {
 
 /**
  * @brief Shift the smallest value in the right subtree to the left subtree.
- * @tparam T T The type of data_ stored in the nodes of this tree.
+ * @tparam T T The type of samples_ stored in the nodes of this tree.
  */
 template<class T>
 void MedianTree<T>::ShiftRTL() {
@@ -397,7 +397,7 @@ void MedianTree<T>::ShiftRTL() {
 
 /**
  * @brief Perform an LL rotation on a subtree node.
- * @tparam T The type of data_ stored in the nodes of this subtree.
+ * @tparam T The type of samples_ stored in the nodes of this subtree.
  * @param subtree The subtree needing a rotation.
  * @return Root of the new subtree to be inserted into the old subtree's place.
  */
@@ -422,7 +422,7 @@ MedianTree<T>::LLRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
 
 /**
  * @brief Perform an LR rotation on a subtree node.
- * @tparam T The type of data_ stored in the nodes of this subtree.
+ * @tparam T The type of samples_ stored in the nodes of this subtree.
  * @param subtree The subtree needing a rotation.
  * @return Root of the new subtree to be inserted into the old subtree's place.
  */
@@ -445,7 +445,7 @@ MedianTree<T>::LRRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
 
 /**
  * @brief Perform an RL rotation on a subtree.
- * @tparam T The type of data_ stored in the nodes of this subtree.
+ * @tparam T The type of samples_ stored in the nodes of this subtree.
  * @param subtree The subtree needing a rotation.
  * @return Root of the new subtree to be inserted into the old subtree's place.
  */
@@ -468,7 +468,7 @@ MedianTree<T>::RLRotate(std::shared_ptr<MedianTreeNode<T>> subtree) {
 
 /**
  * @brief Perform an RR rotation on a subtree.
- * @tparam T The type of data_ stored in the nodes of this subtree.
+ * @tparam T The type of samples_ stored in the nodes of this subtree.
  * @param subtree The subtree needing a rotation.
  * @return Root of the new subtree to be inserted into the old subtree's place.
  */

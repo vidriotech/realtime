@@ -7,7 +7,7 @@ __global__ void find_crossings_(int n_samples, int n_channels, const T *in,
   unsigned int stride = gridDim.x * blockDim.x;
 
   for (auto i = offset; i < n_samples; i += stride) {
-    out[i] = abs(in[i]) > thresholds[i % n_channels];
+    out[i] = in[i] < -thresholds[i % n_channels];
   }
 }
 

@@ -18,9 +18,10 @@ set(SOURCE_FILES
         ../src/detection/detector.cpp detector_test.cpp
         ../src/detection/threshold_computer.cpp threshold_computer_test.cpp
         ../src/extraction/snippet.cpp snippet_test.cpp
-        SnippetExtractorTests.cpp
+        ../src/extraction/snippet_extractor.cpp snippet_extractor_test.cpp
+        ../src/extraction/extractor.cpp extractor_test.cpp
         ../src/pipeline/pipeline.cpp pipeline_test.cpp
-        ../src/pipeline/pipeline_thread_pool.cpp pipeline_thread_pool_test.cpp utilities_test.cpp)
+        ../src/pipeline/pipeline_thread_pool.cpp pipeline_thread_pool_test.cpp utilities_test.cpp params_test.cpp extractor_test.cpp)
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 
 add_subdirectory(lib)
