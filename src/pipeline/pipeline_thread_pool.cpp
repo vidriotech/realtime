@@ -11,7 +11,7 @@ PipelineThreadPool<T>::PipelineThreadPool(Params &params, Probe &probe,
   max_queue_size = 2 * n_threads;
 
   for (auto i = 0; i < n_threads; i++) {
-    threads.template emplace_back(std::thread([this]() {
+    threads.emplace_back(std::thread([this]() {
       while (true) {
         if (!mutex_.try_lock()) {
           continue;
