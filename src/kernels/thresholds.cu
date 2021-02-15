@@ -1,5 +1,13 @@
 #include "thresholds.cuh"
 
+/**
+ * @brief  
+ * @param n_samples
+ * @param n_channels
+ * @param in
+ * @param thresholds
+ * @param out
+ */
 template<class T>
 __global__ void find_crossings_(int n_samples, int n_channels, const T *in,
                                 const float *thresholds, unsigned char *out) {

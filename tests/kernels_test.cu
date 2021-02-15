@@ -194,7 +194,7 @@ TEST(KernelTestSuite, FindCrossingsKernelShort) {
 
   // column j gets all j's
   for (auto k = 0; k < n_samples; ++k) {
-    data[k] = (short) (k / n_channels);
+    data[k] = (short) (-k / n_channels);
   }
 
   // establish preconditions for the test
@@ -202,9 +202,9 @@ TEST(KernelTestSuite, FindCrossingsKernelShort) {
     EXPECT_FALSE(crossings[k]);
 
     if (k < n_channels * (const_thresh + 1)) {
-      EXPECT_FALSE(data[k] > const_thresh);
+      EXPECT_FALSE(data[k] < -const_thresh);
     } else {
-      EXPECT_TRUE(data[k] > const_thresh);
+      EXPECT_TRUE(data[k] < -const_thresh);
     }
   }
 
@@ -255,7 +255,7 @@ TEST(KernelTestSuite, FindCrossingsKernelFloat) {
 
   // column j gets all j's
   for (auto k = 0; k < n_samples; ++k) {
-    data[k] = (float) (k / n_channels); // NOLINT(bugprone-integer-division)
+    data[k] = (float) (-k / n_channels); // NOLINT(bugprone-integer-division)
   }
 
   // establish preconditions for the test
@@ -263,9 +263,9 @@ TEST(KernelTestSuite, FindCrossingsKernelFloat) {
     EXPECT_FALSE(crossings[k]);
 
     if (k < n_channels * (const_thresh + 1)) {
-      EXPECT_FALSE(data[k] > const_thresh);
+      EXPECT_FALSE(data[k] < -const_thresh);
     } else {
-      EXPECT_TRUE(data[k] > const_thresh);
+      EXPECT_TRUE(data[k] < -const_thresh);
     }
   }
 
@@ -314,7 +314,7 @@ TEST(KernelTestSuite, FindCrossingsShort) {
 
   // column j gets all j's
   for (auto k = 0; k < n_samples; ++k) {
-    data[k] = (short) (k / n_channels);
+    data[k] = (short) (-k / n_channels);
   }
 
   // establish preconditions for the test
@@ -322,9 +322,9 @@ TEST(KernelTestSuite, FindCrossingsShort) {
     EXPECT_FALSE(crossings[k]);
 
     if (k < n_channels * (const_thresh + 1)) {
-      EXPECT_FALSE(data[k] > const_thresh);
+      EXPECT_FALSE(data[k] < -const_thresh);
     } else {
-      EXPECT_TRUE(data[k] > const_thresh);
+      EXPECT_TRUE(data[k] < -const_thresh);
     }
   }
 
