@@ -101,7 +101,7 @@ int main() {
 //    pool.BlockEnqueueData(buf, frame_offset);
     pipeline.Update(buf, frame_offset); // TODO: delete me
     pipeline.Process(); // TODO: delete me
-//    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
   }
 
   // finish up

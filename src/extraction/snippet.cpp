@@ -4,7 +4,7 @@
 template<class T>
 Snippet<T>::Snippet(std::vector<T> buf, uint32_t n_chans, uint32_t n_frames)
     : data(buf), n_chans_(n_chans), n_frames_(n_frames) {
-  // resize data data to match up with our expectations of size
+  // Resize data data to match up with our expectations of size
   if (data.size() != n_chans * n_frames) {
     data.resize(n_chans * n_frames);
   }

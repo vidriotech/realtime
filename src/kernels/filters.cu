@@ -1,7 +1,5 @@
 #include "./filters.cuh"
 
-#include <vector>
-
 template<class T>
 __global__ void ndiff2_(int n_samples, int n_channels, const T *in, T *out) {
   unsigned int offset = blockIdx.x * blockDim.x + threadIdx.x;

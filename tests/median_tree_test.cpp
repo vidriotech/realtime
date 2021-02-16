@@ -72,7 +72,7 @@ TEST(MedianTreeTest, InitialStateSingleArg) {
  *           the height of `tree` is 2; AND
  *           the height balance factor of `tree` is 0; AND
  *           the element-wise balance factor of `tree` is 0; AND
- *           the median of `tree` is the mean of u and v.
+ *           the median of `tree` is the mean_var of u and v.
  */
 TEST(MedianTreeTest, InitialStateTwoArgs) {
   short u = 0;
@@ -150,7 +150,7 @@ TEST(MedianTreeTest, InsertIntoEmpty) {
  *           the height of `tree` is 2; AND
  *           the height balance factor of `tree` is 0; AND
  *           the element-wise balance factor of `tree` is 0; AND
- *           the median of `tree` is the mean of u and v.
+ *           the median of `tree` is the mean_var of u and v.
  */
 TEST(MedianTreeTest, InsertLargerValue) {
   short v = -1;
@@ -195,7 +195,7 @@ TEST(MedianTreeTest, InsertLargerValue) {
  *           there are two elements in `tree`; AND
  *           the height of `tree` is 2; AND
  *           the element-wise balance of `tree` is 0; AND
- *           the median of `tree` is the mean of u and w.
+ *           the median of `tree` is the mean_var of u and w.
  */
 TEST(MedianTreeTest, RemoveSubtreeRoot) {
   short u = -1;
@@ -250,7 +250,7 @@ TEST(MedianTreeTest, RemoveSubtreeRoot) {
  *           there are two elements in `tree`; AND
  *           the height of `tree` is 2; AND
  *           the element-wise balance of `tree` is 0; AND
- *           the median of `tree` is the mean of v and w.
+ *           the median of `tree` is the mean_var of v and w.
  */
 TEST(MedianTreeTest, RemoveSubtreeDescendant) {
   short u = -1;
@@ -306,7 +306,7 @@ TEST(MedianTreeTest, RemoveSubtreeDescendant) {
  *           u is the maximum of the left subtree; AND
  *           v is the minimum of the right subtree; AND
  *           w is the maximum of the right subtree; AND
- *           the median of `tree` is mean of u and v.
+ *           the median of `tree` is mean_var of u and v.
  */
 TEST(MedianTreeTest, BalanceElementsLTR) {
   short t = -1;
@@ -362,7 +362,7 @@ TEST(MedianTreeTest, BalanceElementsLTR) {
  *           u is the maximum of the left subtree; AND
  *           v is the minimum of the right subtree; AND
  *           w is the maximum of the right subtree; AND
- *           the median of `tree` is mean of u and v.
+ *           the median of `tree` is mean_var of u and v.
  */
 TEST(MedianTreeTest, BalanceElementsRTL) {
   short t = -1;

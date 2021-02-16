@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "../src/params/params.h"
-#include "../src/detection/detector.h"
+#include "../src/detection/detector.cuh"
 #include "./test_utilities/test_utilities.h"
 
 /*
@@ -25,10 +25,10 @@ TEST(DetectorTest, InitialState) {
 }
 
 /*
- * GIVEN a ThresholdDetector `detector` and test data data `data_`
- * DO update `detector`'s buffers with `data_` AND
+ * GIVEN a ThresholdDetector `detector` and test data data `data`
+ * DO update `detector`'s buffers with `data` AND
  *    compute the thresholds of each channel AND
- * TEST THAT each detect is as expected.
+ * TEST THAT each threshold is as expected.
  */
 TEST(DetectorTest, DetectThresholds) {
   Params params;
@@ -88,16 +88,16 @@ TEST(DetectorTest, FindCrossings) {
       auto k = i * probe.n_total() + j;
 
       /* Multiply each element of the sequence -1, 0, 1, -1, 0, 1, ... by
-       * j + 1. The median should be 0, so the absolute
+       * -(j + 1). The median should be 0, so the absolute
        * deviation from the median should go j, 0, j, j, 0, j, j, 0, j, ...
        * and, since ~2/3 of the absolute deviations are j-valued, j will be
        * the MAD value.
        */
-      // set the first sample to 1 + the value of the MAD
+      // set the first sample to -(1 + the value of the MAD)
       if (i == 0) {
-        data.at(k) = (short) (multiplier * (float) (j + 1) / 0.6745 + 1);
+        data.at(k) = (short) -(multiplier * (float) (j + 1) / 0.6745 + 1);
       } else {
-        data.at(k) = (short) ((j + 1) * ((i % 3) - 1));
+        data.at(k) = (short) (-(j + 1) * ((i % 3) - 1));
       }
     }
   }

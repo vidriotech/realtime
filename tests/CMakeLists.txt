@@ -15,13 +15,14 @@ set(SOURCE_FILES
         ../src/probe/probe.cpp probe_test.cpp
         ../src/acquisition/file_reader.cpp file_reader_test.cpp
         ../src/acquisition/socket_reader.cpp socket_reader_test.cpp
-        ../src/detection/detector.cpp detector_test.cpp
-        ../src/detection/threshold_computer.cpp threshold_computer_test.cpp
+        ../src/detection/detector.cu detector_test.cpp
+        ../src/detection/threshold_computer.cu threshold_computer_test.cpp
         ../src/extraction/snippet.cpp snippet_test.cpp
         ../src/extraction/snippet_extractor.cpp snippet_extractor_test.cpp
         ../src/extraction/extractor.cpp extractor_test.cpp
         ../src/pipeline/pipeline.cpp pipeline_test.cpp
-        ../src/pipeline/pipeline_thread_pool.cpp pipeline_thread_pool_test.cpp utilities_test.cpp params_test.cpp extractor_test.cpp)
+        ../src/pipeline/pipeline_thread_pool.cpp pipeline_thread_pool_test.cpp utilities_test.cpp params_test.cpp extractor_test.cpp thrust_test.cu)
+
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 
 add_subdirectory(lib)

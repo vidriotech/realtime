@@ -6,7 +6,7 @@
 #include <thread>
 
 #include "../params/params.h"
-#include "../detection/detector.h"
+#include "../detection/detector.cuh"
 #include "../extraction/extractor.h"
 
 template<class T>

@@ -1,4 +1,4 @@
-#include "detector.h"
+#include "detector.cuh"
 
 template<class T>
 Detector<T>::Detector(Params &params, Probe &probe)

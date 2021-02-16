@@ -6,6 +6,9 @@
 #include <map>
 #include <vector>
 
+#include <thrust/device_vector.h>
+#include <thrust/sort.h>
+
 namespace utilities {
 
 template<class T>
@@ -16,6 +19,28 @@ double median(std::vector<T> &data, bool is_sorted) {
 
   if (!is_sorted) {
     std::sort(data.begin(), data.end());
+  }
+
+  auto n = data.size();
+  double med;
+
+  if (n % 2 == 0) {
+    med = (data[n / 2 - 1] + data[n / 2]) / 2.0;
+  } else {
+    med = data[n / 2];
+  }
+
+  return med;
+}
+
+template<class T>
+double median(thrust::device_vector<T> &data, bool is_sorted) {
+  if (data.size() == 0) {
+    return 0;
+  }
+
+  if (!is_sorted) {
+    thrust::sort(data.begin(), data.end());
   }
 
   auto n = data.size();

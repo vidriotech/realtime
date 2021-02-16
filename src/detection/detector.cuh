@@ -1,5 +1,5 @@
-#ifndef RTS_2_SRC_DETECTION_DETECTOR_H_
-#define RTS_2_SRC_DETECTION_DETECTOR_H_
+#ifndef RTS_2_SRC_DETECTION_DETECTOR_CUH_
+#define RTS_2_SRC_DETECTION_DETECTOR_CUH_
 
 #include <cmath>
 #include <cstring>
@@ -8,12 +8,15 @@
 #include <utility>
 #include <vector>
 
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
+
 #include "../utilities.h"
 #include "../kernels/filters.cuh"
 #include "../kernels/thresholds.cuh"
 #include "../params/params.h"
 #include "../probe/probe.h"
-#include "threshold_computer.h"
+#include "threshold_computer.cuh"
 
 template<class T>
 class Detector {
@@ -50,10 +53,13 @@ class Detector {
   T *cu_out = nullptr; /*<! GPU output data */
   float *cu_thresh = nullptr; /*<! GPU detect data */
 
+  thrust::host_vector<T> host_data_;
+  thrust::device_vector<T> dev_data_;
+
   void DedupePeaksTime();
   void DedupePeaksSpace();
 
   void Realloc();
 };
 
-#endif //RTS_2_SRC_DETECTION_DETECTOR_H_
+#endif //RTS_2_SRC_DETECTION_DETECTOR_CUH_

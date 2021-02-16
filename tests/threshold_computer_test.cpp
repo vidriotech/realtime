@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "../src/detection/threshold_computer.h"
+#include "../src/detection/threshold_computer.cuh"
 
 /*
  * GIVEN a data size `bufsize`

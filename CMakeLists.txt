@@ -12,15 +12,15 @@ set(HEADER_FILES src/utilities.h
         src/probe/probe.h src/probe/probe_reader.h
         src/params/acquire_params.h src/params/detect_params.h
         src/acquisition/reader.h src/acquisition/file_reader.h src/acquisition/socket_reader.h
-        src/detection/threshold_computer.h src/detection/detector.h
+        src/detection/detector.cuh src/detection/threshold_computer.cuh
         src/extraction/snippet.h src/extraction/snippet_extractor.h
         src/pipeline/pipeline.h src/params/extract_params.h)
-set(SOURCE_FILES src/main.cpp
+set(SOURCE_FILES src/main.cu
         src/structures/median_tree_node.cpp src/structures/median_tree.cpp src/structures/distance_matrix.cpp
         src/pipeline/pipeline_thread_pool.cpp
         src/probe/probe.cpp src/probe/probe_reader.cpp
         src/acquisition/reader.cpp src/acquisition/file_reader.cpp src/acquisition/socket_reader.cpp
-        src/detection/detector.cpp src/detection/threshold_computer.cpp
+        src/detection/detector.cu src/detection/threshold_computer.cu
         src/extraction/snippet.cpp src/extraction/snippet_extractor.cpp src/params/params.h
         src/pipeline/pipeline.cpp src/params/device_params.h src/extraction/extractor.h src/extraction/extractor.cpp)
 
@@ -38,10 +38,6 @@ include_directories(src/kernels)
 add_subdirectory(src/kernels)
 
 target_link_libraries(rts_2 RTSKernels)
-
-# QT
-find_package(Qt5Widgets REQUIRED)
-target_link_libraries(rts_2 Qt5::Widgets)
 
 # tests
 add_subdirectory(tests)

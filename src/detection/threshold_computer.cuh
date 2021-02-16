@@ -6,6 +6,9 @@
 #include <cstring>
 #include <memory>
 
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
+
 #include "../utilities.h"
 
 template<class T>
@@ -33,6 +36,8 @@ class ThresholdComputer {
  private:
   std::vector<T> data_;
   std::vector<double> abs_dev_;
+  thrust::host_vector<T> host_data_;
+  thrust::device_vector<T> dev_data_;
   double mad = 0.0; /*!< cached median absolute deviation from the median. */
   bool is_sorted = false; /*!< true iff the data is already sorted. */
   bool is_cached = false; /*!< true iff the mad is already computed. */
