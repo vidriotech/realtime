@@ -19,9 +19,10 @@ set(SOURCE_FILES
         ../src/detection/threshold_computer.cu threshold_computer_test.cpp
         ../src/extraction/snippet.cpp snippet_test.cpp
         ../src/extraction/snippet_extractor.cpp snippet_extractor_test.cpp
-        ../src/extraction/extractor.cpp extractor_test.cpp
-        ../src/pipeline/pipeline.cpp pipeline_test.cpp
-        ../src/pipeline/pipeline_thread_pool.cpp pipeline_thread_pool_test.cpp utilities_test.cpp params_test.cpp extractor_test.cpp thrust_test.cu)
+        ../src/extraction/extractor.cu extractor_test.cpp
+        ../src/extraction/feature_extractor.cu
+        ../src/pipeline/pipeline.cu pipeline_test.cpp
+        ../src/pipeline/pipeline_thread_pool.cpp pipeline_thread_pool_test.cpp utilities_test.cpp params_test.cpp extractor_test.cpp)
 
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 

@@ -3,10 +3,10 @@
 
 template<class T>
 Snippet<T>::Snippet(std::vector<T> buf, uint32_t n_chans, uint32_t n_frames)
-    : data(buf), n_chans_(n_chans), n_frames_(n_frames) {
-  // Resize data data to match up with our expectations of size
-  if (data.size() != n_chans * n_frames) {
-    data.resize(n_chans * n_frames);
+    : data_(buf), n_chans_(n_chans), n_frames_(n_frames) {
+  // Resize data buffer to match up with our expectations of size
+  if (data_.size() != n_chans * n_frames) {
+    data_.resize(n_chans * n_frames);
   }
 }
 
@@ -27,8 +27,8 @@ double Snippet<T>::SqDist(const Snippet<T> &other) {
 
   double d = 0.0;
 
-  for (auto i = 0; i < data.size(); ++i) {
-    d += pow(data.at(i) - other.data.at(i), 2);
+  for (auto i = 0; i < data_.size(); ++i) {
+    d += pow(data_.at(i) - other.data_.at(i), 2);
   }
 
   return d;
@@ -44,7 +44,7 @@ double Snippet<T>::SqDist(const Snippet<T> &other) {
  */
 template<class T>
 T Snippet<T>::at(uint32_t chan, uint32_t frame) const {
-  return data.at(chan * n_frames_ + frame);
+  return data_.at(chan * n_frames_ + frame);
 }
 
 /**

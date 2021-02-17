@@ -10,19 +10,22 @@ set(HEADER_FILES src/utilities.h
         src/structures/median_tree_node.h src/structures/median_tree.h src/structures/distance_matrix.h
         src/pipeline/pipeline_thread_pool.h
         src/probe/probe.h src/probe/probe_reader.h
-        src/params/acquire_params.h src/params/detect_params.h
+        src/params/device_params.h src/params/acquire_params.h src/params/detect_params.h
+        src/params/extract_params.h src/params/classify_params.h src/params/params.h
         src/acquisition/reader.h src/acquisition/file_reader.h src/acquisition/socket_reader.h
         src/detection/detector.cuh src/detection/threshold_computer.cuh
         src/extraction/snippet.h src/extraction/snippet_extractor.h
-        src/pipeline/pipeline.h src/params/extract_params.h)
+        src/extraction/extractor.cuh
+        src/pipeline/pipeline.cuh src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh)
 set(SOURCE_FILES src/main.cu
         src/structures/median_tree_node.cpp src/structures/median_tree.cpp src/structures/distance_matrix.cpp
         src/pipeline/pipeline_thread_pool.cpp
         src/probe/probe.cpp src/probe/probe_reader.cpp
         src/acquisition/reader.cpp src/acquisition/file_reader.cpp src/acquisition/socket_reader.cpp
         src/detection/detector.cu src/detection/threshold_computer.cu
-        src/extraction/snippet.cpp src/extraction/snippet_extractor.cpp src/params/params.h
-        src/pipeline/pipeline.cpp src/params/device_params.h src/extraction/extractor.h src/extraction/extractor.cpp)
+        src/extraction/snippet.cpp src/extraction/snippet_extractor.cpp
+        src/extraction/extractor.cu
+        src/pipeline/pipeline.cu src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh src/structures/sample_matrix.cu src/structures/sample_matrix.cuh)
 
 add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
 

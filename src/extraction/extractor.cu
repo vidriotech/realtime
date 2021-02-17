@@ -1,4 +1,4 @@
-#include "extractor.h"
+#include "extractor.cuh"
 
 template<class T>
 void Extractor<T>::Update(std::vector<T> &samples,
@@ -21,7 +21,12 @@ void Extractor<T>::MakeSnippets() {
 
 template<class T>
 void Extractor<T>::ExtractFeatures() {
+  if (snippets_.empty()) {
+    return;
+  }
 
+  FeatureExtractor<T> feature_extractor(params_, probe_);
+  feature_extractor.Update(snippets_);
 }
 
 template

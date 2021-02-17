@@ -7,7 +7,7 @@
 
 #include "../params/params.h"
 #include "../detection/detector.cuh"
-#include "../extraction/extractor.h"
+#include "../extraction/extractor.cuh"
 
 template<class T>
 class Pipeline {
@@ -23,12 +23,15 @@ class Pipeline {
   [[nodiscard]] uint64_t frame_offset() const { return frame_offset_; };
   [[nodiscard]] uint32_t n_frames_buf() const;
 
- protected:
+ private:
   Params params_;
   Probe probe_;
 
   std::vector<T> buf_;
   uint64_t frame_offset_ = 0;
+
+  void ProcessClustering(Extractor<T> &extractor);
+  void ProcessClassification(Extractor<T> &extractor);
 };
 
 #endif //RTS_2_SRC_PIPELINE_H_

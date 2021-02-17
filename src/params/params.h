@@ -5,6 +5,7 @@
 #include "device_params.h"
 #include "detect_params.h"
 #include "extract_params.h"
+#include "classify_params.h"
 
 class Params {
  public:
@@ -12,6 +13,7 @@ class Params {
   DeviceParams device;
   DetectParams detect;
   ExtractParams extract;
+  ClassifyParams classify;
 };
 
 #endif //RTS_2_SRC_PARAMS_PARAMS_H_

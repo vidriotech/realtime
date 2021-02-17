@@ -1,3 +1,3 @@
 #include "gtest/gtest.h"
 
-#include "../src/extraction/extractor.h"
+#include "../src/extraction/extractor.cuh"

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "pipeline.h"
+#include "pipeline.cuh"
 
 /**
  * @brief Get the number of frames in the data.
@@ -22,7 +22,7 @@ void Pipeline<T>::Update(std::vector<T> buf, uint64_t frame_offset) {
 }
 
 /**
- * @brief Process the data in the data.
+ * @brief Process the data in the buffer.
  */
 template<class T>
 void Pipeline<T>::Process() {
@@ -30,7 +30,7 @@ void Pipeline<T>::Process() {
     return;
   }
 
-  // detect
+  // detect crossings
   Detector<T> detector(params_, probe_);
   detector.UpdateBuffer(buf_);
   detector.Filter();
@@ -51,11 +51,28 @@ void Pipeline<T>::Process() {
   }
   std::cout << n_crossings << "/" << buf_.size() << " after" << std::endl;
 
+  // extract snippets
   Extractor<T> extractor(params_, probe_);
   extractor.Update(detector.data(), detector.crossings(), frame_offset_);
   extractor.MakeSnippets();
-  auto x = 1 + 1;
-//  auto features = extractor.ExtractFeatures();
+
+  //
+  auto n_secs = frame_offset_ / probe_.sample_rate();
+  if (n_secs < params_.classify.n_secs_cluster) {
+    ProcessClustering(extractor);
+  } else {
+    ProcessClassification(extractor);
+  }
+}
+
+template<class T>
+void Pipeline<T>::ProcessClustering(Extractor<T> &extractor) {
+  extractor.ExtractFeatures();
+}
+
+template<class T>
+void Pipeline<T>::ProcessClassification(Extractor<T> &extractor) {
+
 }
 
 template

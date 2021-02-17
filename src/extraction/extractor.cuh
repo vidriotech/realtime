@@ -1,10 +1,11 @@
-#ifndef RTS_2_SRC_EXTRACTION_EXTRACTOR_H_
-#define RTS_2_SRC_EXTRACTION_EXTRACTOR_H_
+#ifndef RTS_2_SRC_EXTRACTION_EXTRACTOR_CUH_
+#define RTS_2_SRC_EXTRACTION_EXTRACTOR_CUH_
 
 #include "../params/params.h"
 #include "../probe/probe.h"
 #include "snippet.h"
 #include "snippet_extractor.h"
+#include "feature_extractor.cuh"
 
 template<class T>
 class Extractor {
@@ -34,4 +35,4 @@ class Extractor {
   std::vector<Snippet<T>> snippets_;
 };
 
-#endif //RTS_2_SRC_EXTRACTION_EXTRACTOR_H_
+#endif //RTS_2_SRC_EXTRACTION_EXTRACTOR_CUH_

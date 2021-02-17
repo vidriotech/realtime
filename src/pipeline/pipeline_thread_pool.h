@@ -11,7 +11,7 @@
 
 #include "../params/params.h"
 #include "../probe/probe.h"
-#include "pipeline.h"
+#include "pipeline.cuh"
 
 template<class T>
 class PipelineThreadPool {

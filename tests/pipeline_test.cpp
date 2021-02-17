@@ -5,7 +5,7 @@
 
 #include "../src/params/params.h"
 #include "../src/acquisition/file_reader.h"
-#include "../src/pipeline/pipeline.h"
+#include "../src/pipeline/pipeline.cuh"
 
 /*
  * GIVEN a Params `params` and a Probe `probe`

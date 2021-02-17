@@ -79,8 +79,8 @@ TEST(ThresholdComputerTest, ComputeThreshold) {
 
   computer.UpdateBuffer(buf);
 
-  EXPECT_FLOAT_EQ(185.32246, computer.ComputeThreshold(5));
+  EXPECT_FLOAT_EQ(181.6160118606375, computer.ComputeThreshold(5));
 
   // should be cached now, check that it hasn't changed
-  EXPECT_FLOAT_EQ(185.32246, computer.ComputeThreshold(5));
+  EXPECT_FLOAT_EQ(181.6160118606375, computer.ComputeThreshold(5));
 }

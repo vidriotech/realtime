@@ -5,9 +5,13 @@
 
 class ExtractParams {
  public:
-  uint32_t n_sites = 5; /*!< number of sites to extract in a snippet */
+  // snippet extraction
+  uint8_t n_sites = 5; /*!< number of sites to extract in a snippet */
   float before_peak_ms = 0.25; /*!< number of ms before peak to extract */
   float after_peak_ms = 0.75; /*!< number of ms before peak to extract */
+
+  // feature extraction
+  uint8_t n_pcs = 5; /*!< number of principal components to extract */
 
   /**
    * @brief Compute the number of frames necessary to extract
