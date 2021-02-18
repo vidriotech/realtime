@@ -25,7 +25,7 @@ set(SOURCE_FILES src/main.cu
         src/detection/detector.cu src/detection/threshold_computer.cu
         src/extraction/snippet.cpp src/extraction/snippet_extractor.cpp
         src/extraction/extractor.cu
-        src/pipeline/pipeline.cu src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh src/structures/sample_matrix.cu src/structures/sample_matrix.cuh)
+        src/pipeline/pipeline.cu src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh)
 
 add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
 
@@ -40,7 +40,7 @@ include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 include_directories(src/kernels)
 add_subdirectory(src/kernels)
 
-target_link_libraries(rts_2 RTSKernels)
+target_link_libraries(rts_2 RTSKernels cublas)
 
 # tests
 add_subdirectory(tests)

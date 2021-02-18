@@ -4,7 +4,7 @@ template<class T>
 void ThresholdComputer<T>::UpdateBuffer(std::vector<T> buf) {
   data_.assign(buf.begin(), buf.end());
   host_data_.assign(buf.begin(), buf.end());
-  dev_data_ = host_data_; // copy data to device
+  device_data_ = host_data_; // copy data to device
 
   abs_dev_.assign(buf.size(), 0); // fill with zeros
 
@@ -26,8 +26,8 @@ float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
   }
 
   // median absolute deviation from the median (i.e., the MAD)
-  dev_data_ = host_data_;
-  mad = utilities::median(dev_data_, false);
+  device_data_ = host_data_;
+  mad = utilities::median(device_data_, false);
   is_cached = true;
 
   return multiplier * mad / 0.6745;
@@ -39,10 +39,10 @@ float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
  */
 template<class T>
 double ThresholdComputer<T>::median() {
-  auto med = utilities::median<T>(dev_data_, is_sorted);
+  auto med = utilities::median<T>(device_data_, is_sorted);
   is_sorted = true;
 
-  host_data_ = dev_data_;
+  host_data_ = device_data_;
 
   return med;
 }

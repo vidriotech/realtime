@@ -36,20 +36,7 @@ void Pipeline<T>::Process() {
   detector.Filter();
   detector.ComputeThresholds(params_.detect.thresh_multiplier);
   detector.FindCrossings();
-
-  uint32_t n_crossings = 0;
-  for (auto i = 0; i < buf_.size(); ++i) {
-    if (detector.crossings().at(i)) n_crossings++;
-  }
-  std::cout << n_crossings << "/" << buf_.size() << " found before; ";
-
   detector.DedupePeaks();
-
-  n_crossings = 0;
-  for (auto i = 0; i < buf_.size(); ++i) {
-    if (detector.crossings().at(i)) n_crossings++;
-  }
-  std::cout << n_crossings << "/" << buf_.size() << " after" << std::endl;
 
   // extract snippets
   Extractor<T> extractor(params_, probe_);
@@ -63,6 +50,9 @@ void Pipeline<T>::Process() {
   } else {
     ProcessClassification(extractor);
   }
+
+  auto tid = std::this_thread::get_id();
+  std::cout << "thread " << tid << " finished processing " << frame_offset_ << std::endl;
 }
 
 template<class T>
