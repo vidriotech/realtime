@@ -31,24 +31,22 @@ void Pipeline<T>::Process() {
   }
 
   // detect crossings
-  Detector<T> detector(params_, probe_);
-  detector.UpdateBuffer(buf_);
-  detector.Filter();
-  detector.ComputeThresholds(params_.detect.thresh_multiplier);
-  detector.FindCrossings();
-  detector.DedupePeaks();
+  detector_.UpdateBuffer(buf_);
+  detector_.Filter();
+  detector_.ComputeThresholds();
+  detector_.FindCrossings();
+  detector_.DedupePeaks();
 
   // extract snippets
-  Extractor<T> extractor(params_, probe_);
-  extractor.Update(detector.data(), detector.crossings(), frame_offset_);
-  extractor.MakeSnippets();
+  extractor_.Update(detector_.data(), detector_.crossings(), frame_offset_);
+  extractor_.MakeSnippets();
 
-  //
+  // switch to
   auto n_secs = frame_offset_ / probe_.sample_rate();
   if (n_secs < params_.classify.n_secs_cluster) {
-    ProcessClustering(extractor);
+    ProcessClustering(extractor_);
   } else {
-    ProcessClassification(extractor);
+    ProcessClassification(extractor_);
   }
 
   auto tid = std::this_thread::get_id();

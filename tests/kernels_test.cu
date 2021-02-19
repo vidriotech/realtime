@@ -1,4 +1,7 @@
 #include "gtest/gtest.h"
+
+#include <thrust/device_vector.h>
+
 #include "../src/kernels/kernels.cuh"
 
 TEST(KernelTest, TestNdiff2KernelShort) {
@@ -292,9 +295,9 @@ TEST(KernelTest, FindCrossingsShort) {
   cudaFree(thresholds);
 }
 
-TEST(KernelTest, TestCovarianceMatrix) {
-  int n_obs = 11;
-  int n_feats = 5;
+TEST(KernelTest, TestMakeCovMatrix) {
+  unsigned long n_obs = 11;
+  unsigned int n_feats = 5;
 
   float *features;
   float *cov;
@@ -311,16 +314,9 @@ TEST(KernelTest, TestCovarianceMatrix) {
     }
   }
 
-  std::vector<float> features_vec;
-  features_vec.assign(features, features + (n_obs * n_feats));
-
-  CovMatrixArgs args { n_obs, n_feats, features, cov };
-
-  // perform the covariance matrix computation
-  cov_matrix(args);
-
-  std::vector<float> cov_vec;
-  cov_vec.assign(args.cov_matrix, args.cov_matrix + (n_feats * n_feats));
+  // compute the covariance matrix
+  CovMatrixArgs args{n_obs, n_feats, features, cov};
+  make_cov_matrix(args);
 
   auto base_val = (float) n_obs / ((float) n_obs - 1);
   for (auto i = 0; i < n_feats; ++i) {
@@ -333,4 +329,24 @@ TEST(KernelTest, TestCovarianceMatrix) {
 
   cudaFree(features);
   cudaFree(cov);
+}
+
+TEST(KernelTest, CenterFeatures) {
+  unsigned long n_obs = 11;
+  unsigned int n_feats = 5;
+
+  thrust::device_vector<float> features(n_feats * n_obs);
+  thrust::sequence(features.begin(), features.end());
+
+  // center the features matrix
+  CenterFeaturesArgs args{n_obs, n_feats, features};
+  center_features(args);
+
+  for (auto i = 0; i < n_feats; ++i) {
+    for (auto j = 0; j < n_obs; ++j) {
+      auto k = i * n_obs + j;
+
+      EXPECT_LT(std::abs(args.features[k] - (i - 2) * 11), 1e-5);
+    }
+  }
 }

@@ -98,7 +98,9 @@ void Detector<T>::UpdateThresholdComputers() {
  * @param multiplier Multiple of MAD to serve as detect.
  */
 template<class T>
-void Detector<T>::ComputeThresholds(float multiplier) {
+void Detector<T>::ComputeThresholds() {
+  auto multiplier = params_.detect.thresh_multiplier;
+
   auto site_idx = 0;
   for (auto i = 0; i < probe_.n_total(); i++) {
     if (!probe_.is_active(i)) {

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 message(WARNING, "${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
-project(rts_2 CXX CUDA)
+project(rts CXX CUDA)
 
 set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CXX_STANDARD 17)
@@ -27,10 +27,10 @@ set(SOURCE_FILES src/main.cu
         src/extraction/extractor.cu
         src/pipeline/pipeline.cu src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh)
 
-add_executable(rts_2 ${SOURCE_FILES} ${HEADER_FILES})
+add_executable(rts ${SOURCE_FILES} ${HEADER_FILES})
 
 set_target_properties(
-        rts_2
+        rts
         PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON)
 
@@ -40,7 +40,7 @@ include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 include_directories(src/kernels)
 add_subdirectory(src/kernels)
 
-target_link_libraries(rts_2 RTSKernels)
+target_link_libraries(rts RTSKernels)
 
 # tests
 add_subdirectory(tests)

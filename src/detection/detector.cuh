@@ -29,7 +29,7 @@ class Detector {
   void UpdateBuffer(std::vector<T> buf);
   void Filter();
   void UpdateThresholdComputers();
-  void ComputeThresholds(float multiplier);
+  void ComputeThresholds();
   void FindCrossings();
   void DedupePeaks();
 

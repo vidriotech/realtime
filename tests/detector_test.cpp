@@ -9,7 +9,7 @@
 
 /*
  * GIVEN a Params `params_` and a Probe `probe_`
- * DO construct a Detector `detector` AND
+ * DO construct a Detector `detector_` AND
  * TEST THAT `thresholds` is a vector of zeros.
  */
 TEST(DetectorTest, InitialState) {
@@ -25,8 +25,8 @@ TEST(DetectorTest, InitialState) {
 }
 
 /*
- * GIVEN a ThresholdDetector `detector` and test data data `data`
- * DO update `detector`'s buffers with `data` AND
+ * GIVEN a ThresholdDetector `detector_` and test data data `data`
+ * DO update `detector_`'s buffers with `data` AND
  *    compute the thresholds of each channel AND
  * TEST THAT each threshold is as expected.
  */

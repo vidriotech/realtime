@@ -13,7 +13,8 @@ template<class T>
 class Pipeline {
  public:
   Pipeline(Params &params, Probe &probe)
-      : params_(params), probe_(probe) {};
+      : params_(params), probe_(probe), detector_(params, probe),
+        extractor_(params, probe) {};
 
   void Update(std::vector<T> buf, uint64_t frame_offset);
   void Process();
@@ -29,6 +30,9 @@ class Pipeline {
 
   std::vector<T> buf_;
   uint64_t frame_offset_ = 0;
+
+  Detector<T> detector_;
+  Extractor<T> extractor_;
 
   void ProcessClustering(Extractor<T> &extractor);
   void ProcessClassification(Extractor<T> &extractor);
