@@ -40,7 +40,7 @@ include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 include_directories(src/kernels)
 add_subdirectory(src/kernels)
 
-target_link_libraries(rts_2 RTSKernels cublas)
+target_link_libraries(rts_2 RTSKernels)
 
 # tests
 add_subdirectory(tests)

@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "../src/kernels/kernels.cuh"
 
-TEST(KernelTestSuite, TestNdiff2KernelShort) {
+TEST(KernelTest, TestNdiff2KernelShort) {
   auto nchans = 64;
 
   short *data, *filtered;
@@ -39,7 +39,7 @@ TEST(KernelTestSuite, TestNdiff2KernelShort) {
   cudaFree(filtered);
 }
 
-TEST(KernelTestSuite, TestNdiff2KernelFloat) {
+TEST(KernelTest, TestNdiff2KernelFloat) {
   auto nchans = 64;
 
   float *data, *filtered;
@@ -77,7 +77,7 @@ TEST(KernelTestSuite, TestNdiff2KernelFloat) {
   cudaFree(filtered);
 }
 
-TEST(KernelTestSuite, TestNdiff2Short) {
+TEST(KernelTest, TestNdiff2Short) {
   auto nchans = 64;
 
   auto n_frames = 4;
@@ -120,7 +120,7 @@ TEST(KernelTestSuite, TestNdiff2Short) {
  * TEST THAT values in `data_` which exceed `const_thresh` correspond to true
  *           values in a boolean data `crossings_`.
  */
-TEST(KernelTestSuite, FindCrossingsKernelShort) {
+TEST(KernelTest, FindCrossingsKernelShort) {
   auto n_channels = 100;
   auto n_frames = 100;
   auto n_samples = n_channels * n_frames;
@@ -181,7 +181,7 @@ TEST(KernelTestSuite, FindCrossingsKernelShort) {
 * TEST THAT values in `data_` which exceed `const_thresh` correspond to true
 *           values in a boolean data `crossings_`.
 */
-TEST(KernelTestSuite, FindCrossingsKernelFloat) {
+TEST(KernelTest, FindCrossingsKernelFloat) {
   auto n_channels = 100;
   auto n_frames = 100;
   auto n_samples = n_channels * n_frames;
@@ -237,10 +237,7 @@ TEST(KernelTestSuite, FindCrossingsKernelFloat) {
   cudaFree(thresholds);
 }
 
-/*
- *
- */
-TEST(KernelTestSuite, FindCrossingsShort) {
+TEST(KernelTest, FindCrossingsShort) {
   auto n_channels = 100;
   auto n_frames = 100;
   auto n_samples = n_channels * n_frames;
@@ -293,4 +290,47 @@ TEST(KernelTestSuite, FindCrossingsShort) {
   cudaFree(data);
   cudaFree(crossings);
   cudaFree(thresholds);
+}
+
+TEST(KernelTest, TestCovarianceMatrix) {
+  int n_obs = 11;
+  int n_feats = 5;
+
+  float *features;
+  float *cov;
+
+  cudaMallocManaged(&features, n_obs * n_feats * sizeof(float));
+  cudaMallocManaged(&cov, n_feats * n_feats * sizeof(float));
+
+  // store each observation in a row (row-major order)
+  for (auto i = 0; i < n_feats; ++i) {
+    for (auto j = 0; j < n_obs; ++j) {
+      auto k = i * n_obs + j;
+
+      features[k] = (float) (i + 1);
+    }
+  }
+
+  std::vector<float> features_vec;
+  features_vec.assign(features, features + (n_obs * n_feats));
+
+  CovMatrixArgs args { n_obs, n_feats, features, cov };
+
+  // perform the covariance matrix computation
+  cov_matrix(args);
+
+  std::vector<float> cov_vec;
+  cov_vec.assign(args.cov_matrix, args.cov_matrix + (n_feats * n_feats));
+
+  auto base_val = (float) n_obs / ((float) n_obs - 1);
+  for (auto i = 0; i < n_feats; ++i) {
+    for (auto j = 0; j < n_feats; ++j) {
+      auto k = i * n_obs + j;
+
+      EXPECT_FLOAT_EQ((i + 1) * (j + 1) * base_val, args.cov_matrix[k]);
+    }
+  }
+
+  cudaFree(features);
+  cudaFree(cov);
 }
