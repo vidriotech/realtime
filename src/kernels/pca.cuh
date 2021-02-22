@@ -26,9 +26,9 @@ struct CovMatrixArgs {
 void make_cov_matrix(CovMatrixArgs &args);
 
 struct MakePVArgs {
-  unsigned int n_feats;
-  unsigned int n_pcs;
-  thrust::device_vector<float> &cov_matrix;
+  unsigned int n_feats; /*!< number of features (columns/rows of cov_matrix) */
+  unsigned int n_pcs; /*!< desired number of principal vectors */
+  thrust::device_vector<float> &cov_matrix; /*!< covariance matrix of data */
 };
 
 void make_principal_vectors(MakePVArgs &args);
