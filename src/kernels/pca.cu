@@ -101,32 +101,35 @@ void make_cov_matrix(CovMatrixArgs &args) {
  * @param args Covariance matrix, number of features.
  */
 void make_principal_vectors(MakePVArgs &args) {
-  auto m = args.n_feats;
-  auto lda = args.n_feats;
+  auto m = args.n_feats; // number of rows/columns
+  auto lda = args.n_feats; // leading dimension of covariance matrix
   auto n_pcs = args.n_pcs == 0 ? m : std::min(args.n_pcs, m);
 
-  float *d_A = thrust::raw_pointer_cast(args.cov_matrix.data());
-  float *d_W = nullptr;
-  float *d_work = nullptr;
+  float *eigvecs = thrust::raw_pointer_cast(args.cov_matrix.data());
+  float *eigvals = nullptr;
+  float *workspace = nullptr;
   auto lwork = 0;
   int *devInfo = nullptr;
 
-  cudaMallocManaged(&d_W, m * sizeof(double));
+  cudaMallocManaged(&eigvals, m * sizeof(double));
   cudaMallocManaged(&devInfo, sizeof(int));
   cusolverDnHandle_t handle = nullptr;
 
+  // create a handle to cuSolverDN library context
   cusolverStatus_t cusolver_status = cusolverDnCreate(&handle);
   assert(CUSOLVER_STATUS_SUCCESS == cusolver_status);
 
+  // don't throw out the eigenvectors
   cusolverEigMode_t jobz = CUSOLVER_EIG_MODE_VECTOR;
   cublasFillMode_t uplo = CUBLAS_FILL_MODE_LOWER;
-  cusolver_status = cusolverDnSsyevd_bufferSize(handle, jobz, uplo, m, d_A,
-                                                lda, d_W, &lwork);
+  cusolver_status = cusolverDnSsyevd_bufferSize(handle, jobz, uplo, m, eigvecs,
+                                                lda, eigvals, &lwork);
   assert(cusolver_status == CUSOLVER_STATUS_SUCCESS);
 
-  cudaMallocManaged(&d_work, lwork * sizeof(double));
-  cusolver_status = cusolverDnSsyevd(handle, jobz, uplo, m, d_A, lda, d_W,
-                                     d_work, lwork, devInfo);
+  // compute the eigenvalues and eigenvectors
+  cudaMallocManaged(&workspace, lwork * sizeof(double));
+  cusolver_status = cusolverDnSsyevd(handle, jobz, uplo, m, eigvecs, lda, eigvals,
+                                     workspace, lwork, devInfo);
 
   cudaError_t cuda_status = cudaDeviceSynchronize();
   assert(CUSOLVER_STATUS_SUCCESS == cusolver_status);
@@ -137,11 +140,40 @@ void make_principal_vectors(MakePVArgs &args) {
   args.cov_matrix.resize(m * n_pcs);
 
   cudaFree(devInfo);
-  cudaFree(d_W);
-  cudaFree(d_work);
-
+  cudaFree(eigvals);
+  cudaFree(workspace);
   if (handle) {
     cusolverDnDestroy(handle);
   }
 }
 
+/**
+ * @brief Project features onto principal vectors.
+ * @param args
+ */
+void project_onto_pvs(ProjectOntoPVsArgs &args) {
+  cublasHandle_t handle;
+  cublasCreate(&handle);
+
+  auto n_pcs = args.n_pcs;
+  auto n_obs = args.n_obs;
+  auto n_feats = args.n_feats;
+
+  float *pvs = thrust::raw_pointer_cast(args.pvs.data());
+  float *observations = thrust::raw_pointer_cast(args.observations.data());
+  float *projections = thrust::raw_pointer_cast(args.projections.data());
+
+  auto alpha = 1.0f;
+  auto beta = 0.f;
+
+  cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_N,
+              n_pcs, n_obs, n_feats,
+              &alpha,
+              pvs, n_feats, observations, n_feats,
+              &beta,
+              projections, n_pcs);
+
+  cudaDeviceSynchronize();
+
+  cublasDestroy(handle);
+}

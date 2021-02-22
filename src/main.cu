@@ -94,8 +94,8 @@ int main() {
   // start acquiring!
   auto sleep_time_ms = (int) (params.acquire.n_seconds * 1000);
   auto tic = std::chrono::high_resolution_clock::now();
-//  for (uint64_t frame_offset = 0; frame_offset < reader.n_frames();
-  for (uint64_t frame_offset = 0; frame_offset < n_frames_buf;
+  for (uint64_t frame_offset = 0; frame_offset < reader.n_frames();
+//  for (uint64_t frame_offset = 0; frame_offset < n_frames_buf;
        frame_offset += n_frames_buf) {
     reader.AcquireFrames(buf, frame_offset, n_frames_buf);
 
@@ -115,8 +115,8 @@ int main() {
   auto toc = std::chrono::high_resolution_clock::now();
   auto proc_dur =
       std::chrono::duration_cast<std::chrono::milliseconds>(toc - tic);
-//  auto rec_dur = reader.n_frames() / probe.sample_rate() * 1000;
-  auto rec_dur = n_frames_buf / probe.sample_rate() * 1000;
+  auto rec_dur = reader.n_frames() / probe.sample_rate() * 1000;
+//  auto rec_dur = n_frames_buf / probe.sample_rate() * 1000;
 
   auto ratio{proc_dur.count() / rec_dur};
 

@@ -430,3 +430,72 @@ TEST(KernelTest, MakePVs) {
   EXPECT_LT(std::abs(std::abs(0.4114306) - std::abs(mat[47])), 1e-5);
   EXPECT_LT(std::abs(std::abs(0.5402491) - std::abs(mat[48])), 1e-5);
 }
+
+TEST(KernelTest, ProjectOntoPVs) {
+  // 3 principal components, 5 dimensions, 10 observations
+  uint32_t q = 3, d = 5, N = 10;
+
+  // observations matrix
+  thrust::device_vector<float> obs(d * N);
+  thrust::sequence(obs.begin(), obs.end());
+
+  // principal vectors
+  thrust::device_vector<float> pvs(q * d);
+  pvs[0] = 0.1f;
+  pvs[1] = 0.6f;
+  pvs[2] = -0.9f;
+  pvs[3] = -1.0f;
+  pvs[4] = 0.8f;
+  pvs[5] = 0.4f;
+  pvs[6] = -0.3f;
+  pvs[7] = -0.3f;
+  pvs[8] = 0.5f;
+  pvs[9] = 0.5f;
+  pvs[10] = 0.5f;
+  pvs[11] = -0.7f;
+  pvs[12] = 0.7f;
+  pvs[13] = -0.3f;
+  pvs[14] = 0.0f;
+
+  // projections
+  thrust::device_vector<float> projections(q * N);
+
+  ProjectOntoPVsArgs args{q, d, N, pvs, obs, projections};
+  project_onto_pvs(args);
+
+  std::vector<float> vec;
+  vec.assign(projections.begin(), projections.end());
+
+  EXPECT_LT(std::abs(-1.0 - projections[0]), 1e-5);
+  EXPECT_LT(std::abs(2.6 - projections[1]), 1e-5);
+  EXPECT_LT(std::abs(-0.2 - projections[2]), 1e-5);
+  EXPECT_LT(std::abs(-3.0 - projections[3]), 1e-5);
+  EXPECT_LT(std::abs(6.6 - projections[4]), 1e-5);
+  EXPECT_LT(std::abs(0.8 - projections[5]), 1e-5);
+  EXPECT_LT(std::abs(-5.0 - projections[6]), 1e-5);
+  EXPECT_LT(std::abs(10.6 - projections[7]), 1e-5);
+  EXPECT_LT(std::abs(1.8 - projections[8]), 1e-5);
+  EXPECT_LT(std::abs(-7.0 - projections[9]), 1e-5);
+  EXPECT_LT(std::abs(14.6 - projections[10]), 1e-5);
+  EXPECT_LT(std::abs(2.8 - projections[11]), 1e-5);
+  EXPECT_LT(std::abs(-9.0 - projections[12]), 1e-5);
+  EXPECT_LT(std::abs(18.6 - projections[13]), 1e-5);
+  EXPECT_LT(std::abs(3.8 - projections[14]), 1e-5);
+  EXPECT_LT(std::abs(-11.0 - projections[15]), 1e-5);
+  EXPECT_LT(std::abs(22.6 - projections[16]), 1e-5);
+  EXPECT_LT(std::abs(4.8 - projections[17]), 1e-5);
+  EXPECT_LT(std::abs(-13.0 - projections[18]), 1e-5);
+  EXPECT_LT(std::abs(26.6 - projections[19]), 1e-5);
+  EXPECT_LT(std::abs(5.8 - projections[20]), 1e-5);
+  EXPECT_LT(std::abs(-15.0 - projections[21]), 1e-5);
+  EXPECT_LT(std::abs(30.6 - projections[22]), 1e-5);
+  EXPECT_LT(std::abs(6.8 - projections[23]), 1e-5);
+  EXPECT_LT(std::abs(-17.0 - projections[24]), 1e-5);
+  EXPECT_LT(std::abs(34.6 - projections[25]), 1e-5);
+  EXPECT_LT(std::abs(7.8 - projections[26]), 1e-5);
+  EXPECT_LT(std::abs(-19.0 - projections[27]), 1e-5);
+  EXPECT_LT(std::abs(38.6 - projections[28]), 1e-5);
+  EXPECT_LT(std::abs(8.8 - projections[29]), 1e-5);
+}
+
+

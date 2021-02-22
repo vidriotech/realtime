@@ -25,7 +25,7 @@ void FeatureExtractor<T>::Update(std::vector<Snippet<T>> &snippets) {
 }
 
 /**
- * @brief
+ * @brief Compute the covariance matrix of snippet features.
  * @tparam T
  */
 template<class T>
@@ -35,17 +35,13 @@ void FeatureExtractor<T>::ComputeCovarianceMatrix() {
   }
 
   CenterSnippets();
-
-  auto n_obs = device_snippets_.size() / n_feats;
-
-  thrust::device_ptr<float> snip_dev_ptr = device_snippets_.data();
-  auto snip_ptr = thrust::raw_pointer_cast(snip_dev_ptr);
-
   cov_matrix_.resize(n_feats * n_feats);
-  thrust::device_ptr<float> cov_dev_ptr = cov_matrix_.data();
-  auto cov_ptr = thrust::raw_pointer_cast(cov_dev_ptr);
 
-  CovMatrixArgs args{n_obs, n_feats, snip_ptr, cov_ptr};
+  float *snip_ptr = thrust::raw_pointer_cast(device_snippets_.data());
+  float *cov_ptr = thrust::raw_pointer_cast(cov_matrix_.data());
+
+  CovMatrixArgs args{device_snippets_.size() / n_feats,
+                     n_feats, snip_ptr, cov_ptr};
   make_cov_matrix(args);
 }
 
@@ -65,6 +61,9 @@ void FeatureExtractor<T>::CenterSnippets() {
 
   CenterFeaturesArgs args{n_obs, n_feats, device_snippets_};
   center_features(args);
+
+  std::vector<float> feats;
+  feats.assign(device_snippets_.begin(), device_snippets_.end());
 
   host_snippets_ = device_snippets_;
 }

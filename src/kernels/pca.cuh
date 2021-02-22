@@ -33,4 +33,15 @@ struct MakePVArgs {
 
 void make_principal_vectors(MakePVArgs &args);
 
+struct ProjectOntoPVsArgs {
+  unsigned int n_pcs;
+  unsigned int n_feats;
+  unsigned int n_obs;
+  thrust::device_vector<float> &pvs;
+  thrust::device_vector<float> &observations;
+  thrust::device_vector<float> &projections;
+};
+
+void project_onto_pvs(ProjectOntoPVsArgs &args);
+
 #endif //RTS_2_SRC_KERNELS_PCA_CUH_
