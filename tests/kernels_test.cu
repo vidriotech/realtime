@@ -350,3 +350,83 @@ TEST(KernelTest, CenterFeatures) {
     }
   }
 }
+
+TEST(KernelTest, MakePVs) {
+  uint32_t n_feats = 7;
+  thrust::device_vector<float> mat(n_feats * n_feats);
+
+  // generate an n = 7 Wilkinson eigenvalue test matrix
+  // https://en.wikipedia.org/wiki/Wilkinson_matrix
+  thrust::fill(mat.begin(), mat.end(), 0);
+  for (auto i = 0; i < n_feats; ++i) {
+    if (i < n_feats - 1) {
+      auto j = i + 1;
+      mat[i * n_feats + j] = 1.0; // i, j entry
+      mat[j * n_feats + i] = 1.0; // j, i entry
+    }
+
+    auto diag = i * n_feats + i;
+    if (i == 0 || i == n_feats - 1) {
+      mat[diag] = 3.0;
+    } else if (i == 1 || i == n_feats - 2) {
+      mat[diag] = 2.0;
+    } else if (i == 2 || i == n_feats - 3) {
+      mat[diag] = 1.0;
+    }
+  }
+
+  MakePVArgs args{n_feats, n_feats, mat};
+  make_principal_vectors(args);
+
+  // principal vectors are stored in mat in column-major order,
+  // but may differ by a sign
+  EXPECT_LT(std::abs(std::abs(-0.036139846) - std::abs(mat[0])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.14907272) - std::abs(mat[1])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.4296953) - std::abs(mat[2])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.76398057) - std::abs(mat[3])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.4296953) - std::abs(mat[4])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.14907272) - std::abs(mat[5])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.036139846) - std::abs(mat[6])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.14942925) - std::abs(mat[7])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.4082483) - std::abs(mat[8])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.5576775) - std::abs(mat[9])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(3.0957322e-15) - std::abs(mat[10])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.5576775) - std::abs(mat[11])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.4082483) - std::abs(mat[12])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.14942925) - std::abs(mat[13])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.25) - std::abs(mat[14])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.5) - std::abs(mat[15])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.25) - std::abs(mat[16])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.5) - std::abs(mat[17])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.25) - std::abs(mat[18])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.5) - std::abs(mat[19])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.25) - std::abs(mat[20])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.4082483) - std::abs(mat[21])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.4082483) - std::abs(mat[22])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.4082483) - std::abs(mat[23])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-9.064933e-16) - std::abs(mat[24])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.4082483) - std::abs(mat[25])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.4082483) - std::abs(mat[26])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.4082483) - std::abs(mat[27])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.37990108) - std::abs(mat[28])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.24187228) - std::abs(mat[29])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.46778008) - std::abs(mat[30])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.39586553) - std::abs(mat[31])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.46778008) - std::abs(mat[32])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.24187228) - std::abs(mat[33])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.37990108) - std::abs(mat[34])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.5576775) - std::abs(mat[35])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.4082483) - std::abs(mat[36])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(-0.14942925) - std::abs(mat[37])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0) - std::abs(mat[38])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.14942925) - std::abs(mat[39])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.4082483) - std::abs(mat[40])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.5576775) - std::abs(mat[41])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.5402491) - std::abs(mat[42])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.4114306) - std::abs(mat[43])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.1845094) - std::abs(mat[44])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.09810267) - std::abs(mat[45])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.1845094) - std::abs(mat[46])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.4114306) - std::abs(mat[47])), 1e-5);
+  EXPECT_LT(std::abs(std::abs(0.5402491) - std::abs(mat[48])), 1e-5);
+}

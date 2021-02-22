@@ -2,6 +2,8 @@
 #define RTS_2_SRC_KERNELS_PCA_CUH_
 
 #include <cublas_v2.h>
+#include <cusolverDn.h>
+
 #include <thrust/device_vector.h>
 
 #include "operators.cuh"
@@ -23,11 +25,12 @@ struct CovMatrixArgs {
 
 void make_cov_matrix(CovMatrixArgs &args);
 
-struct MakePCsArgs {
+struct MakePVArgs {
   unsigned int n_feats;
+  unsigned int n_pcs;
   thrust::device_vector<float> &cov_matrix;
 };
 
-void make_pcs(MakePCsArgs &args);
+void make_principal_vectors(MakePVArgs &args);
 
 #endif //RTS_2_SRC_KERNELS_PCA_CUH_

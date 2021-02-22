@@ -91,7 +91,57 @@ void make_cov_matrix(CovMatrixArgs &args) {
   cublasDestroy(handle);
 }
 
-void make_pcs(MakePCsArgs &args) {
+/**
+ * @brief Make the principal vectors of the data whose covariance matrix is
+ * given as a component of args.
+ *
+ * Principal vectors, i.e., eigenvectors of the covariance matrix, are stored
+ * in place of the covariance matrix in column major order.
+ *
+ * @param args Covariance matrix, number of features.
+ */
+void make_principal_vectors(MakePVArgs &args) {
+  auto m = args.n_feats;
+  auto lda = args.n_feats;
+  auto n_pcs = args.n_pcs == 0 ? m : std::min(args.n_pcs, m);
 
+  float *d_A = thrust::raw_pointer_cast(args.cov_matrix.data());
+  float *d_W = nullptr;
+  float *d_work = nullptr;
+  auto lwork = 0;
+  int *devInfo = nullptr;
+
+  cudaMallocManaged(&d_W, m * sizeof(double));
+  cudaMallocManaged(&devInfo, sizeof(int));
+  cusolverDnHandle_t handle = nullptr;
+
+  cusolverStatus_t cusolver_status = cusolverDnCreate(&handle);
+  assert(CUSOLVER_STATUS_SUCCESS == cusolver_status);
+
+  cusolverEigMode_t jobz = CUSOLVER_EIG_MODE_VECTOR;
+  cublasFillMode_t uplo = CUBLAS_FILL_MODE_LOWER;
+  cusolver_status = cusolverDnSsyevd_bufferSize(handle, jobz, uplo, m, d_A,
+                                                lda, d_W, &lwork);
+  assert(cusolver_status == CUSOLVER_STATUS_SUCCESS);
+
+  cudaMallocManaged(&d_work, lwork * sizeof(double));
+  cusolver_status = cusolverDnSsyevd(handle, jobz, uplo, m, d_A, lda, d_W,
+                                     d_work, lwork, devInfo);
+
+  cudaError_t cuda_status = cudaDeviceSynchronize();
+  assert(CUSOLVER_STATUS_SUCCESS == cusolver_status);
+  assert(cudaSuccess == cuda_status);
+
+  // truncate the eigenvector matrix to just the number of desired principal
+  // vectors
+  args.cov_matrix.resize(m * n_pcs);
+
+  cudaFree(devInfo);
+  cudaFree(d_W);
+  cudaFree(d_work);
+
+  if (handle) {
+    cusolverDnDestroy(handle);
+  }
 }
 
