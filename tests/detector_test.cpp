@@ -58,8 +58,9 @@ TEST(DetectorTest, DetectThresholds) {
   // update buffers
   detector.UpdateBuffer(data);
   detector.UpdateThresholdComputers();
-  // compute thresholds
-  detector.ComputeThresholds(1.0);
+  // update threshold multiplier and compute thresholds
+  params.detect.thresh_multiplier = 1.0;
+  detector.ComputeThresholds();
 
   for (auto i = 0; i < probe.n_active(); ++i) {
     EXPECT_FLOAT_EQ((i + 1) / 0.6745, detector.thresholds().at(i));
@@ -105,8 +106,9 @@ TEST(DetectorTest, FindCrossings) {
   // update buffers
   detector.UpdateBuffer(data);
   detector.UpdateThresholdComputers();
-  // compute thresholds
-  detector.ComputeThresholds(multiplier);
+  // update threshold multiplier and compute thresholds
+  params.detect.thresh_multiplier = 1.0;
+  detector.ComputeThresholds();
 
   detector.FindCrossings();
 

@@ -13,4 +13,4 @@ set_target_properties(
         PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON)
 
-target_link_libraries(RTSKernels cublas)
+target_link_libraries(RTSKernels cublas cublasLt cusolver)

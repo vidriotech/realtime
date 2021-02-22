@@ -16,7 +16,7 @@ set(HEADER_FILES src/utilities.h
         src/detection/detector.cuh src/detection/threshold_computer.cuh
         src/extraction/snippet.h src/extraction/snippet_extractor.h
         src/extraction/extractor.cuh
-        src/pipeline/pipeline.cuh src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh)
+        src/pipeline/pipeline.cuh src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh src/detection/thresholding.cuh)
 set(SOURCE_FILES src/main.cu
         src/structures/median_tree_node.cpp src/structures/median_tree.cpp src/structures/distance_matrix.cpp
         src/pipeline/pipeline_thread_pool.cpp

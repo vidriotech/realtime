@@ -25,8 +25,8 @@ class Pipeline {
   [[nodiscard]] uint32_t n_frames_buf() const;
 
  private:
-  Params params_;
-  Probe probe_;
+  Params &params_;
+  Probe &probe_;
 
   std::vector<T> buf_;
   uint64_t frame_offset_ = 0;

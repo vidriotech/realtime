@@ -40,8 +40,8 @@ class Detector {
   [[nodiscard]] unsigned n_frames() const;
 
  private:
-  Params params_;
-  Probe probe_;
+  Params &params_;
+  Probe &probe_;
   std::vector<ThresholdComputer<T>> threshold_computers;
 
   std::vector<T> data_;
@@ -49,9 +49,9 @@ class Detector {
   std::vector<uint8_t> crossings_;
 
   // CUDA buffers
-  T *cu_in = nullptr; /*<! GPU input data */
-  T *cu_out = nullptr; /*<! GPU output data */
-  float *cu_thresh = nullptr; /*<! GPU detect data */
+  T *cu_in = nullptr; /*!< GPU input data */
+  T *cu_out = nullptr; /*!< GPU output data */
+  float *cu_thresh = nullptr; /*!< GPU threshold data */
 
   thrust::host_vector<T> host_data_;
   thrust::device_vector<T> dev_data_;

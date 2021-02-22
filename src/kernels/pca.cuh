@@ -23,4 +23,11 @@ struct CovMatrixArgs {
 
 void make_cov_matrix(CovMatrixArgs &args);
 
+struct MakePCsArgs {
+  unsigned int n_feats;
+  thrust::device_vector<float> &cov_matrix;
+};
+
+void make_pcs(MakePCsArgs &args);
+
 #endif //RTS_2_SRC_KERNELS_PCA_CUH_

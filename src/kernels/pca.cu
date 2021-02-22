@@ -91,3 +91,7 @@ void make_cov_matrix(CovMatrixArgs &args) {
   cublasDestroy(handle);
 }
 
+void make_pcs(MakePCsArgs &args) {
+
+}
+
