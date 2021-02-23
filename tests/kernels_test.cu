@@ -457,45 +457,37 @@ TEST(KernelTest, ProjectOntoPVs) {
   pvs[13] = -0.3f;
   pvs[14] = 0.0f;
 
-  // projections
-  thrust::device_vector<float> projections(q * N);
-
-  ProjectOntoPVsArgs args{q, d, N, pvs, obs, projections};
+  ProjectOntoPVsArgs args{q, d, N, pvs, obs};
   project_onto_pvs(args);
 
-  std::vector<float> vec;
-  vec.assign(projections.begin(), projections.end());
-
-  EXPECT_LT(std::abs(-1.0 - projections[0]), 1e-5);
-  EXPECT_LT(std::abs(2.6 - projections[1]), 1e-5);
-  EXPECT_LT(std::abs(-0.2 - projections[2]), 1e-5);
-  EXPECT_LT(std::abs(-3.0 - projections[3]), 1e-5);
-  EXPECT_LT(std::abs(6.6 - projections[4]), 1e-5);
-  EXPECT_LT(std::abs(0.8 - projections[5]), 1e-5);
-  EXPECT_LT(std::abs(-5.0 - projections[6]), 1e-5);
-  EXPECT_LT(std::abs(10.6 - projections[7]), 1e-5);
-  EXPECT_LT(std::abs(1.8 - projections[8]), 1e-5);
-  EXPECT_LT(std::abs(-7.0 - projections[9]), 1e-5);
-  EXPECT_LT(std::abs(14.6 - projections[10]), 1e-5);
-  EXPECT_LT(std::abs(2.8 - projections[11]), 1e-5);
-  EXPECT_LT(std::abs(-9.0 - projections[12]), 1e-5);
-  EXPECT_LT(std::abs(18.6 - projections[13]), 1e-5);
-  EXPECT_LT(std::abs(3.8 - projections[14]), 1e-5);
-  EXPECT_LT(std::abs(-11.0 - projections[15]), 1e-5);
-  EXPECT_LT(std::abs(22.6 - projections[16]), 1e-5);
-  EXPECT_LT(std::abs(4.8 - projections[17]), 1e-5);
-  EXPECT_LT(std::abs(-13.0 - projections[18]), 1e-5);
-  EXPECT_LT(std::abs(26.6 - projections[19]), 1e-5);
-  EXPECT_LT(std::abs(5.8 - projections[20]), 1e-5);
-  EXPECT_LT(std::abs(-15.0 - projections[21]), 1e-5);
-  EXPECT_LT(std::abs(30.6 - projections[22]), 1e-5);
-  EXPECT_LT(std::abs(6.8 - projections[23]), 1e-5);
-  EXPECT_LT(std::abs(-17.0 - projections[24]), 1e-5);
-  EXPECT_LT(std::abs(34.6 - projections[25]), 1e-5);
-  EXPECT_LT(std::abs(7.8 - projections[26]), 1e-5);
-  EXPECT_LT(std::abs(-19.0 - projections[27]), 1e-5);
-  EXPECT_LT(std::abs(38.6 - projections[28]), 1e-5);
-  EXPECT_LT(std::abs(8.8 - projections[29]), 1e-5);
+  EXPECT_LT(std::abs(-1.0 - obs[0]), 1e-5);
+  EXPECT_LT(std::abs(2.6 - obs[1]), 1e-5);
+  EXPECT_LT(std::abs(-0.2 - obs[2]), 1e-5);
+  EXPECT_LT(std::abs(-3.0 - obs[3]), 1e-5);
+  EXPECT_LT(std::abs(6.6 - obs[4]), 1e-5);
+  EXPECT_LT(std::abs(0.8 - obs[5]), 1e-5);
+  EXPECT_LT(std::abs(-5.0 - obs[6]), 1e-5);
+  EXPECT_LT(std::abs(10.6 - obs[7]), 1e-5);
+  EXPECT_LT(std::abs(1.8 - obs[8]), 1e-5);
+  EXPECT_LT(std::abs(-7.0 - obs[9]), 1e-5);
+  EXPECT_LT(std::abs(14.6 - obs[10]), 1e-5);
+  EXPECT_LT(std::abs(2.8 - obs[11]), 1e-5);
+  EXPECT_LT(std::abs(-9.0 - obs[12]), 1e-5);
+  EXPECT_LT(std::abs(18.6 - obs[13]), 1e-5);
+  EXPECT_LT(std::abs(3.8 - obs[14]), 1e-5);
+  EXPECT_LT(std::abs(-11.0 - obs[15]), 1e-5);
+  EXPECT_LT(std::abs(22.6 - obs[16]), 1e-5);
+  EXPECT_LT(std::abs(4.8 - obs[17]), 1e-5);
+  EXPECT_LT(std::abs(-13.0 - obs[18]), 1e-5);
+  EXPECT_LT(std::abs(26.6 - obs[19]), 1e-5);
+  EXPECT_LT(std::abs(5.8 - obs[20]), 1e-5);
+  EXPECT_LT(std::abs(-15.0 - obs[21]), 1e-5);
+  EXPECT_LT(std::abs(30.6 - obs[22]), 1e-5);
+  EXPECT_LT(std::abs(6.8 - obs[23]), 1e-5);
+  EXPECT_LT(std::abs(-17.0 - obs[24]), 1e-5);
+  EXPECT_LT(std::abs(34.6 - obs[25]), 1e-5);
+  EXPECT_LT(std::abs(7.8 - obs[26]), 1e-5);
+  EXPECT_LT(std::abs(-19.0 - obs[27]), 1e-5);
+  EXPECT_LT(std::abs(38.6 - obs[28]), 1e-5);
+  EXPECT_LT(std::abs(8.8 - obs[29]), 1e-5);
 }
-
-

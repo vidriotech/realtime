@@ -39,7 +39,6 @@ struct ProjectOntoPVsArgs {
   unsigned int n_obs;
   thrust::device_vector<float> &pvs;
   thrust::device_vector<float> &observations;
-  thrust::device_vector<float> &projections;
 };
 
 void project_onto_pvs(ProjectOntoPVsArgs &args);

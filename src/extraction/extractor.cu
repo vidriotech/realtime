@@ -28,6 +28,7 @@ void Extractor<T>::ExtractFeatures() {
   FeatureExtractor<T> feature_extractor(params_, probe_);
   feature_extractor.Update(snippets_);
   feature_extractor.ComputeCovarianceMatrix();
+  feature_extractor.ProjectSnippets();
 }
 
 template

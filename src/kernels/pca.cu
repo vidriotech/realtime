@@ -83,8 +83,12 @@ void make_cov_matrix(CovMatrixArgs &args) {
   auto alpha = 1.0f / ((float) n_obs - 1);
   auto beta = 0.f;
 
-  cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_N, n_feats, n_feats, n_obs, &alpha,
-              features, n_obs, features, n_obs, &beta, cov_matrix, n_obs);
+  cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_N,
+              n_feats, n_feats, n_obs,
+              &alpha,
+              features, n_obs, features, n_obs,
+              &beta,
+              cov_matrix, n_obs);
 
   cudaDeviceSynchronize();
 
@@ -159,9 +163,11 @@ void project_onto_pvs(ProjectOntoPVsArgs &args) {
   auto n_obs = args.n_obs;
   auto n_feats = args.n_feats;
 
+  assert(n_pcs <= n_feats);
+
   float *pvs = thrust::raw_pointer_cast(args.pvs.data());
   float *observations = thrust::raw_pointer_cast(args.observations.data());
-  float *projections = thrust::raw_pointer_cast(args.projections.data());
+  float *projections = observations;
 
   auto alpha = 1.0f;
   auto beta = 0.f;

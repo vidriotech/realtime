@@ -19,6 +19,7 @@ class FeatureExtractor {
 
   void Update(std::vector<Snippet<T>> &snippets);
   void ComputeCovarianceMatrix();
+  void ProjectSnippets();
 
  private:
   Params params_;
@@ -28,7 +29,7 @@ class FeatureExtractor {
 
   thrust::host_vector<float> host_snippets_;
   thrust::device_vector<float> device_snippets_;
-  thrust::device_vector<float> cov_matrix_;
+  thrust::device_vector<float> features_;
 
   void CenterSnippets();
 };

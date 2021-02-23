@@ -35,14 +35,31 @@ void FeatureExtractor<T>::ComputeCovarianceMatrix() {
   }
 
   CenterSnippets();
-  cov_matrix_.resize(n_feats * n_feats);
+  features_.resize(n_feats * n_feats);
 
   float *snip_ptr = thrust::raw_pointer_cast(device_snippets_.data());
-  float *cov_ptr = thrust::raw_pointer_cast(cov_matrix_.data());
+  float *cov_ptr = thrust::raw_pointer_cast(features_.data());
 
   CovMatrixArgs args{device_snippets_.size() / n_feats,
                      n_feats, snip_ptr, cov_ptr};
   make_cov_matrix(args);
+}
+
+template<class T>
+void FeatureExtractor<T>::ProjectSnippets() {
+  uint32_t n_obs = (uint32_t) host_snippets_.size() / n_feats;
+  MakePVArgs pv_args{n_feats, params_.extract.n_pcs, features_};
+  make_principal_vectors(pv_args);
+
+  ProjectOntoPVsArgs project_args{params_.extract.n_pcs,
+                                  n_feats,
+                                  n_obs,
+                                  features_,
+                                  device_snippets_};
+  project_onto_pvs(project_args);
+
+  // projected snippets live in features_
+  features_.resize(params_.extract.n_pcs * n_obs);
 }
 
 /**
@@ -54,12 +71,12 @@ void FeatureExtractor<T>::CenterSnippets() {
   if (n_feats == 0) {
     return;
   }
+
   // copy host data to device
   device_snippets_ = host_snippets_;
 
-  auto n_obs = host_snippets_.size() / n_feats;
-
-  CenterFeaturesArgs args{n_obs, n_feats, device_snippets_};
+  CenterFeaturesArgs args{host_snippets_.size() / n_feats,
+                          n_feats, device_snippets_};
   center_features(args);
 
   std::vector<float> feats;

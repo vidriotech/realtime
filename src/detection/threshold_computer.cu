@@ -21,6 +21,7 @@ float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
   auto med = median();
 
   // absolute deviation from the median
+  // TODO: a Thrust implementation should be straightforward
   for (auto i = 0; i < host_data_.size(); i++) {
     host_data_[i] = std::abs(host_data_[i] - med);
   }
