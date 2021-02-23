@@ -1,6 +1,5 @@
 #include "snippet.h"
 
-
 template<class T>
 Snippet<T>::Snippet(std::vector<T> buf, uint32_t n_chans, uint32_t n_frames)
     : data_(buf), n_chans_(n_chans), n_frames_(n_frames) {
@@ -58,6 +57,17 @@ void Snippet<T>::set_channel_ids(std::vector<uint32_t> &ids) {
   }
 
   channel_ids_.assign(ids.begin(), ids.end());
+}
+
+template<class T>
+void Snippet<T>::assign(typename std::vector<float>::iterator begin,
+                        uint32_t size) {
+  data_.assign(begin, begin + size);
+}
+template<class T>
+void Snippet<T>::assign(typename thrust::host_vector<float>::iterator begin,
+                        uint32_t size) {
+  data_.assign(begin, begin + size);
 }
 
 template

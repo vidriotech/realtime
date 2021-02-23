@@ -27,8 +27,8 @@ class FeatureExtractor {
 
   uint32_t n_feats = 0;
 
-  thrust::host_vector<float> host_snippets_;
-  thrust::device_vector<float> device_snippets_;
+  std::vector<Snippet<T>> snippets_;
+  thrust::device_vector<float> dev_snippets_;
   thrust::device_vector<float> features_;
 
   void CenterSnippets();

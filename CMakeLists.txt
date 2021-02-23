@@ -25,7 +25,7 @@ set(SOURCE_FILES src/main.cu
         src/detection/detector.cu src/detection/threshold_computer.cu
         src/extraction/snippet.cpp src/extraction/snippet_extractor.cpp
         src/extraction/extractor.cu
-        src/pipeline/pipeline.cu src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh)
+        src/pipeline/pipeline.cu src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh src/clustering/dp_clustering.cpp src/clustering/dp_clustering.h)
 
 add_executable(rts ${SOURCE_FILES} ${HEADER_FILES})
 
