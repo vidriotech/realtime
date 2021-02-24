@@ -7,25 +7,26 @@ set(CMAKE_CXX_STANDARD 17)
 
 # RTS
 set(HEADER_FILES src/utilities.cuh
-        src/structures/median_tree_node.h src/structures/median_tree.h src/structures/distance_matrix.h
+        src/structures/median_tree_node.cuh src/structures/median_tree.cuh src/structures/distance_matrix.cuh
         src/pipeline/pipeline_thread_pool.cuh
-        src/probe/probe.h src/probe/probe_reader.h
-        src/params/device_params.h src/params/acquire_params.h src/params/detect_params.h
-        src/params/extract_params.h src/params/classify_params.h src/params/params.h
-        src/acquisition/reader.h src/acquisition/file_reader.h src/acquisition/socket_reader.h
+        src/probe/probe.cuh src/probe/probe_reader.cuh
+        src/params/device_params.cuh src/params/acquire_params.cuh src/params/detect_params.cuh
+        src/params/extract_params.cuh src/params/classify_params.cuh src/params/params.cuh
+        src/acquisition/reader.cuh src/acquisition/file_reader.cuh src/acquisition/socket_reader.cuh
         src/detection/detector.cuh src/detection/threshold_computer.cuh
-        src/extraction/snippet.h src/extraction/snippet_extractor.h
+        src/extraction/snippet.cuh src/extraction/snippet_extractor.cuh
         src/extraction/extractor.cuh
-        src/pipeline/pipeline.cuh src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh src/detection/thresholding.cuh)
+        src/pipeline/pipeline.cuh src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh
+        src/clustering/dp_clustering.cuh)
 set(SOURCE_FILES src/main.cu
-        src/structures/median_tree_node.cpp src/structures/median_tree.cpp src/structures/distance_matrix.cpp
+        src/structures/median_tree_node.cu src/structures/median_tree.cu src/structures/distance_matrix.cu
         src/pipeline/pipeline_thread_pool.cu
-        src/probe/probe.cpp src/probe/probe_reader.cpp
-        src/acquisition/reader.cpp src/acquisition/file_reader.cpp src/acquisition/socket_reader.cpp
+        src/probe/probe.cu src/probe/probe_reader.cu
+        src/acquisition/reader.cu src/acquisition/file_reader.cu src/acquisition/socket_reader.cu
         src/detection/detector.cu src/detection/threshold_computer.cu
-        src/extraction/snippet.cpp src/extraction/snippet_extractor.cpp
+        src/extraction/snippet.cu src/extraction/snippet_extractor.cu
         src/extraction/extractor.cu
-        src/pipeline/pipeline.cu src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh src/clustering/dp_clustering.cpp src/clustering/dp_clustering.h)
+        src/pipeline/pipeline.cu src/extraction/feature_extractor.cu src/clustering/dp_clustering.cu src/utilities.cu)
 
 add_executable(rts ${SOURCE_FILES} ${HEADER_FILES})
 

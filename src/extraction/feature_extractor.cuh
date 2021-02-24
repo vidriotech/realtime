@@ -7,9 +7,9 @@
 #include <thrust/device_vector.h>
 
 #include "../kernels/kernels.cuh"
-#include "../params/params.h"
-#include "../probe/probe.h"
-#include "snippet.h"
+#include "../params/params.cuh"
+#include "../probe/probe.cuh"
+#include "snippet.cuh"
 
 template<class T>
 class FeatureExtractor {

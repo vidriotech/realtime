@@ -14,8 +14,8 @@
 #include "../utilities.cuh"
 #include "../kernels/filters.cuh"
 #include "../kernels/thresholds.cuh"
-#include "../params/params.h"
-#include "../probe/probe.h"
+#include "../params/params.cuh"
+#include "../probe/probe.cuh"
 #include "threshold_computer.cuh"
 
 template<class T>

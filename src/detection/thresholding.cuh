@@ -1,8 +1,0 @@
-#ifndef RTS_SRC_DETECTION_THRESHOLDING_CUH_
-#define RTS_SRC_DETECTION_THRESHOLDING_CUH_
-
-#include <thrust/functional.h>
-
-
-
-#endif //RTS_SRC_DETECTION_THRESHOLDING_CUH_

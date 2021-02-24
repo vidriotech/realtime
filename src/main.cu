@@ -3,10 +3,10 @@
 #include <string>
 #include <thread>
 
-#include "params/params.h"
-#include "probe/probe.h"
-#include "acquisition/file_reader.h"
-#include "structures/median_tree.h"
+#include "params/params.cuh"
+#include "probe/probe.cuh"
+#include "acquisition/file_reader.cuh"
+#include "structures/median_tree.cuh"
 #include "pipeline/pipeline_thread_pool.cuh"
 
 std::string get_env_var(std::string const &key) {

@@ -5,7 +5,7 @@
 #include <memory>
 #include <thread>
 
-#include "../params/params.h"
+#include "../params/params.cuh"
 #include "../detection/detector.cuh"
 #include "../extraction/extractor.cuh"
 

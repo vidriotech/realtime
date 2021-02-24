@@ -9,8 +9,8 @@
 #include <thread>
 #include <vector>
 
-#include "../params/params.h"
-#include "../probe/probe.h"
+#include "../params/params.cuh"
+#include "../probe/probe.cuh"
 #include "pipeline.cuh"
 
 template<class T>
