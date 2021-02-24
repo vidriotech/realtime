@@ -4,7 +4,7 @@
 #include <random>
 #include <vector>
 
-#include "../src/utilities.h"
+#include "../src/utilities.cuh"
 
 TEST(UtilitiesTest, Argsort) {
   std::vector<int> vec(100);

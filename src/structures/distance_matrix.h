@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "../utilities.h"
+#include "../utilities.cuh"
 
 template<class T>
 class DistanceMatrix {

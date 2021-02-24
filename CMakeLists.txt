@@ -6,9 +6,9 @@ set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CXX_STANDARD 17)
 
 # RTS
-set(HEADER_FILES src/utilities.h
+set(HEADER_FILES src/utilities.cuh
         src/structures/median_tree_node.h src/structures/median_tree.h src/structures/distance_matrix.h
-        src/pipeline/pipeline_thread_pool.h
+        src/pipeline/pipeline_thread_pool.cuh
         src/probe/probe.h src/probe/probe_reader.h
         src/params/device_params.h src/params/acquire_params.h src/params/detect_params.h
         src/params/extract_params.h src/params/classify_params.h src/params/params.h
@@ -19,7 +19,7 @@ set(HEADER_FILES src/utilities.h
         src/pipeline/pipeline.cuh src/extraction/feature_extractor.cu src/extraction/feature_extractor.cuh src/detection/thresholding.cuh)
 set(SOURCE_FILES src/main.cu
         src/structures/median_tree_node.cpp src/structures/median_tree.cpp src/structures/distance_matrix.cpp
-        src/pipeline/pipeline_thread_pool.cpp
+        src/pipeline/pipeline_thread_pool.cu
         src/probe/probe.cpp src/probe/probe_reader.cpp
         src/acquisition/reader.cpp src/acquisition/file_reader.cpp src/acquisition/socket_reader.cpp
         src/detection/detector.cu src/detection/threshold_computer.cu

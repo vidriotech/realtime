@@ -12,7 +12,7 @@
  *           the height of `tree` is 1; AND
  *           the height balance factor of `tree` is 0; AND
  *           the element-wise balance factor of `tree` is 0; AND
- *           the median of `tree` is 0.
+ *           the ComputeMedian of `tree` is 0.
  */
 TEST(MedianTreeTest, InitialStateNoArgs) {
   MedianTree<short> tree;
@@ -25,7 +25,7 @@ TEST(MedianTreeTest, InitialStateNoArgs) {
   EXPECT_EQ(1, tree.height());
   EXPECT_EQ(0, tree.balance());
 
-  // check element-wise balance and median
+  // check element-wise balance and ComputeMedian
   EXPECT_EQ(0, tree.el_balance());
   EXPECT_EQ(0, tree.median());
 }
@@ -40,7 +40,7 @@ TEST(MedianTreeTest, InitialStateNoArgs) {
  *           the height of `tree` is 2; AND
  *           the height balance factor of `tree` is 1; AND
  *           the element-wise balance factor of `tree` is 1; AND
- *           the median of `tree` is v.
+ *           the ComputeMedian of `tree` is v.
  */
 TEST(MedianTreeTest, InitialStateSingleArg) {
   short v = -1;
@@ -56,7 +56,7 @@ TEST(MedianTreeTest, InitialStateSingleArg) {
   EXPECT_EQ(2, tree.height());
   EXPECT_EQ(1, tree.balance());
 
-  // check element-wise balance and median
+  // check element-wise balance and ComputeMedian
   EXPECT_EQ(1, tree.el_balance());
   EXPECT_EQ(v, tree.median());
 }
@@ -72,7 +72,7 @@ TEST(MedianTreeTest, InitialStateSingleArg) {
  *           the height of `tree` is 2; AND
  *           the height balance factor of `tree` is 0; AND
  *           the element-wise balance factor of `tree` is 0; AND
- *           the median of `tree` is the mean_var of u and v.
+ *           the ComputeMedian of `tree` is the mean_var of u and v.
  */
 TEST(MedianTreeTest, InitialStateTwoArgs) {
   short u = 0;
@@ -92,7 +92,7 @@ TEST(MedianTreeTest, InitialStateTwoArgs) {
   EXPECT_EQ(2, tree.height());
   EXPECT_EQ(0, tree.balance());
 
-  // check element-wise balance and median
+  // check element-wise balance and ComputeMedian
   EXPECT_EQ(0, tree.el_balance());
   EXPECT_EQ((u + v) / 2.0, tree.median());
 }
@@ -107,7 +107,7 @@ TEST(MedianTreeTest, InitialStateTwoArgs) {
  *           the height of `tree` is 2; AND
  *           the height balance factor of `tree` is 1; AND
  *           the element-wise balance factor of `tree` is 1; AND
- *           the median of `tree` is v.
+ *           the ComputeMedian of `tree` is v.
  */
 TEST(MedianTreeTest, InsertIntoEmpty) {
   short v = -1;
@@ -136,7 +136,7 @@ TEST(MedianTreeTest, InsertIntoEmpty) {
   EXPECT_EQ(2, tree.height());
   EXPECT_EQ(1, tree.balance());
 
-  // check element-wise balance and median
+  // check element-wise balance and ComputeMedian
   EXPECT_EQ(1, tree.el_balance());
   EXPECT_EQ(v, tree.median());
 }
@@ -150,7 +150,7 @@ TEST(MedianTreeTest, InsertIntoEmpty) {
  *           the height of `tree` is 2; AND
  *           the height balance factor of `tree` is 0; AND
  *           the element-wise balance factor of `tree` is 0; AND
- *           the median of `tree` is the mean_var of u and v.
+ *           the ComputeMedian of `tree` is the mean_var of u and v.
  */
 TEST(MedianTreeTest, InsertLargerValue) {
   short v = -1;
@@ -180,7 +180,7 @@ TEST(MedianTreeTest, InsertLargerValue) {
   EXPECT_EQ(2, tree.height());
   EXPECT_EQ(0, tree.balance());
 
-  // check element-wise balance and median
+  // check element-wise balance and ComputeMedian
   EXPECT_EQ(0, tree.el_balance());
   EXPECT_EQ((u + v) / 2.0, tree.median());
 }
@@ -195,7 +195,7 @@ TEST(MedianTreeTest, InsertLargerValue) {
  *           there are two elements in `tree`; AND
  *           the height of `tree` is 2; AND
  *           the element-wise balance of `tree` is 0; AND
- *           the median of `tree` is the mean_var of u and w.
+ *           the ComputeMedian of `tree` is the mean_var of u and w.
  */
 TEST(MedianTreeTest, RemoveSubtreeRoot) {
   short u = -1;
@@ -235,7 +235,7 @@ TEST(MedianTreeTest, RemoveSubtreeRoot) {
   EXPECT_EQ(2, tree.height());
   EXPECT_EQ(0, tree.balance());
 
-  // check element-wise balance and median
+  // check element-wise balance and ComputeMedian
   EXPECT_EQ(0, tree.el_balance());
   EXPECT_EQ((u + w) / 2.0, tree.median());
 }
@@ -250,7 +250,7 @@ TEST(MedianTreeTest, RemoveSubtreeRoot) {
  *           there are two elements in `tree`; AND
  *           the height of `tree` is 2; AND
  *           the element-wise balance of `tree` is 0; AND
- *           the median of `tree` is the mean_var of v and w.
+ *           the ComputeMedian of `tree` is the mean_var of v and w.
  */
 TEST(MedianTreeTest, RemoveSubtreeDescendant) {
   short u = -1;
@@ -290,7 +290,7 @@ TEST(MedianTreeTest, RemoveSubtreeDescendant) {
   EXPECT_EQ(2, tree.height());
   EXPECT_EQ(0, tree.balance());
 
-  // check element-wise balance and median
+  // check element-wise balance and ComputeMedian
   EXPECT_EQ(0, tree.el_balance());
   EXPECT_EQ((v + w) / 2.0, tree.median());
 }
@@ -306,7 +306,7 @@ TEST(MedianTreeTest, RemoveSubtreeDescendant) {
  *           u is the maximum of the left subtree; AND
  *           v is the minimum of the right subtree; AND
  *           w is the maximum of the right subtree; AND
- *           the median of `tree` is mean_var of u and v.
+ *           the ComputeMedian of `tree` is mean_var of u and v.
  */
 TEST(MedianTreeTest, BalanceElementsLTR) {
   short t = -1;
@@ -362,7 +362,7 @@ TEST(MedianTreeTest, BalanceElementsLTR) {
  *           u is the maximum of the left subtree; AND
  *           v is the minimum of the right subtree; AND
  *           w is the maximum of the right subtree; AND
- *           the median of `tree` is mean_var of u and v.
+ *           the ComputeMedian of `tree` is mean_var of u and v.
  */
 TEST(MedianTreeTest, BalanceElementsRTL) {
   short t = -1;
@@ -636,7 +636,7 @@ TEST(MedianTreeTest, RRRotation) {
  * DO insert u, v, w, x, y, z, in that order, maintaining element-wise balance,
  * AND
  * TEST THAT the element-wise balance never exceeds 1 in absolute value; AND
- *           the median value updates as appropriate.
+ *           the ComputeMedian value updates as appropriate.
  */
 TEST(MedianTreeTest, AutoBalanceOnInsert) {
   MedianTree<short> tree;
@@ -692,7 +692,7 @@ TEST(MedianTreeTest, AutoBalanceOnInsert) {
  *           the subtree balance never exceeds 1 in absolute value; AND
  *           the balances of the subtrees themselves never exceed 1 in
  *           absolute value; AND
- *           the median value updates as appropriate.
+ *           the ComputeMedian value updates as appropriate.
  */
 TEST(MedianTreeTest, AutoBalanceAndRotateOnInsert) {
   MedianTree<short> tree;

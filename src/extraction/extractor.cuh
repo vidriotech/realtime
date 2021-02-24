@@ -21,7 +21,7 @@ class Extractor {
   void ExtractFeatures();
 
   // getters
-  std::vector<Snippet<T>> snippets() const { return snippets_; };
+  std::vector<Snippet> snippets() const { return snippets_; };
 
  private:
   std::vector<T> samples_;
@@ -32,7 +32,7 @@ class Extractor {
   Probe probe_;
 
   SnippetExtractor<T> snippet_extractor_;
-  std::vector<Snippet<T>> snippets_;
+  std::vector<Snippet> snippets_;
 };
 
 #endif //RTS_2_SRC_EXTRACTION_EXTRACTOR_CUH_

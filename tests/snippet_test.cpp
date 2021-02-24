@@ -17,7 +17,7 @@ TEST(SnippetTest, InitialState) {
   for (auto i = 0; i < buf.size(); ++i) {
     buf.at(i) = i;
   }
-  Snippet<short> snippet(buf, n_chans, n_frames);
+  Snippet snippet(buf, n_chans, n_frames);
 
   // test channel and frame counts
   EXPECT_EQ(n_chans, snippet.n_chans());
@@ -43,7 +43,7 @@ TEST(SnippetTest, SelfSqDist) {
   for (auto i = 0; i < buf.size(); ++i) {
     buf.at(i) = i;
   }
-  Snippet<short> snippet(buf, n_chans, n_frames);
+  Snippet snippet(buf, n_chans, n_frames);
 
   EXPECT_DOUBLE_EQ(0, snippet.SqDist(snippet));
 }
@@ -64,10 +64,10 @@ TEST(SnippetTest, ZeroSqDist) {
     expected_dist += i * i;
   }
 
-  Snippet<short> snippet(buf, n_chans, n_frames);
+  Snippet snippet(buf, n_chans, n_frames);
 
   std::vector<short> buf0(buf.size(), 0);
-  Snippet<short> zero(buf0, n_chans, n_frames);
+  Snippet zero(buf0, n_chans, n_frames);
 
   EXPECT_DOUBLE_EQ(expected_dist, snippet.SqDist(zero));
 }
@@ -85,11 +85,11 @@ TEST(SnippetTest, MismatchSqDist) {
   for (auto i = 0; i < buf.size(); ++i) {
     buf.at(i) = i;
   }
-  Snippet<short> snippet(buf, n_chans, n_frames);
+  Snippet snippet(buf, n_chans, n_frames);
 
   // same number of channels, but different frame count
   std::vector<short> mismatched_buf(n_chans * (n_frames + 1), 0);
-  Snippet<short> mismatch(mismatched_buf, n_chans, n_frames + 1);
+  Snippet mismatch(mismatched_buf, n_chans, n_frames + 1);
 
   EXPECT_DOUBLE_EQ(std::numeric_limits<double>::infinity(),
                    snippet.SqDist(mismatch));
@@ -114,8 +114,8 @@ TEST(SnippetTest, SqDist) {
     neg_buf.at(i) = -i;
     expected_dist += 4 * i * i;
   }
-  Snippet<short> snippet(buf, n_chans, n_frames);
-  Snippet<short> negative(neg_buf, n_chans, n_frames);
+  Snippet snippet(buf, n_chans, n_frames);
+  Snippet negative(neg_buf, n_chans, n_frames);
 
   EXPECT_DOUBLE_EQ(expected_dist, snippet.SqDist(negative));
 }

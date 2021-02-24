@@ -8,11 +8,11 @@
 template<class T>
 class DPClustering {
  public:
-  explicit DPClustering(std::vector<Snippet<T>> &snippets)
+  explicit DPClustering(std::vector<Snippet> &snippets)
       : snippets_(snippets) {};
 
  private:
-  std::vector<Snippet<T>> &snippets_;
+  std::vector<Snippet> &snippets_;
 };
 
 #endif //RTS_SRC_CLUSTERING_DP_CLUSTERING_H_

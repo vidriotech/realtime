@@ -21,8 +21,8 @@ void SnippetExtractor<T>::Update(std::vector<T> &samples,
  * @return Vector of snippets.
  */
 template<class T>
-std::vector<Snippet<T>> SnippetExtractor<T>::ExtractSnippets() {
-  std::vector<Snippet<T>> snippets;
+std::vector<Snippet> SnippetExtractor<T>::ExtractSnippets() {
+  std::vector<Snippet> snippets;
 
   auto n_sites_snippet = params_.extract.n_sites;
   auto n_frames_snippet = params_.extract.n_frames(probe_.sample_rate());
@@ -32,6 +32,7 @@ std::vector<Snippet<T>> SnippetExtractor<T>::ExtractSnippets() {
     auto n_before = params_.extract.n_frames_before(probe_.sample_rate());
     auto n_after = params_.extract.n_frames_after(probe_.sample_rate());
 
+    std::vector<float> snippet_buf;
     for (auto site_idx = 0; site_idx < probe_.n_active(); ++site_idx) {
       auto chan_idx = probe_.chan_index(site_idx);
       auto neighbors = probe_.NearestNeighbors(site_idx, n_sites_snippet);
@@ -44,16 +45,16 @@ std::vector<Snippet<T>> SnippetExtractor<T>::ExtractSnippets() {
         }
 
         // found a crossing -- extract snippet in row-major order
-        std::vector<T> snippet_buf;
         for (auto & neighbor : neighbors) {
           auto neighbor_chan_idx = probe_.chan_index(neighbor);
           for (auto f = frame - n_before; f < frame + n_after + 1; ++f) {
             k = f * probe_.n_total() + neighbor_chan_idx;
+            // snippet_buf value is moved
             snippet_buf.push_back(samples_.at(k));
           }
         }
 
-        Snippet<T> snippet(snippet_buf, n_sites_snippet, n_frames_snippet);
+        Snippet snippet(snippet_buf, n_frames_snippet);
         snippet.set_channel_ids(neighbors);
         snippet.set_frame_offset(frame_offset_);
 

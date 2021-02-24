@@ -6,13 +6,14 @@
 #include <map>
 #include <vector>
 
-#include <thrust/device_vector.h>
 #include <thrust/sort.h>
+
+#include "kernels/operators.cuh"
 
 namespace utilities {
 
 template<class T>
-double median(std::vector<T> &data, bool is_sorted) {
+float median(std::vector<T> &data, bool is_sorted) {
   if (data.size() == 0) {
     return 0;
   }
@@ -33,10 +34,9 @@ double median(std::vector<T> &data, bool is_sorted) {
   return med;
 }
 
-template<class T>
-double median(thrust::device_vector<T> &data, bool is_sorted) {
+float median(thrust::device_vector<float> &data, bool is_sorted) {
   if (data.size() == 0) {
-    return 0;
+    return std::numeric_limits<float>::infinity();
   }
 
   if (!is_sorted) {
@@ -44,7 +44,7 @@ double median(thrust::device_vector<T> &data, bool is_sorted) {
   }
 
   auto n = data.size();
-  double med;
+  float med;
 
   if (n % 2 == 0) {
     med = (data[n / 2 - 1] + data[n / 2]) / 2.0;

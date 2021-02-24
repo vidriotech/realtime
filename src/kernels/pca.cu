@@ -18,7 +18,7 @@ void center_features(CenterFeaturesArgs &args) {
 
   auto mean_iter =
       thrust::make_transform_iterator(features_t,
-                                      mean_functor((float) n_feats));
+                                      div_by_mean((float) n_feats));
 
   auto row_iter =
       thrust::make_transform_iterator(thrust::counting_iterator<int>(0),
@@ -44,7 +44,7 @@ void center_features(CenterFeaturesArgs &args) {
                     features_t + (n_feats * n_obs),
                     row_iter,
                     features.begin(),
-                    mean_subtract(thrust::raw_pointer_cast(means_ptr)));
+                    subtract_mean(thrust::raw_pointer_cast(means_ptr)));
 
   // transpose the subtracted matrix back to its original form
   transpose_idx =
@@ -115,11 +115,14 @@ void make_principal_vectors(MakePVArgs &args) {
   auto lwork = 0;
   int *devInfo = nullptr;
 
-  cudaMallocManaged(&eigvals, m * sizeof(double));
-  cudaMallocManaged(&devInfo, sizeof(int));
-  cusolverDnHandle_t handle = nullptr;
+  cudaError stat = cudaMalloc(&eigvals, m * sizeof(float));
+  assert(cudaSuccess == stat);
+
+  stat = cudaMalloc(&devInfo, sizeof(int));
+  assert(cudaSuccess == stat);
 
   // create a handle to cuSolverDN library context
+  cusolverDnHandle_t handle = nullptr;
   cusolverStatus_t cusolver_status = cusolverDnCreate(&handle);
   assert(CUSOLVER_STATUS_SUCCESS == cusolver_status);
 
@@ -131,7 +134,7 @@ void make_principal_vectors(MakePVArgs &args) {
   assert(cusolver_status == CUSOLVER_STATUS_SUCCESS);
 
   // compute the eigenvalues and eigenvectors
-  cudaMallocManaged(&workspace, lwork * sizeof(double));
+  cudaMalloc(&workspace, lwork * sizeof(float));
   cusolver_status = cusolverDnSsyevd(handle, jobz, uplo, m, eigvecs, lda, eigvals,
                                      workspace, lwork, devInfo);
 

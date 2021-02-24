@@ -121,7 +121,7 @@ TEST(KernelTest, TestNdiff2Short) {
 /*
  * GIVEN a buffer `data_` of int16 and a constant detect `const_thresh`
  * TEST THAT values in `data_` which exceed `const_thresh` correspond to true
- *           values in a boolean data `crossings_`.
+ *           values in a boolean data `host_crossings_`.
  */
 TEST(KernelTest, FindCrossingsKernelShort) {
   auto n_channels = 100;
@@ -164,7 +164,7 @@ TEST(KernelTest, FindCrossingsKernelShort) {
                                            thresholds, crossings);
   cudaDeviceSynchronize();
 
-  // test crossings_ detected correctly
+  // test host_crossings_ detected correctly
   for (auto k = 0; k < n_samples; k++) {
     if (k < n_channels * (const_thresh + 1)) {
       EXPECT_FALSE(crossings[k]);
@@ -182,7 +182,7 @@ TEST(KernelTest, FindCrossingsKernelShort) {
 /*
 * GIVEN a buffer `data_` of float32 and a constant detect `const_thresh`
 * TEST THAT values in `data_` which exceed `const_thresh` correspond to true
-*           values in a boolean data `crossings_`.
+*           values in a boolean data `host_crossings_`.
 */
 TEST(KernelTest, FindCrossingsKernelFloat) {
   auto n_channels = 100;
@@ -225,7 +225,7 @@ TEST(KernelTest, FindCrossingsKernelFloat) {
                                            thresholds, crossings);
   cudaDeviceSynchronize();
 
-  // test crossings_ detected correctly
+  // test host_crossings_ detected correctly
   for (auto k = 0; k < n_samples; k++) {
     if (k < n_channels * (const_thresh + 1)) {
       EXPECT_FALSE(crossings[k]);
@@ -280,7 +280,7 @@ TEST(KernelTest, FindCrossingsShort) {
   find_crossings(n_samples, n_channels, data, thresholds, crossings,
                  n_blocks, n_threads);
 
-  // test crossings_ detected correctly
+  // test host_crossings_ detected correctly
   for (auto k = 0; k < n_samples; k++) {
     if (k < n_channels * (const_thresh + 1)) {
       EXPECT_FALSE(crossings[k]);
@@ -338,7 +338,7 @@ TEST(KernelTest, CenterFeatures) {
   thrust::device_vector<float> features(n_feats * n_obs);
   thrust::sequence(features.begin(), features.end());
 
-  // center the features matrix
+  // center_ the features matrix
   CenterFeaturesArgs args{n_obs, n_feats, features};
   center_features(args);
 

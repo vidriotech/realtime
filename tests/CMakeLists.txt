@@ -22,7 +22,7 @@ set(SOURCE_FILES
         ../src/extraction/extractor.cu extractor_test.cpp
         ../src/extraction/feature_extractor.cu
         ../src/pipeline/pipeline.cu pipeline_test.cpp
-        ../src/pipeline/pipeline_thread_pool.cpp pipeline_thread_pool_test.cpp utilities_test.cpp params_test.cpp extractor_test.cpp)
+        ../src/pipeline/pipeline_thread_pool.cu pipeline_thread_pool_test.cpp utilities_test.cpp params_test.cpp extractor_test.cpp)
 
 add_executable(rtstests ${SOURCE_FILES} ${HEADER_FILES})
 

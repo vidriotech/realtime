@@ -2,11 +2,10 @@
 
 template<class T>
 void ThresholdComputer<T>::UpdateBuffer(std::vector<T> buf) {
-  data_.assign(buf.begin(), buf.end());
+  thrust::host_vector<float> host_data_;
+
   host_data_.assign(buf.begin(), buf.end());
   device_data_ = host_data_; // copy data to device
-
-  abs_dev_.assign(buf.size(), 0); // fill with zeros
 
   is_sorted = false;
   is_cached = false;
@@ -18,16 +17,13 @@ float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
     return multiplier * mad / 0.6745;
   }
 
-  auto med = median();
+  ComputeMedian(); // sorts device_data_
 
-  // absolute deviation from the median
-  // TODO: a Thrust implementation should be straightforward
-  for (auto i = 0; i < host_data_.size(); i++) {
-    host_data_[i] = std::abs(host_data_[i] - med);
-  }
+  // absolute deviation from the ComputeMedian
+  thrust::transform(device_data_.begin(), device_data_.end(),
+                    device_data_.begin(), abs_dev(med));
 
-  // median absolute deviation from the median (i.e., the MAD)
-  device_data_ = host_data_;
+  // median absolute deviation from the ComputeMedian (i.e., the MAD)
   mad = utilities::median(device_data_, false);
   is_cached = true;
 
@@ -35,15 +31,17 @@ float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
 }
 
 /**
- * @brief Compute and return the median of the data.
- * @return The median of the data.
+ * @brief Compute and return the ComputeMedian of the data.
+ * @return The ComputeMedian of the data.
  */
 template<class T>
-double ThresholdComputer<T>::median() {
-  auto med = utilities::median<T>(device_data_, is_sorted);
-  is_sorted = true;
+float ThresholdComputer<T>::ComputeMedian() {
+  if (med < std::numeric_limits<float>::infinity()) {
+    return med;
+  }
 
-  host_data_ = device_data_;
+  med = utilities::median(device_data_, is_sorted);
+  is_sorted = true;
 
   return med;
 }

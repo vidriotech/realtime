@@ -1,4 +1,4 @@
-#include "pipeline_thread_pool.h"
+#include "pipeline_thread_pool.cuh"
 
 template<class T>
 PipelineThreadPool<T>::PipelineThreadPool(Params &params, Probe &probe,

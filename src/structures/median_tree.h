@@ -265,9 +265,9 @@ short MedianTree<T>::el_balance() {
 }
 
 /**
- * @brief Compute and return the median of all values in this tree.
+ * @brief Compute and return the ComputeMedian of all values in this tree.
  * @tparam T The type of samples_ stored in the nodes of this tree.
- * @return The median of all values.
+ * @return The ComputeMedian of all values.
  */
 template<class T>
 float MedianTree<T>::median() const {

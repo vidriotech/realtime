@@ -7,7 +7,7 @@
 #include "probe/probe.h"
 #include "acquisition/file_reader.h"
 #include "structures/median_tree.h"
-#include "pipeline/pipeline_thread_pool.h"
+#include "pipeline/pipeline_thread_pool.cuh"
 
 std::string get_env_var(std::string const &key) {
   char *val = getenv(key.c_str());

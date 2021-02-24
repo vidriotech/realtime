@@ -46,7 +46,7 @@ TEST(DetectorTest, DetectThresholds) {
 
       /* Multiply each element of the sequence -1, 0, 1, -1, 0, 1, ... by
        * j + 1. The median should be 0, so the absolute
-       * deviation from the median should go j, 0, j, j, 0, j, j, 0, j, ...
+       * deviation from the ComputeMedian should go j, 0, j, j, 0, j, j, 0, j, ...
        * and, since ~2/3 of the absolute deviations are j-valued, j will be
        * the MAD value.
        */
@@ -68,7 +68,7 @@ TEST(DetectorTest, DetectThresholds) {
 
   for (auto i = probe.n_active(); i < probe.n_total(); ++i) {
     EXPECT_FLOAT_EQ(std::numeric_limits<float>::infinity(),
-                    detector.thresholds().at(i));
+                    detector.thresholds()[i]);
   }
 }
 
@@ -90,7 +90,7 @@ TEST(DetectorTest, FindCrossings) {
 
       /* Multiply each element of the sequence -1, 0, 1, -1, 0, 1, ... by
        * -(j + 1). The median should be 0, so the absolute
-       * deviation from the median should go j, 0, j, j, 0, j, j, 0, j, ...
+       * deviation from the ComputeMedian should go j, 0, j, j, 0, j, j, 0, j, ...
        * and, since ~2/3 of the absolute deviations are j-valued, j will be
        * the MAD value.
        */

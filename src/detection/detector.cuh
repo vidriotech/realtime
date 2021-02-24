@@ -11,7 +11,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
-#include "../utilities.h"
+#include "../utilities.cuh"
 #include "../kernels/filters.cuh"
 #include "../kernels/thresholds.cuh"
 #include "../params/params.h"
@@ -23,7 +23,6 @@ class Detector {
  public:
   // rule of 5
   Detector(Params &params, Probe &probe);
-  ~Detector();
 
   // detection sub-pipeline
   void UpdateBuffer(std::vector<T> buf);
@@ -35,8 +34,8 @@ class Detector {
 
   // getters
   std::vector<T> &data() { return data_; };
-  std::vector<float> &thresholds() { return thresholds_; };
-  std::vector<uint8_t> &crossings() { return crossings_; };
+  thrust::host_vector<float> &thresholds() { return thr_; };
+  thrust::host_vector<uint8_t> &crossings() { return host_crossings_; };
   [[nodiscard]] unsigned n_frames() const;
 
  private:
@@ -45,21 +44,14 @@ class Detector {
   std::vector<ThresholdComputer<T>> threshold_computers;
 
   std::vector<T> data_;
-  std::vector<float> thresholds_;
-  std::vector<uint8_t> crossings_;
+  thrust::host_vector<uint8_t> host_crossings_;
+  thrust::host_vector<float> thr_;
 
-  // CUDA buffers
-  T *cu_in = nullptr; /*!< GPU input data */
-  T *cu_out = nullptr; /*!< GPU output data */
-  float *cu_thresh = nullptr; /*!< GPU threshold data */
-
-  thrust::host_vector<T> host_data_;
-  thrust::device_vector<T> dev_data_;
+  thrust::host_vector<T> host_buffer_;
+  thrust::device_vector<T> device_buffer_;
 
   void DedupePeaksTime();
   void DedupePeaksSpace();
-
-  void Realloc();
 };
 
 #endif //RTS_2_SRC_DETECTION_DETECTOR_CUH_

@@ -2,32 +2,11 @@
 
 template<class T>
 Detector<T>::Detector(Params &params, Probe &probe)
-    : params_(params),
-      probe_(probe),
-      thresholds_(probe.n_total()) {
+    : params_(params), probe_(probe), thr_(probe.n_total()) {
   auto nf = (int) std::ceil(params_.acquire.n_seconds * probe_.sample_rate());
-  data_.resize(nf);
 
   for (auto i = 0; i < probe.n_active(); i++) {
     threshold_computers.push_back(ThresholdComputer<T>(nf));
-  }
-
-  cudaMalloc(&cu_thresh, probe_.n_total() * sizeof(float));
-  Realloc();
-}
-
-template<class T>
-Detector<T>::~Detector() {
-  if (cu_in != nullptr) {
-    cudaFree(cu_in);
-  }
-
-  if (cu_out != nullptr) {
-    cudaFree(cu_out);
-  }
-
-  if (cu_thresh != nullptr) {
-    cudaFree(cu_thresh);
   }
 }
 
@@ -37,17 +16,8 @@ Detector<T>::~Detector() {
  */
 template<class T>
 void Detector<T>::UpdateBuffer(std::vector<T> buf) {
-  auto do_realloc = buf.size() != data_.size();
-  data_ = buf;
-
-  // (re)allocate memory on GPU
-  if (do_realloc) {
-    Realloc();
-  }
-
-  // copy data over
-  cudaMemcpy(cu_in, data_.data(), data_.size() * sizeof(T),
-             cudaMemcpyHostToDevice);
+  host_buffer_.assign(buf.begin(), buf.end());
+  device_buffer_ = host_buffer_;
 }
 
 /**
@@ -55,20 +25,20 @@ void Detector<T>::UpdateBuffer(std::vector<T> buf) {
  */
 template<class T>
 void Detector<T>::Filter() {
-  if (cu_in == nullptr || cu_out == nullptr) {
+  if (host_buffer_.empty()) {
     return;
   }
 
-  auto n_blocks = params_.device.n_blocks(data_.size());
+  thrust::device_vector<T> filtered_values_(host_buffer_.size());
+  auto n_blocks = params_.device.n_blocks(filtered_values_.size());
   auto n_threads = params_.device.n_threads;
-  ndiff2<T>(data_.size(), probe_.n_total(), cu_in, cu_out, n_blocks,
-            n_threads);
+  ndiff2<T>(filtered_values_.size(), probe_.n_total(),
+            thrust::raw_pointer_cast(device_buffer_.data()),
+            thrust::raw_pointer_cast(filtered_values_.data()),
+            n_blocks, n_threads);
 
-  cudaMemcpy(data_.data(), cu_out, data_.size() * sizeof(T),
-             cudaMemcpyDeviceToHost);
-
-  cudaMemcpy(cu_in, cu_out, data_.size() * sizeof(T),
-             cudaMemcpyDeviceToDevice);
+  host_buffer_ = filtered_values_;
+  device_buffer_.clear(); // free up device memory
 
   UpdateThresholdComputers();
 }
@@ -78,7 +48,8 @@ void Detector<T>::Filter() {
  */
 template<class T>
 void Detector<T>::UpdateThresholdComputers() {
-  std::vector<T> threshold_buffer(n_frames());
+  std::vector<T> buf(n_frames());
+
   auto site_idx = 0;
   for (auto j = 0; j < probe_.n_total(); ++j) {
     if (!probe_.is_active(j)) {
@@ -86,10 +57,10 @@ void Detector<T>::UpdateThresholdComputers() {
     }
 
     for (auto i = 0; i < n_frames(); ++i) {
-      threshold_buffer.at(i) = data_.at(j + i * probe_.n_total());
+      buf.at(i) = host_buffer_[j + i * probe_.n_total()];
     }
 
-    threshold_computers[site_idx++].UpdateBuffer(threshold_buffer);
+    threshold_computers[site_idx++].UpdateBuffer(buf);
   }
 }
 
@@ -104,10 +75,9 @@ void Detector<T>::ComputeThresholds() {
   auto site_idx = 0;
   for (auto i = 0; i < probe_.n_total(); i++) {
     if (!probe_.is_active(i)) {
-      thresholds_.at(i) = std::numeric_limits<float>::infinity();
+      thr_[i] = std::numeric_limits<float>::infinity();
     } else {
-      thresholds_.at(i) =
-          threshold_computers[site_idx++].ComputeThreshold(multiplier);
+      thr_[i] = threshold_computers[site_idx++].ComputeThreshold(multiplier);
     }
   }
 }
@@ -117,27 +87,21 @@ void Detector<T>::ComputeThresholds() {
  */
 template<class T>
 void Detector<T>::FindCrossings() {
-  auto n_blocks = params_.device.n_blocks(data_.size());
+  device_buffer_ = host_buffer_;
+
+  auto n_blocks = params_.device.n_blocks(device_buffer_.size());
   auto n_threads = params_.device.n_threads;
 
-  cudaMemcpy(cu_thresh, thresholds_.data(),
-             probe_.n_total() * sizeof(float), cudaMemcpyHostToDevice);
+  thrust::device_vector<uint8_t> device_crossings_(device_buffer_.size());
+  thrust::device_vector<float> device_thresholds_(thr_);
 
-  unsigned char *cu_crossings;
-  cudaMalloc(&cu_crossings, data_.size() * sizeof(char));
+  find_crossings<T>(device_buffer_.size(), probe_.n_total(),
+                    thrust::raw_pointer_cast(device_buffer_.data()),
+                    thrust::raw_pointer_cast(device_thresholds_.data()),
+                    thrust::raw_pointer_cast(device_crossings_.data()),
+                    n_blocks, n_threads);
 
-  std::vector<T> vec_buf(data_.size());
-  cudaMemcpy(vec_buf.data(), cu_in, data_.size() * sizeof(T),
-             cudaMemcpyDeviceToHost);
-
-  std::vector<T> vec_buf_out(data_.size());
-  cudaMemcpy(vec_buf_out.data(), cu_out, data_.size() * sizeof(T),
-             cudaMemcpyDeviceToHost);
-
-  find_crossings(data_.size(), probe_.n_total(), cu_in, cu_thresh,
-                 (unsigned char *) cu_out, n_blocks, n_threads);
-  cudaMemcpy(crossings_.data(), cu_out, data_.size() * sizeof(char),
-             cudaMemcpyDeviceToHost);
+  host_crossings_ = device_crossings_;
 }
 
 /**
@@ -167,13 +131,14 @@ void Detector<T>::DedupePeaksTime() {
 
     chan_crossings.clear();
     chan_offsets.clear();
+    chan_offsets.clear();
 
     for (auto j = 0; j < n_frames(); ++j) {
       auto k = j * probe_.n_total() + i;
 
-      if (crossings_.at(k)) {
+      if (host_crossings_[k]) {
         chan_crossings.push_back(j);
-        crossings_.at(k) = 0; // clear out the crossing at this point
+        host_crossings_[k] = 0; // clear out the crossing at this point
       }
     }
 
@@ -190,7 +155,7 @@ void Detector<T>::DedupePeaksTime() {
       } else {
         std::vector<uint64_t> cross_values;
         for (auto &idx : group) {
-          auto val = data_.at(idx * probe_.n_total() + i);
+          auto val = host_buffer_[idx * probe_.n_total() + i];
           cross_values.push_back(std::abs(val));
         }
 
@@ -202,7 +167,7 @@ void Detector<T>::DedupePeaksTime() {
     // replace crossings *only* at peak sites
     for (auto &j : chan_offsets) {
       auto k = i + probe_.n_total() * j;
-      crossings_.at(k) = 1;
+      host_crossings_[k] = 1;
     }
   }
 }
@@ -230,7 +195,7 @@ void Detector<T>::DedupePeaksSpace() {
     for (auto frame = 0; frame < n_frames(); ++frame) {
       auto k = frame * probe_.n_total() + chan;
 
-      if (crossings_.at(k)) {
+      if (host_crossings_[k]) {
         peaks.push_back(frame);
       }
     }
@@ -259,21 +224,21 @@ void Detector<T>::DedupePeaksSpace() {
        */
       for (auto &peak : peaks) {
         auto k = chan + peak * probe_.n_total();
-        auto peak_val = std::abs(data_.at(k));
+        auto peak_val = std::abs(host_buffer_[k]);
 
         for (auto frame = peak - std::min(peak, time_thresh);
              frame < std::min((uint64_t) n_frames(), peak + time_thresh);
              ++frame) {
           auto k2 = chan2 + frame * probe_.n_total();
-          if (!crossings_.at(k2)) {
+          if (!host_crossings_[k2]) {
             continue;
           }
 
-          auto peak_val2 = std::abs(data_.at(k2));
+          auto peak_val2 = std::abs(host_buffer_[k2]);
           if (peak_val >= peak_val2) {
-            crossings_.at(k2) = 0;
+            host_crossings_[k2] = 0;
           } else {
-            crossings_.at(k) = 0;
+            host_crossings_[k] = 0;
             break;
           }
         }
@@ -282,33 +247,9 @@ void Detector<T>::DedupePeaksSpace() {
   }
 }
 
-/**
- * @brief (Re)allocate pointers to in/out GPU memory buffers.
- */
-template<class T>
-void Detector<T>::Realloc() {
-  if (cu_in != nullptr) {
-    cudaFree(cu_in);
-    cu_in = nullptr;
-  }
-  if (cu_out != nullptr) {
-    cudaFree(cu_out);
-    cu_out = nullptr;
-  }
-
-  crossings_.resize(data_.size());
-
-  if (data_.empty()) {
-    return;
-  }
-
-  cudaMalloc(&cu_in, data_.size() * sizeof(T));
-  cudaMalloc(&cu_out, data_.size() * sizeof(T));
-}
-
 template<class T>
 unsigned Detector<T>::n_frames() const {
-  return data_.size() / probe_.n_total();
+  return host_buffer_.size() / probe_.n_total();
 }
 
 template

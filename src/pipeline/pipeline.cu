@@ -38,19 +38,19 @@ void Pipeline<T>::Process() {
   detector_.DedupePeaks();
 
   // extract snippets
-  extractor_.Update(detector_.data(), detector_.crossings(), frame_offset_);
-  extractor_.MakeSnippets();
-
-  // switch to
-  auto n_secs = frame_offset_ / probe_.sample_rate();
-  if (n_secs < params_.classify.n_secs_cluster) {
-    ProcessClustering(extractor_);
-  } else {
-    ProcessClassification(extractor_);
-  }
-
-  auto tid = std::this_thread::get_id();
-  std::cout << "thread " << tid << " finished processing " << frame_offset_ << std::endl;
+//  extractor_.Update(detector_.data(), detector_.crossings(), frame_offset_);
+//  extractor_.MakeSnippets();
+//
+//  // switch to
+//  auto n_secs = frame_offset_ / probe_.sample_rate();
+//  if (n_secs < params_.classify.n_secs_cluster) {
+//    ProcessClustering(extractor_);
+//  } else {
+//    ProcessClassification(extractor_);
+//  }
+//
+//  auto tid = std::this_thread::get_id();
+//  std::cout << "thread " << tid << " finished processing " << frame_offset_ << std::endl;
 }
 
 template<class T>

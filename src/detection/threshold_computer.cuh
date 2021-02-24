@@ -9,36 +9,30 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
-#include "../utilities.h"
+#include "../kernels/operators.cuh"
+#include "../utilities.cuh"
 
 template<class T>
 class ThresholdComputer {
  public:
-  explicit ThresholdComputer(unsigned buf_size)
-      : data_(buf_size), abs_dev_(buf_size) {};
+  explicit ThresholdComputer(unsigned buf_size) {};
 
   void UpdateBuffer(std::vector<T> buf);
+  float ComputeMedian();
   float ComputeThreshold(float multiplier);
+  void Clear() { device_data_.clear(); };
 
   // getters
   /**
    * @brief Get the size of the data.
    * @return The size of the data.
    */
-  [[nodiscard]] uint32_t buffer_size() const { return data_.size(); };
-  /**
-   * @brief Get the underlying data data.
-   * @return The underlying data data.
-   */
-  const std::vector<T>& data() { return data_; };
-  double median();
+  [[nodiscard]] uint32_t buffer_size() const { return device_data_.size(); };
 
  private:
-  std::vector<T> data_;
-  std::vector<double> abs_dev_;
-  thrust::host_vector<T> host_data_;
-  thrust::device_vector<T> device_data_;
-  double mad = 0.0; /*!< cached median absolute deviation from the median. */
+  thrust::device_vector<float> device_data_;
+  float med = std::numeric_limits<float>::infinity();
+  float mad = std::numeric_limits<float>::infinity(); /*!< cached median absolute deviation from the ComputeMedian. */
   bool is_sorted = false; /*!< true iff the data is already sorted. */
   bool is_cached = false; /*!< true iff the mad is already computed. */
 };
