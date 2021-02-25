@@ -3,63 +3,38 @@
 #include "../src/detection/threshold_computer.cuh"
 
 /*
- * GIVEN a data size `bufsize`
  * DO construct a ThresholdComputer `computer` AND
- * TEST THAT buffer_size is equal to `bufsize`.
+ * TEST THAT buffer_size is 0.
  */
 TEST(ThresholdComputerTest, InitialState) {
-  unsigned bufsize = 100;
-  ThresholdComputer<short> computer(bufsize);
+  ThresholdComputer<short> computer;
 
-  EXPECT_EQ(bufsize, computer.buffer_size());
+  EXPECT_EQ(0, computer.buffer_size());
 }
 
 /*
- * GIVEN a ThresholdComputer `computer` and a buffer `data_`
- * DO update buffer underlying `computer` with the samples_ from `data_` AND
+ * GIVEN a ThresholdComputer `computer` and a buffer `data`
+ * DO update data underlying `computer` with the samples_ from `data_` AND
  * TEST THAT the samples_ in the `computer` data matches that in `data_`.
  */
 TEST(ThresholdComputerTest, UpdateData) {
-  unsigned bufsize = 100;
-  ThresholdComputer<short> computer(bufsize);
+  unsigned bufsize = 1024;
+  ThresholdComputer<short> computer;
 
-  std::vector<short> buf(bufsize);
+  std::vector<short> data(bufsize);
   for (auto i = 0; i < bufsize; i++)
-    buf.at(i) = i;
+    data.at(i) = i;
 
   // perform the update
-  computer.UpdateBuffer(buf);
+  computer.UpdateBuffer(data);
 
-  for (auto i = 0; i < bufsize; i++)
-    EXPECT_EQ(buf.at(i), computer.data().at(i));
-}
+  EXPECT_EQ(bufsize, computer.buffer_size());
+  auto computer_data = computer.data();
+  ASSERT_EQ(data.size(), computer_data.size());
 
-/*
- * GIVEN a ThresholdComputer `computer`
- * DO construct a copy `computer_copy` AND
- * TEST THAT buffer_size()s match; AND
- *           samples_ is equal between the underlying buffers.
- */
-TEST(ThresholdComputerTest, CopyConstructor) {
-  unsigned bufsize = 100;
-  ThresholdComputer<short> computer(bufsize);
-
-  std::vector<short> buf(bufsize);
-  for (auto i = 0; i < bufsize; i++)
-    buf.at(i) = i;
-
-  computer.UpdateBuffer(buf);
-
-  // establish preconditions for the test
-  for (auto i = 0; i < bufsize; i++)
-    EXPECT_EQ(buf.at(i), computer.data().at(i));
-
-  // perform the copy
-  ThresholdComputer<short> computer_copy(computer);
-
-  EXPECT_EQ(computer.buffer_size(), computer_copy.buffer_size());
-  for (auto i = 0; i < bufsize; i++)
-    EXPECT_EQ(computer.data().at(i), computer_copy.data().at(i));
+  for (auto i = 0; i < data.size(); ++i) {
+    EXPECT_EQ(data.at(i), computer_data[i]);
+  }
 }
 
 /*
@@ -71,7 +46,7 @@ TEST(ThresholdComputerTest, CopyConstructor) {
  */
 TEST(ThresholdComputerTest, ComputeThreshold) {
   unsigned bufsize = 100;
-  ThresholdComputer<short> computer(bufsize);
+  ThresholdComputer<short> computer;
 
   std::vector<short> buf(bufsize);
   for (auto i = 0; i < bufsize; i++)
@@ -79,8 +54,8 @@ TEST(ThresholdComputerTest, ComputeThreshold) {
 
   computer.UpdateBuffer(buf);
 
-  EXPECT_FLOAT_EQ(181.6160118606375, computer.ComputeThreshold(5));
+  EXPECT_FLOAT_EQ(185.32246108228318, computer.ComputeThreshold(5));
 
   // should be cached now, check that it hasn't changed
-  EXPECT_FLOAT_EQ(181.6160118606375, computer.ComputeThreshold(5));
+  EXPECT_FLOAT_EQ(185.32246108228318, computer.ComputeThreshold(5));
 }

@@ -20,7 +20,7 @@ TEST(PipelineTest, InitialState) {
   Probe probe = probe_from_env();
   Pipeline<short> pipeline(params, probe);
 
-  EXPECT_EQ(0, pipeline.buffer().size());
+  EXPECT_EQ(0, pipeline.data().size());
   EXPECT_EQ(0, pipeline.frame_offset());
   EXPECT_EQ(0, pipeline.n_frames_buf());
 }
@@ -29,7 +29,7 @@ TEST(PipelineTest, InitialState) {
  * GIVEN a Pipeline `pipeline`, a buffer size `buffer_size`, and a frame offset
  *           `frame_offset_`
  * DO update the pipeline with an uninitialized shared_ptr AND
- * TEST THAT the buffer returned is a nullptr; AND
+ * TEST THAT the data returned is a nullptr; AND
  *           the frame offset is reported correctly; AND
  *           the data size is reported as 0.
  */
@@ -43,7 +43,7 @@ TEST(PipelineTest, UpdateNullptr) {
   uint64_t frame_offset = 4294967296;
   pipeline.Update(buf, frame_offset);
 
-  EXPECT_EQ(0, pipeline.buffer().size());
+  EXPECT_EQ(0, pipeline.data().size());
   EXPECT_EQ(frame_offset, pipeline.frame_offset());
   EXPECT_EQ(0, pipeline.n_frames_buf());
 }

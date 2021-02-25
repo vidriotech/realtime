@@ -3,7 +3,7 @@
 
 template<class T>
 FileReader<T>::FileReader(std::string &filename, Probe &probe)
-    : Reader<T>(probe), file_size_(0) {
+    : Reader<T>(probe), filename_(filename), file_size_(0) {
   set_filename(filename);
 }
 
@@ -80,7 +80,11 @@ uint64_t FileReader<T>::n_frames() const {
 template<class T>
 void FileReader<T>::set_filename(std::string &filename) {
   filename_ = filename;
+  ComputeFileSize();
+}
 
+template<class T>
+void FileReader<T>::ComputeFileSize() {
   FileReader<T>::Open();
 
   // seek to the end to get the size in bytes

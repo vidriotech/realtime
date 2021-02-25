@@ -1,5 +1,4 @@
 #include "feature_extractor.cuh"
-#include "operators.cuh"
 
 /**
  * @brief

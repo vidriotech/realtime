@@ -12,10 +12,19 @@ float utilities::median(thrust::device_vector<float> &data, bool is_sorted) {
     thrust::sort(data.begin(), data.end());
   }
 
+//  // make an iterator for both value and index
+//  thrust::device_vector<int> idx(n);
+//  thrust::sequence(idx.begin(), idx.end());
+//
+//  thrust::transform(data.begin(), data.end(), idx.begin(), data.begin(),
+//                    med_trans(n));
+
+  auto first = n % 2 == 0 ? n / 2 - 1 : n / 2;
+  auto last = n / 2 + 1;
+  med = thrust::reduce(data.begin() + first, data.begin() + last,
+                       0.0f, thrust::plus<float>());
   if (n % 2 == 0) {
-    med = (data[n / 2 - 1] + data[n / 2]) / 2.0;
-  } else {
-    med = data[n / 2];
+    med *= 0.5f;
   }
 
   return med;
@@ -62,7 +71,6 @@ std::vector<std::vector<T>> utilities::part_nearby(std::vector<T> &arr,
 template
 std::vector<std::vector<uint64_t>>
 utilities::part_nearby(std::vector<uint64_t> &arr, uint64_t thresh);
-
 
 template<class T>
 long utilities::argmax(std::vector<T> vec) {

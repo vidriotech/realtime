@@ -13,7 +13,7 @@ void ThresholdComputer<T>::UpdateBuffer(std::vector<T> buf) {
 
 template<class T>
 float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
-  if (is_cached) {
+  if (mad < std::numeric_limits<float>::infinity()) {
     return multiplier * mad / 0.6745;
   }
 
@@ -23,7 +23,7 @@ float ThresholdComputer<T>::ComputeThreshold(float multiplier) {
   thrust::transform(device_data_.begin(), device_data_.end(),
                     device_data_.begin(), abs_dev(med));
 
-  // median absolute deviation from the ComputeMedian (i.e., the MAD)
+  // median absolute deviation from the median (i.e., the MAD)
   mad = utilities::median(device_data_, false);
   is_cached = true;
 
@@ -44,6 +44,12 @@ float ThresholdComputer<T>::ComputeMedian() {
   is_sorted = true;
 
   return med;
+}
+
+template<class T>
+thrust::host_vector<float> ThresholdComputer<T>::data() {
+  thrust::host_vector<float> d(device_data_);
+  return d;
 }
 
 template

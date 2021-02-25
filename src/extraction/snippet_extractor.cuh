@@ -14,7 +14,7 @@ class SnippetExtractor {
       : params_(params), probe_(probe) {};
 
   void
-  Update(std::vector<T> &samples, std::vector<uint8_t> &crossings,
+  Update(thrust::host_vector<T> &samples, thrust::host_vector<uint8_t> &crossings,
          uint64_t frame_offset);
   std::vector<Snippet> ExtractSnippets();
 

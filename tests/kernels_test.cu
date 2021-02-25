@@ -119,7 +119,7 @@ TEST(KernelTest, TestNdiff2Short) {
 }
 
 /*
- * GIVEN a buffer `data_` of int16 and a constant detect `const_thresh`
+ * GIVEN a data `data_` of int16 and a constant detect `const_thresh`
  * TEST THAT values in `data_` which exceed `const_thresh` correspond to true
  *           values in a boolean data `host_crossings_`.
  */
@@ -180,7 +180,7 @@ TEST(KernelTest, FindCrossingsKernelShort) {
 }
 
 /*
-* GIVEN a buffer `data_` of float32 and a constant detect `const_thresh`
+* GIVEN a data `data_` of float32 and a constant detect `const_thresh`
 * TEST THAT values in `data_` which exceed `const_thresh` correspond to true
 *           values in a boolean data `host_crossings_`.
 */

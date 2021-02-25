@@ -7,59 +7,67 @@
  */
 template<class T>
 uint32_t Pipeline<T>::n_frames_buf() const {
-  return buf_.size() / probe_.n_total();
+  return data_.size() / probe_.n_total();
 }
 
 /**
- * @brief Update the data buffer, data size, and frame offset.
+ * @brief Update the data data, data size, and frame offset.
  * @param buf The new data data.
  * @param frame_offset Timestep at the beginning of the new data data.
  */
 template<class T>
 void Pipeline<T>::Update(std::vector<T> buf, uint64_t frame_offset) {
-  buf_ = buf;
+  data_ = buf;
   frame_offset_ = frame_offset;
 }
 
 /**
- * @brief Process the data in the buffer.
+ * @brief Process the data in the data.
  */
 template<class T>
 void Pipeline<T>::Process() {
-  if (buf_.empty()) {
+  if (data_.empty()) {
     return;
   }
 
   // detect crossings
-  detector_.UpdateBuffer(buf_);
+  detector_.UpdateBuffer(data_);
   detector_.Filter();
   detector_.ComputeThresholds();
   detector_.FindCrossings();
   detector_.DedupePeaks();
 
+  data_ = std::move(detector_.data());
+  crossings_ = std::move(detector_.crossings());
+
   // extract snippets
-//  extractor_.Update(detector_.data(), detector_.crossings(), frame_offset_);
+//  extractor_.Update(data_, detector_.crossings(), frame_offset_);
 //  extractor_.MakeSnippets();
 //
-//  // switch to
+//  // cluster extracted snippets or switch to classification task, depending
+//  // on where we are in the recording
 //  auto n_secs = frame_offset_ / probe_.sample_rate();
 //  if (n_secs < params_.classify.n_secs_cluster) {
-//    ProcessClustering(extractor_);
+//    ProcessClustering();
 //  } else {
-//    ProcessClassification(extractor_);
+//    ProcessClassification();
 //  }
-//
-//  auto tid = std::this_thread::get_id();
-//  std::cout << "thread " << tid << " finished processing " << frame_offset_ << std::endl;
+
+  auto tid = std::this_thread::get_id();
+  std::cout << "thread " << tid << " finished processing " << frame_offset_ << std::endl;
+}
+
+/**
+ * @brief Process a clustering: extract features and cluster them.
+ * @param extractor
+ */
+template<class T>
+void Pipeline<T>::ProcessClustering() {
+  extractor_.ExtractFeatures();
 }
 
 template<class T>
-void Pipeline<T>::ProcessClustering(Extractor<T> &extractor) {
-  extractor.ExtractFeatures();
-}
-
-template<class T>
-void Pipeline<T>::ProcessClassification(Extractor<T> &extractor) {
+void Pipeline<T>::ProcessClassification() {
 
 }
 

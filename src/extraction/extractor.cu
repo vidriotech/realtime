@@ -1,11 +1,12 @@
 #include "extractor.cuh"
 
 template<class T>
-void Extractor<T>::Update(std::vector<T> &samples,
-                          std::vector<uint8_t> &crossings,
-                          uint64_t frame_offset) {
-  samples_.assign(samples.begin(), samples.end());
-  crossings_.assign(crossings.begin(), crossings.end());
+void
+Extractor<T>::Update(thrust::host_vector<T> &samples,
+                     thrust::host_vector<uint8_t> &crossings,
+                     uint64_t frame_offset) {
+  samples_ = samples;
+  crossings_ = crossings;
   frame_offset_ = frame_offset;
 }
 

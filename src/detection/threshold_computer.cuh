@@ -15,8 +15,6 @@
 template<class T>
 class ThresholdComputer {
  public:
-  explicit ThresholdComputer(unsigned buf_size) {};
-
   void UpdateBuffer(std::vector<T> buf);
   float ComputeMedian();
   float ComputeThreshold(float multiplier);
@@ -28,11 +26,13 @@ class ThresholdComputer {
    * @return The size of the data.
    */
   [[nodiscard]] uint32_t buffer_size() const { return device_data_.size(); };
+  thrust::host_vector<float> data();
 
  private:
   thrust::device_vector<float> device_data_;
   float med = std::numeric_limits<float>::infinity();
-  float mad = std::numeric_limits<float>::infinity(); /*!< cached median absolute deviation from the ComputeMedian. */
+  float mad =
+      std::numeric_limits<float>::infinity(); /*!< cached median absolute deviation from the ComputeMedian. */
   bool is_sorted = false; /*!< true iff the data is already sorted. */
   bool is_cached = false; /*!< true iff the mad is already computed. */
 };

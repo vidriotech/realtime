@@ -2,11 +2,9 @@
 
 template<class T>
 Detector<T>::Detector(Params &params, Probe &probe)
-    : params_(params), probe_(probe), thr_(probe.n_total()) {
-  auto nf = (int) std::ceil(params_.acquire.n_seconds * probe_.sample_rate());
-
+    : params_(params), probe_(probe), thresholds_(probe.n_total()) {
   for (auto i = 0; i < probe.n_active(); i++) {
-    threshold_computers.push_back(ThresholdComputer<T>(nf));
+    threshold_computers.push_back(ThresholdComputer<T>());
   }
 }
 
@@ -15,9 +13,9 @@ Detector<T>::Detector(Params &params, Probe &probe)
  * @param buf Incoming data, n_total x n_frames_buf, column-major.
  */
 template<class T>
-void Detector<T>::UpdateBuffer(std::vector<T> buf) {
-  host_buffer_.assign(buf.begin(), buf.end());
-  device_buffer_ = host_buffer_;
+void Detector<T>::UpdateBuffer(std::vector<T> &buf) {
+  data_ = std::move(buf);
+  crossings_.resize(data_.size());
 }
 
 /**
@@ -25,20 +23,32 @@ void Detector<T>::UpdateBuffer(std::vector<T> buf) {
  */
 template<class T>
 void Detector<T>::Filter() {
-  if (host_buffer_.empty()) {
+  if (data_.empty()) {
     return;
   }
 
-  thrust::device_vector<T> filtered_values_(host_buffer_.size());
-  auto n_blocks = params_.device.n_blocks(filtered_values_.size());
+  auto n_samples = data_.size();
+  auto n_bytes = n_samples * sizeof(T);
+  auto n_blocks = params_.device.n_blocks(n_samples);
   auto n_threads = params_.device.n_threads;
-  ndiff2<T>(filtered_values_.size(), probe_.n_total(),
-            thrust::raw_pointer_cast(device_buffer_.data()),
-            thrust::raw_pointer_cast(filtered_values_.data()),
-            n_blocks, n_threads);
 
-  host_buffer_ = filtered_values_;
-  device_buffer_.clear(); // free up device memory
+  // allocate device memory and copy raw samples to device
+  T *cu_raw, *cu_filtered;
+
+  cudaMallocManaged(&cu_raw, n_bytes);
+  cudaMallocManaged(&cu_filtered, n_bytes);
+  cudaMemcpy(cu_raw, data_.data(), n_bytes, cudaMemcpyHostToDevice);
+
+  // do the filtering
+  ndiff2<T>(n_samples, probe_.n_total(),
+            cu_raw, cu_filtered, n_blocks, n_threads);
+
+  // copy device memory back to host
+  cudaMemcpy(data_.data(), cu_filtered, n_bytes, cudaMemcpyDeviceToHost);
+
+  // clean up
+  cudaFree(cu_raw);
+  cudaFree(cu_filtered);
 
   UpdateThresholdComputers();
 }
@@ -57,7 +67,7 @@ void Detector<T>::UpdateThresholdComputers() {
     }
 
     for (auto i = 0; i < n_frames(); ++i) {
-      buf.at(i) = host_buffer_[j + i * probe_.n_total()];
+      buf.at(i) = data_[j + i * probe_.n_total()];
     }
 
     threshold_computers[site_idx++].UpdateBuffer(buf);
@@ -75,9 +85,11 @@ void Detector<T>::ComputeThresholds() {
   auto site_idx = 0;
   for (auto i = 0; i < probe_.n_total(); i++) {
     if (!probe_.is_active(i)) {
-      thr_[i] = std::numeric_limits<float>::infinity();
+      thresholds_.at(i) = std::numeric_limits<float>::infinity();
     } else {
-      thr_[i] = threshold_computers[site_idx++].ComputeThreshold(multiplier);
+      thresholds_.at(i) =
+          threshold_computers[site_idx].ComputeThreshold(multiplier);
+      threshold_computers[site_idx++].Clear();
     }
   }
 }
@@ -87,21 +99,35 @@ void Detector<T>::ComputeThresholds() {
  */
 template<class T>
 void Detector<T>::FindCrossings() {
-  device_buffer_ = host_buffer_;
-
-  auto n_blocks = params_.device.n_blocks(device_buffer_.size());
+  auto n_samples = data_.size();
+  auto n_bytes = n_samples * sizeof(T);
+  auto n_blocks = params_.device.n_blocks(n_samples);
   auto n_threads = params_.device.n_threads;
 
-  thrust::device_vector<uint8_t> device_crossings_(device_buffer_.size());
-  thrust::device_vector<float> device_thresholds_(thr_);
+  // allocate device memory and copy thresholds and filtered samples to device
+  T *cu_filtered;
+  uint8_t *cu_crossings;
+  float *cu_thresholds;
 
-  find_crossings<T>(device_buffer_.size(), probe_.n_total(),
-                    thrust::raw_pointer_cast(device_buffer_.data()),
-                    thrust::raw_pointer_cast(device_thresholds_.data()),
-                    thrust::raw_pointer_cast(device_crossings_.data()),
+  cudaMallocManaged(&cu_filtered, n_bytes);
+  cudaMallocManaged(&cu_crossings, n_samples * sizeof(uint8_t));
+  cudaMallocManaged(&cu_thresholds, probe_.n_total() * sizeof(float));
+
+  cudaMemcpy(cu_filtered, data_.data(), n_bytes, cudaMemcpyHostToDevice);
+  cudaMemcpy(cu_thresholds, thresholds_.data(),
+             probe_.n_total() * sizeof(float), cudaMemcpyHostToDevice);
+
+  find_crossings<T>(n_samples, probe_.n_total(),
+                    cu_filtered, cu_thresholds, cu_crossings,
                     n_blocks, n_threads);
 
-  host_crossings_ = device_crossings_;
+  cudaMemcpy(crossings_.data(), cu_crossings, n_samples * sizeof(uint8_t),
+             cudaMemcpyDeviceToHost);
+
+  // clean up
+  cudaFree(cu_filtered);
+  cudaFree(cu_crossings);
+  cudaFree(cu_thresholds);
 }
 
 /**
@@ -136,9 +162,9 @@ void Detector<T>::DedupePeaksTime() {
     for (auto j = 0; j < n_frames(); ++j) {
       auto k = j * probe_.n_total() + i;
 
-      if (host_crossings_[k]) {
+      if (crossings_.at(k)) {
         chan_crossings.push_back(j);
-        host_crossings_[k] = 0; // clear out the crossing at this point
+        crossings_.at(k) = 0; // clear out the crossing at this point
       }
     }
 
@@ -155,7 +181,7 @@ void Detector<T>::DedupePeaksTime() {
       } else {
         std::vector<uint64_t> cross_values;
         for (auto &idx : group) {
-          auto val = host_buffer_[idx * probe_.n_total() + i];
+          auto val = data_[idx * probe_.n_total() + i];
           cross_values.push_back(std::abs(val));
         }
 
@@ -167,7 +193,7 @@ void Detector<T>::DedupePeaksTime() {
     // replace crossings *only* at peak sites
     for (auto &j : chan_offsets) {
       auto k = i + probe_.n_total() * j;
-      host_crossings_[k] = 1;
+      crossings_.at(k) = 1;
     }
   }
 }
@@ -195,7 +221,7 @@ void Detector<T>::DedupePeaksSpace() {
     for (auto frame = 0; frame < n_frames(); ++frame) {
       auto k = frame * probe_.n_total() + chan;
 
-      if (host_crossings_[k]) {
+      if (crossings_.at(k)) {
         peaks.push_back(frame);
       }
     }
@@ -224,21 +250,21 @@ void Detector<T>::DedupePeaksSpace() {
        */
       for (auto &peak : peaks) {
         auto k = chan + peak * probe_.n_total();
-        auto peak_val = std::abs(host_buffer_[k]);
+        auto peak_val = std::abs(data_[k]);
 
         for (auto frame = peak - std::min(peak, time_thresh);
              frame < std::min((uint64_t) n_frames(), peak + time_thresh);
              ++frame) {
           auto k2 = chan2 + frame * probe_.n_total();
-          if (!host_crossings_[k2]) {
+          if (!crossings_.at(k2)) {
             continue;
           }
 
-          auto peak_val2 = std::abs(host_buffer_[k2]);
+          auto peak_val2 = std::abs(data_[k2]);
           if (peak_val >= peak_val2) {
-            host_crossings_[k2] = 0;
+            crossings_.at(k2) = 0;
           } else {
-            host_crossings_[k] = 0;
+            crossings_.at(k) = 0;
             break;
           }
         }
@@ -249,7 +275,7 @@ void Detector<T>::DedupePeaksSpace() {
 
 template<class T>
 unsigned Detector<T>::n_frames() const {
-  return host_buffer_.size() / probe_.n_total();
+  return data_.size() / probe_.n_total();
 }
 
 template

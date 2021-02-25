@@ -7,8 +7,8 @@
  * @param frame_offset New frame offset.
  */
 template<class T>
-void SnippetExtractor<T>::Update(std::vector<T> &samples,
-                                 std::vector<uint8_t> &crossings,
+void SnippetExtractor<T>::Update(thrust::host_vector<T> &samples,
+                                 thrust::host_vector<uint8_t> &crossings,
                                  uint64_t frame_offset) {
   samples_.assign(samples.begin(), samples.end());
   crossings_.assign(crossings.begin(), crossings.end());

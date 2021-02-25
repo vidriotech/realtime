@@ -5,14 +5,6 @@
 #include "../src/acquisition/file_reader.cuh"
 #include "./test_utilities/test_utilities.cuh"
 
-template<class T>
-FileReader<T> make_file_reader() {
-  auto filename = get_env_var("TEST_FILE");
-  auto probe = probe_from_env();
-
-  return FileReader<T>(filename, probe);
-}
-
 /*
  * GIVEN a file name `filename` and Probe `probe_`
  * DO construct a FileReader AND
@@ -22,7 +14,9 @@ FileReader<T> make_file_reader() {
 TEST(FileReaderTest, InitialState) {
   auto filename = get_env_var("TEST_FILE");
   auto n_frames = std::stoi(get_env_var("TEST_NFRAMES"));
-  auto reader = make_file_reader<short>();
+
+  auto probe = probe_from_env();
+  FileReader<short> reader(filename, probe);
 
   EXPECT_EQ(filename, reader.filename());
   EXPECT_EQ(n_frames, reader.n_frames());
@@ -35,7 +29,9 @@ TEST(FileReaderTest, InitialState) {
  *           the data so acquired is equal to the data as read directly.
  */
 TEST(FileReaderTest, AcquireFrames) {
-  auto reader = make_file_reader<short>();
+  auto filename = get_env_var("TEST_FILE");
+  auto probe = probe_from_env();
+  FileReader<short> reader(filename, probe);
 
   auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
   auto n_frames = std::min(5, (int) reader.n_frames()); // try to use 5 frames
@@ -64,7 +60,9 @@ TEST(FileReaderTest, AcquireFrames) {
  *          the end of the file.
 */
 TEST(FileReaderTest, AcquireFramesEOF) {
-  auto reader = make_file_reader<short>();
+  auto filename = get_env_var("TEST_FILE");
+  auto probe = probe_from_env();
+  FileReader<short> reader(filename, probe);
 
   auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
   auto n_frames_desired = std::min(5, (int) reader.n_frames());

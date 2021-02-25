@@ -15,9 +15,7 @@
 template<class T>
 class FileReader : public Reader<T> {
  public:
-  explicit FileReader(Probe &probe)
-      : Reader<T>(probe), file_size_(0) {};
-  explicit FileReader(std::string &filename, Probe &probe);
+  FileReader(std::string &filename, Probe &probe);
   FileReader(FileReader &other)
       : Reader<T>(other.probe_),
         filename_(other.filename_),
@@ -47,10 +45,11 @@ class FileReader : public Reader<T> {
   void Close();
 
  private:
-  std::string filename_;
+  std::string &filename_;
   std::ifstream fp;
-
   uint64_t file_size_ = 0;
+
+  void ComputeFileSize();
 };
 
 #endif //RTS_2_FILE_READER_H

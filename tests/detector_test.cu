@@ -36,7 +36,7 @@ TEST(DetectorTest, DetectThresholds) {
 
   Detector<short> detector(params, probe);
 
-  auto n_frames = detector.n_frames();
+  auto n_frames = params.extract.n_frames(probe.sample_rate());
   auto n_samples = n_frames * probe.n_total();
 
   std::vector<short> data(n_samples);
@@ -63,7 +63,7 @@ TEST(DetectorTest, DetectThresholds) {
   detector.ComputeThresholds();
 
   for (auto i = 0; i < probe.n_active(); ++i) {
-    EXPECT_FLOAT_EQ((i + 1) / 0.6745, detector.thresholds().at(i));
+    EXPECT_FLOAT_EQ((i + 1) / 0.6745, detector.thresholds()[i]);
   }
 
   for (auto i = probe.n_active(); i < probe.n_total(); ++i) {
@@ -115,9 +115,9 @@ TEST(DetectorTest, FindCrossings) {
   // ensure sample at first
   for (auto i = 0; i < n_samples; i++) {
     if (i < probe.n_total() && probe.is_active(i)) {
-      EXPECT_EQ(1, detector.crossings().at(i));
+      EXPECT_EQ(1, detector.crossings()[i]);
     } else {
-      EXPECT_EQ(0, detector.crossings().at(i));
+      EXPECT_EQ(0, detector.crossings()[i]);
     }
   }
 }

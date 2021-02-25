@@ -20,7 +20,7 @@ class Pipeline {
   void Process();
 
   // getters
-  std::vector<T> buffer() const { return buf_; };
+  std::vector<T> &data() { return data_; };
   [[nodiscard]] uint64_t frame_offset() const { return frame_offset_; };
   [[nodiscard]] uint32_t n_frames_buf() const;
 
@@ -28,14 +28,15 @@ class Pipeline {
   Params &params_;
   Probe &probe_;
 
-  std::vector<T> buf_;
+  std::vector<T> data_; /*!< raw (or filtered) data buffer */
+  std::vector<uint8_t> crossings_; /*!< threshold crossings per sample */
   uint64_t frame_offset_ = 0;
 
   Detector<T> detector_;
   Extractor<T> extractor_;
 
-  void ProcessClustering(Extractor<T> &extractor);
-  void ProcessClassification(Extractor<T> &extractor);
+  void ProcessClustering();
+  void ProcessClassification();
 };
 
 #endif //RTS_2_SRC_PIPELINE_H_

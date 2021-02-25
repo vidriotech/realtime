@@ -25,7 +25,7 @@ class Detector {
   Detector(Params &params, Probe &probe);
 
   // detection sub-pipeline
-  void UpdateBuffer(std::vector<T> buf);
+  void UpdateBuffer(std::vector<T> &buf);
   void Filter();
   void UpdateThresholdComputers();
   void ComputeThresholds();
@@ -34,8 +34,8 @@ class Detector {
 
   // getters
   std::vector<T> &data() { return data_; };
-  thrust::host_vector<float> &thresholds() { return thr_; };
-  thrust::host_vector<uint8_t> &crossings() { return host_crossings_; };
+  std::vector<uint8_t> &crossings() { return crossings_; };
+  std::vector<float> &thresholds() { return thresholds_; };
   [[nodiscard]] unsigned n_frames() const;
 
  private:
@@ -44,11 +44,8 @@ class Detector {
   std::vector<ThresholdComputer<T>> threshold_computers;
 
   std::vector<T> data_;
-  thrust::host_vector<uint8_t> host_crossings_;
-  thrust::host_vector<float> thr_;
-
-  thrust::host_vector<T> host_buffer_;
-  thrust::device_vector<T> device_buffer_;
+  std::vector<uint8_t> crossings_;
+  std::vector<float> thresholds_;
 
   void DedupePeaksTime();
   void DedupePeaksSpace();

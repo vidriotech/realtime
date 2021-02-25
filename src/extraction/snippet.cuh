@@ -38,7 +38,7 @@ class Snippet {
   uint64_t frame_offset_ = 0; /*!< global offset of first sample in snippet */
   std::vector<uint32_t> channel_ids_; /*!< ids of channels in snippets */
 
-  std::vector<float> data_; /*!< data buffer, stored in row major order */
+  std::vector<float> data_; /*!< data data, stored in row major order */
 };
 
 #endif //RTS_2_SNIPPET_H
