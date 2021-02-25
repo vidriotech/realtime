@@ -7,7 +7,7 @@
  */
 template<class T>
 uint32_t Pipeline<T>::n_frames_buf() const {
-  return data_.size() / probe_.n_total();
+  return samples_.size() / probe_.n_total();
 }
 
 /**
@@ -16,8 +16,8 @@ uint32_t Pipeline<T>::n_frames_buf() const {
  * @param frame_offset Timestep at the beginning of the new data data.
  */
 template<class T>
-void Pipeline<T>::Update(std::vector<T> buf, uint64_t frame_offset) {
-  data_ = buf;
+void Pipeline<T>::Update(std::vector<T> &buf, uint64_t frame_offset) {
+  samples_ = std::move(buf);
   frame_offset_ = frame_offset;
 }
 
@@ -26,26 +26,23 @@ void Pipeline<T>::Update(std::vector<T> buf, uint64_t frame_offset) {
  */
 template<class T>
 void Pipeline<T>::Process() {
-  if (data_.empty()) {
+  if (samples_.empty()) {
     return;
   }
 
   // detect crossings
-  detector_.UpdateBuffer(data_);
+  detector_.UpdateBuffer(samples_);
   detector_.Filter();
   detector_.ComputeThresholds();
   detector_.FindCrossings();
   detector_.DedupePeaks();
 
-  data_ = std::move(detector_.data());
-  crossings_ = std::move(detector_.crossings());
-
   // extract snippets
-//  extractor_.Update(data_, detector_.crossings(), frame_offset_);
-//  extractor_.MakeSnippets();
-//
-//  // cluster extracted snippets or switch to classification task, depending
-//  // on where we are in the recording
+  extractor_.Update(detector_.data(), detector_.crossings(), frame_offset_);
+  extractor_.MakeSnippets();
+
+  // cluster extracted snippets or switch to classification task, depending
+  // on where we are in the recording
 //  auto n_secs = frame_offset_ / probe_.sample_rate();
 //  if (n_secs < params_.classify.n_secs_cluster) {
 //    ProcessClustering();

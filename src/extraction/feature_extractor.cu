@@ -11,7 +11,7 @@ void FeatureExtractor<T>::Update(std::vector<Snippet> &snippets) {
     return;
   }
 
-  snippets_ = snippets;
+  snippets_ = std::move(snippets);
   n_feats_ = snippets_.at(0).size();
 
   // concatenate snippet values

@@ -7,11 +7,12 @@
  * @param frame_offset New frame offset.
  */
 template<class T>
-void SnippetExtractor<T>::Update(thrust::host_vector<T> &samples,
-                                 thrust::host_vector<uint8_t> &crossings,
-                                 uint64_t frame_offset) {
-  samples_.assign(samples.begin(), samples.end());
-  crossings_.assign(crossings.begin(), crossings.end());
+void
+SnippetExtractor<T>::Update(std::vector<T> &samples,
+                            std::vector<uint8_t> &crossings,
+                            uint64_t frame_offset) {
+  samples_ = std::move(samples);
+  crossings_ = std::move(crossings);
 
   frame_offset_ = frame_offset;
 }
@@ -45,17 +46,19 @@ std::vector<Snippet> SnippetExtractor<T>::ExtractSnippets() {
         }
 
         // found a crossing -- extract snippet in row-major order
-        for (auto & neighbor : neighbors) {
+        for (auto &neighbor : neighbors) {
           auto neighbor_chan_idx = probe_.chan_index(neighbor);
           for (auto f = frame - n_before; f < frame + n_after + 1; ++f) {
             k = f * probe_.n_total() + neighbor_chan_idx;
-            // snippet_buf value is moved
+            // snippet_buf value is moved, no need to explicitly clear
             snippet_buf.push_back(samples_.at(k));
           }
         }
 
         Snippet snippet(snippet_buf, n_frames_snippet);
         snippet.set_channel_ids(neighbors);
+        // TODO: extract spike time, not just frame offset
+        // e.g., frame_offset_ + k
         snippet.set_frame_offset(frame_offset_);
 
         snippets.push_back(snippet);

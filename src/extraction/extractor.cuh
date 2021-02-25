@@ -13,11 +13,11 @@ template<class T>
 class Extractor {
  public:
   Extractor(Params &params, Probe &probe)
-      : params_(params), probe_(probe), snippet_extractor_(params, probe) {};
+      : params_(params), probe_(probe),
+      snippet_extractor_(params, probe), feature_extractor_(params, probe) {};
 
   void
-  Update(thrust::host_vector<T> &samples,
-         thrust::host_vector<uint8_t> &crossings,
+  Update(std::vector<T> &samples, std::vector<uint8_t> &crossings,
          uint64_t frame_offset);
 
   void MakeSnippets();
@@ -27,15 +27,17 @@ class Extractor {
   std::vector<Snippet> snippets() const { return snippets_; };
 
  private:
-  thrust::host_vector<T> samples_;
-  thrust::host_vector<uint8_t> crossings_;
-  uint64_t frame_offset_ = 0;
-
   Params params_;
   Probe probe_;
 
+  std::vector<T> samples_;
+  std::vector<uint8_t> crossings_;
+  uint64_t frame_offset_ = 0;
+
   SnippetExtractor<T> snippet_extractor_;
   std::vector<Snippet> snippets_;
+
+  FeatureExtractor<T> feature_extractor_;
 };
 
 #endif //RTS_2_SRC_EXTRACTION_EXTRACTOR_CUH_

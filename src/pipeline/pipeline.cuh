@@ -13,14 +13,15 @@ template<class T>
 class Pipeline {
  public:
   Pipeline(Params &params, Probe &probe)
-      : params_(params), probe_(probe), detector_(params, probe),
+      : params_(params), probe_(probe),
+        detector_(params, probe),
         extractor_(params, probe) {};
 
-  void Update(std::vector<T> buf, uint64_t frame_offset);
+  void Update(std::vector<T> &buf, uint64_t frame_offset);
   void Process();
 
   // getters
-  std::vector<T> &data() { return data_; };
+  std::vector<T> &data() { return samples_; };
   [[nodiscard]] uint64_t frame_offset() const { return frame_offset_; };
   [[nodiscard]] uint32_t n_frames_buf() const;
 
@@ -28,7 +29,7 @@ class Pipeline {
   Params &params_;
   Probe &probe_;
 
-  std::vector<T> data_; /*!< raw (or filtered) data buffer */
+  std::vector<T> samples_; /*!< raw (or filtered) data buffer */
   std::vector<uint8_t> crossings_; /*!< threshold crossings per sample */
   uint64_t frame_offset_ = 0;
 

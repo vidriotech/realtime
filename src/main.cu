@@ -69,19 +69,44 @@ Probe make_probe(uint32_t n_channels, uint32_t n_active, int32_t n_groups,
   return Probe(make_probe_config(n_channels, n_active, n_groups, srate_hz));
 }
 
-int main() {
-  auto filename = get_env_var("TEST_FILE");
-  auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
-  auto n_active = std::stoi(get_env_var("TEST_NACTIVE"));
-  auto n_groups = std::stoi(get_env_var("TEST_NGROUPS"));
-  auto srate_hz = std::stod(get_env_var("TEST_SRATE_HZ"));
+template<class T>
+void process_serial(Params &params, Probe &probe, FileReader<T> &reader) {
+  auto n_frames_buf = (uint64_t) std::ceil(
+      probe.sample_rate() * params.acquire.n_seconds);
+  auto n_samples_buf = n_frames_buf * probe.n_total();
 
-  Params params;
-  auto probe = make_probe(n_channels, n_active, n_groups, srate_hz);
-  FileReader<short> reader(filename, probe);
+  std::vector<short> buf(n_samples_buf);
+  Pipeline<short> pipeline(params, probe);
 
-  auto n_frames_buf = (uint64_t) std::ceil(params.acquire.n_seconds * srate_hz);
-  auto n_samples_buf = n_frames_buf * n_channels;
+  // start acquiring!
+  auto sleep_time_ms = (int) (params.acquire.n_seconds * 1000);
+  auto tic = std::chrono::high_resolution_clock::now();
+
+  for (uint64_t frame_offset = 0; frame_offset < reader.n_frames();
+       frame_offset += n_frames_buf) {
+    reader.AcquireFrames(buf, frame_offset, n_frames_buf);
+
+    pipeline.Update(buf, frame_offset);
+    pipeline.Process();
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+  }
+
+  // gather stats
+  auto toc = std::chrono::high_resolution_clock::now();
+  auto proc_dur =
+      std::chrono::duration_cast<std::chrono::milliseconds>(toc - tic);
+  auto rec_dur = reader.n_frames() / probe.sample_rate() * 1000;
+
+  auto ratio{proc_dur.count() / rec_dur};
+  std::cout << "processing " << rec_dur << " ms took " << proc_dur.count() <<
+            " ms (" << ratio << " of record time)" << std::endl;
+}
+
+template<class T>
+void process_parallel(Params &params, Probe &probe, FileReader<T> &reader) {
+  auto n_frames_buf = (uint64_t) std::ceil(
+      probe.sample_rate() * params.acquire.n_seconds);
+  auto n_samples_buf = n_frames_buf * probe.n_total();
 
   std::vector<short> buf(n_samples_buf);
 
@@ -89,7 +114,6 @@ int main() {
   auto n_threads = std::max((uint32_t) 1,
                             std::thread::hardware_concurrency() / 3);
   PipelineThreadPool<short> pool(params, probe, n_threads);
-//  Pipeline<short> pipeline(params, probe); // TODO: delete me
 
   // start acquiring!
   auto sleep_time_ms = (int) (params.acquire.n_seconds * 1000);
@@ -99,8 +123,6 @@ int main() {
     reader.AcquireFrames(buf, frame_offset, n_frames_buf);
 
     pool.BlockEnqueueData(buf, frame_offset);
-//    pipeline.Update(buf, frame_offset); // TODO: delete me
-//    pipeline.Process(); // TODO: delete me
     std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
   }
 
@@ -115,10 +137,23 @@ int main() {
   auto proc_dur =
       std::chrono::duration_cast<std::chrono::milliseconds>(toc - tic);
   auto rec_dur = reader.n_frames() / probe.sample_rate() * 1000;
-//  auto rec_dur = n_frames_buf / probe.sample_rate() * 1000;
 
   auto ratio{proc_dur.count() / rec_dur};
-
   std::cout << "processing " << rec_dur << " ms took " << proc_dur.count() <<
             " ms (" << ratio << " of record time)" << std::endl;
+}
+
+int main() {
+  auto filename = get_env_var("TEST_FILE");
+  auto n_channels = std::stoi(get_env_var("TEST_NCHANNELS"));
+  auto n_active = std::stoi(get_env_var("TEST_NACTIVE"));
+  auto n_groups = std::stoi(get_env_var("TEST_NGROUPS"));
+  auto srate_hz = std::stod(get_env_var("TEST_SRATE_HZ"));
+
+  Params params;
+  auto probe = make_probe(n_channels, n_active, n_groups, srate_hz);
+  FileReader<short> reader(filename, probe);
+
+//  process_serial(params, probe, reader);
+  process_parallel(params, probe, reader);
 }

@@ -2,17 +2,15 @@
 
 template<class T>
 void
-Extractor<T>::Update(thrust::host_vector<T> &samples,
-                     thrust::host_vector<uint8_t> &crossings,
+Extractor<T>::Update(std::vector<T> &samples, std::vector<uint8_t> &crossings,
                      uint64_t frame_offset) {
-  samples_ = samples;
-  crossings_ = crossings;
+  samples_ = std::move(samples);
+  crossings_ = std::move(crossings);
   frame_offset_ = frame_offset;
 }
 
 /**
  * @brief
- * @tparam T
  */
 template<class T>
 void Extractor<T>::MakeSnippets() {
@@ -26,10 +24,9 @@ void Extractor<T>::ExtractFeatures() {
     return;
   }
 
-  FeatureExtractor<T> feature_extractor(params_, probe_);
-  feature_extractor.Update(snippets_);
-  feature_extractor.ComputeCovarianceMatrix();
-  feature_extractor.ProjectSnippets();
+  feature_extractor_.Update(snippets_);
+  feature_extractor_.ComputeCovarianceMatrix();
+  feature_extractor_.ProjectSnippets();
 }
 
 template
