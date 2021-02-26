@@ -2,7 +2,7 @@
 
 ## Environment variables
 
-Some tests require a test samples_ file and source the pertinent information from
+Some tests require a test samples file and source the pertinent information from
 environment variables.
 When running tests you should have, at a minimum, the following environment
 variables defined:

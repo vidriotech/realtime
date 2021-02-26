@@ -50,12 +50,13 @@ std::vector<Snippet> SnippetExtractor<T>::ExtractSnippets() {
           auto neighbor_chan_idx = probe_.chan_index(neighbor);
           for (auto f = frame - n_before; f < frame + n_after + 1; ++f) {
             k = f * probe_.n_total() + neighbor_chan_idx;
-            // snippet_buf value is moved, no need to explicitly clear
             snippet_buf.push_back(samples_.at(k));
           }
         }
 
         Snippet snippet(snippet_buf, n_frames_snippet);
+        snippet_buf.clear();
+
         snippet.set_channel_ids(neighbors);
         // TODO: extract spike time, not just frame offset
         // e.g., frame_offset_ + k

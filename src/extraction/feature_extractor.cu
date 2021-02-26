@@ -1,5 +1,18 @@
 #include "feature_extractor.cuh"
 
+template<class T>
+FeatureExtractor<T>::~FeatureExtractor() {
+  if (cu_snippets_ != nullptr) {
+    cudaFree(cu_snippets_);
+    cu_snippets_ = nullptr;
+  }
+
+  if (cu_features_ != nullptr) {
+    cudaFree(cu_features_);
+    cu_features_ = nullptr;
+  }
+}
+
 /**
  * @brief
  * @param snippets
@@ -13,16 +26,25 @@ void FeatureExtractor<T>::Update(std::vector<Snippet> &snippets) {
 
   snippets_ = std::move(snippets);
   n_feats_ = snippets_.at(0).size();
+  auto n_samples = snippets_.size() * n_feats_;
 
-  // concatenate snippet values
-  thrust::host_vector<float> host_snippets_;
-  for (auto i = 0; i < n_obs(); ++i) {
+  // free old device memory if necessary and allocate enough to accommodate
+  // new snippet data
+  if (cu_snippets_ != nullptr)
+    cudaFree(cu_snippets_);
+  cudaMallocManaged(&cu_snippets_, n_samples * sizeof(float));
+
+  // copy snippet data to device
+  std::vector<float> snippet_data(n_samples);
+  for (auto i = 0; i < snippets_.size(); ++i) {
     auto snip = snippets_.at(i).data();
-    host_snippets_.insert(host_snippets_.end(), snip.begin(), snip.end());
+    auto offset = i * n_feats_;
+    auto it = snippet_data.begin() + offset;
+    std::copy(snip.begin(), snip.end(), it);
   }
-
-  // copy host data to device
-  dev_snippets_ = host_snippets_;
+  cudaMemcpy(cu_snippets_, snippet_data.data(), n_samples * sizeof(float),
+             cudaMemcpyHostToDevice);
+  snippet_data.clear();
 }
 
 /**
@@ -34,14 +56,16 @@ void FeatureExtractor<T>::ComputeCovarianceMatrix() {
     return;
   }
 
-//  CenterSnippets();
-  features_.resize(n_feats_ * n_feats_);
+  cudaError_t stat;
 
-  float *snip_ptr = thrust::raw_pointer_cast(dev_snippets_.data());
-  float *cov_ptr = thrust::raw_pointer_cast(features_.data());
+  CenterSnippets();
+  if (cu_features_ != nullptr)
+    cudaFree(cu_features_);
+  stat = cudaMallocManaged(&cu_features_,
+                           n_feats_ * n_feats_ * sizeof(float));
 
-  CovMatrixArgs args{dev_snippets_.size() / n_feats_,
-                     n_feats_, snip_ptr, cov_ptr};
+  CovMatrixArgs args{snippets_.size(), n_feats_,
+                     cu_snippets_, cu_features_};
   make_cov_matrix(args);
 }
 
@@ -49,14 +73,14 @@ template<class T>
 void FeatureExtractor<T>::ProjectSnippets() {
   auto n_pcs = params_.extract.n_pcs;
 
-  MakePVArgs pv_args{n_feats_, n_pcs, features_};
+  MakePVArgs pv_args{n_feats_, n_pcs, cu_features_};
   make_principal_vectors(pv_args);
 
   ProjectOntoPVsArgs project_args{n_pcs,
                                   n_feats_,
                                   n_obs(),
-                                  features_,
-                                  dev_snippets_};
+                                  cu_features_,
+                                  cu_snippets_};
   project_onto_pvs(project_args);
 
   // projected snippets live in features_
@@ -83,12 +107,14 @@ void FeatureExtractor<T>::CenterSnippets() {
     return;
   }
 
-  CenterFeaturesArgs args{dev_snippets_.size() / n_feats_,
-                          n_feats_, dev_snippets_};
-  center_features(args);
-
-  std::vector<float> feats;
-  feats.assign(dev_snippets_.begin(), dev_snippets_.end());
+//  auto n_samples = n_feats_ * snippets_.size();
+//  CenterFeaturesArgs args{snippets_.size(), n_feats_, cu_features_};
+//  center_features(args);
+//
+//  std::vector<float> feats(n_samples);
+//  cudaMemcpy(feats.data(), cu_features_, n_samples * sizeof(float),
+//             cudaMemcpyDeviceToHost);
+//  feats.assign(dev_snippets_.begin(), dev_snippets_.end());
 }
 
 template

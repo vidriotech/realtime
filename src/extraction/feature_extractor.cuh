@@ -16,6 +16,7 @@ class FeatureExtractor {
  public:
   FeatureExtractor(Params &params, Probe &probe)
       : params_(params), probe_(probe) {};
+  ~FeatureExtractor();
 
   void Update(std::vector<Snippet> &snippets);
   void ComputeCovarianceMatrix();
@@ -31,7 +32,8 @@ class FeatureExtractor {
   uint32_t n_feats_ = 0;
 
   std::vector<Snippet> snippets_;
-  thrust::device_vector<float> dev_snippets_;
+  float *cu_snippets_ = nullptr;
+  float *cu_features_ = nullptr;
   thrust::device_vector<float> features_;
 
   void CenterSnippets();

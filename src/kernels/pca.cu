@@ -109,13 +109,14 @@ void make_principal_vectors(MakePVArgs &args) {
   auto lda = args.n_feats; // leading dimension of covariance matrix
   auto n_pcs = args.n_pcs == 0 ? m : std::min(args.n_pcs, m);
 
-  float *eigvecs = thrust::raw_pointer_cast(args.cov_matrix.data());
+//  float *eigvecs = thrust::raw_pointer_cast(args.cov_matrix.data());
+  float *eigvecs = args.cov_matrix;
   float *eigvals = nullptr;
   float *workspace = nullptr;
   auto lwork = 0;
   int *devInfo = nullptr;
 
-  cudaError stat = cudaMalloc(&eigvals, m * sizeof(float));
+  cudaError stat = cudaMallocManaged(&eigvals, m * sizeof(float));
   assert(cudaSuccess == stat);
 
   stat = cudaMalloc(&devInfo, sizeof(int));
@@ -142,10 +143,6 @@ void make_principal_vectors(MakePVArgs &args) {
   assert(CUSOLVER_STATUS_SUCCESS == cusolver_status);
   assert(cudaSuccess == cuda_status);
 
-  // truncate the eigenvector matrix to just the number of desired principal
-  // vectors
-  args.cov_matrix.resize(m * n_pcs);
-
   cudaFree(devInfo);
   cudaFree(eigvals);
   cudaFree(workspace);
@@ -168,8 +165,10 @@ void project_onto_pvs(ProjectOntoPVsArgs &args) {
 
   assert(n_pcs <= n_feats);
 
-  float *pvs = thrust::raw_pointer_cast(args.pvs.data());
-  float *observations = thrust::raw_pointer_cast(args.observations.data());
+//  float *pvs = thrust::raw_pointer_cast(args.pvs.data());
+  float *pvs = args.pvs;
+//  float *observations = thrust::raw_pointer_cast(args.observations.data());
+  float *observations = args.observations;
   float *projections = observations;
 
   auto alpha = 1.0f;

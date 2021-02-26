@@ -25,20 +25,34 @@ struct CovMatrixArgs {
 
 void make_cov_matrix(CovMatrixArgs &args);
 
+//struct MakePVArgs {
+//  unsigned int n_feats; /*!< number of features (columns/rows of cov_matrix) */
+//  unsigned int n_pcs; /*!< desired number of principal vectors */
+//  thrust::device_vector<float> &cov_matrix; /*!< covariance matrix of data */
+//};
+
 struct MakePVArgs {
   unsigned int n_feats; /*!< number of features (columns/rows of cov_matrix) */
   unsigned int n_pcs; /*!< desired number of principal vectors */
-  thrust::device_vector<float> &cov_matrix; /*!< covariance matrix of data */
+  float *cov_matrix; /*!< covariance matrix of data */
 };
 
 void make_principal_vectors(MakePVArgs &args);
+
+//struct ProjectOntoPVsArgs {
+//  unsigned int n_pcs;
+//  unsigned int n_feats;
+//  unsigned int n_obs;
+//  thrust::device_vector<float> &pvs;
+//  thrust::device_vector<float> &observations;
+//};
 
 struct ProjectOntoPVsArgs {
   unsigned int n_pcs;
   unsigned int n_feats;
   unsigned int n_obs;
-  thrust::device_vector<float> &pvs;
-  thrust::device_vector<float> &observations;
+  float *pvs;
+  float *observations;
 };
 
 void project_onto_pvs(ProjectOntoPVsArgs &args);

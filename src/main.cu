@@ -154,6 +154,6 @@ int main() {
   auto probe = make_probe(n_channels, n_active, n_groups, srate_hz);
   FileReader<short> reader(filename, probe);
 
-//  process_serial(params, probe, reader);
-  process_parallel(params, probe, reader);
+  process_serial(params, probe, reader);
+//  process_parallel(params, probe, reader);
 }

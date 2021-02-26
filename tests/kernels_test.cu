@@ -375,7 +375,8 @@ TEST(KernelTest, MakePVs) {
     }
   }
 
-  MakePVArgs args{n_feats, n_feats, mat};
+  MakePVArgs args{n_feats, n_feats,
+                  thrust::raw_pointer_cast(mat.data())};
   make_principal_vectors(args);
 
   // principal vectors are stored in mat in column-major order,
@@ -457,7 +458,9 @@ TEST(KernelTest, ProjectOntoPVs) {
   pvs[13] = -0.3f;
   pvs[14] = 0.0f;
 
-  ProjectOntoPVsArgs args{q, d, N, pvs, obs};
+  ProjectOntoPVsArgs args{q, d, N,
+                          thrust::raw_pointer_cast(pvs.data()),
+                          thrust::raw_pointer_cast(obs.data())};
   project_onto_pvs(args);
 
   EXPECT_LT(std::abs(-1.0 - obs[0]), 1e-5);

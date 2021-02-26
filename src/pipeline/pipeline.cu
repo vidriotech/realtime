@@ -43,12 +43,12 @@ void Pipeline<T>::Process() {
 
   // cluster extracted snippets or switch to classification task, depending
   // on where we are in the recording
-//  auto n_secs = frame_offset_ / probe_.sample_rate();
-//  if (n_secs < params_.classify.n_secs_cluster) {
-//    ProcessClustering();
-//  } else {
-//    ProcessClassification();
-//  }
+  auto n_secs = frame_offset_ / probe_.sample_rate();
+  if (n_secs < params_.classify.n_secs_cluster) {
+    ProcessClustering();
+  } else {
+    ProcessClassification();
+  }
 
   auto tid = std::this_thread::get_id();
   std::cout << "thread " << tid << " finished processing " << frame_offset_ << std::endl;
